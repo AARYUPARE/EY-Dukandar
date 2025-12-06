@@ -1,12 +1,12 @@
-import Navbar from "./Navbar"
 import Sidebar from "./Sidebar"
+import Main from "./Main"
+
 import "../styles/ChatInterface.css"
 
-const ChatInterface = () =>
-{
+const ChatInterface = () => {
     return <div className="container">
         <Sidebar></Sidebar>
-        <Navbar></Navbar>
+        <Main></Main>
     </div>
 }
 

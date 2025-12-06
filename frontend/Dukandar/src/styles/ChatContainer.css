@@ -1,0 +1,7 @@
+.chat-field
+{
+    padding: 15px 20px;
+    min-height: 200px;
+    border: 2px solid red;
+    max-width: 80vw;
+}
