@@ -1,0 +1,11 @@
+#nav-bar
+{
+    width: 100%;
+    flex: 1;
+    min-width: 80vw;
+}
+
+.nav-container
+{
+    width: 100%;
+}
