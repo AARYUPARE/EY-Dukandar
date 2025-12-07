@@ -100,8 +100,8 @@ const productsSlice = createSlice({
         },
         extraDetails: {
           originalPrice: 1000,
-          offers: "",
-          finalPrcice: 500,
+          offers: "50% off",
+          finalPrice: 500,
         },
       },
       {
@@ -117,7 +117,7 @@ const productsSlice = createSlice({
         extraDetails: {
           originalPrice: 1000,
           offers: "",
-          finalPrcice: 500,
+          finalPrice: 500,
         },
       },
       {
@@ -133,7 +133,7 @@ const productsSlice = createSlice({
         extraDetails: {
           originalPrice: 1000,
           offers: "",
-          finalPrcice: 500,
+          finalPrice: 500,
         },
       },
     ],

@@ -1,4 +1,12 @@
 #price-details
 {
     border: 2px solid yellow;
+    padding: 20px;
+    color: white;
+}
+
+#offer-bubble
+{
+    font-size: 2rem;
+    margin-bottom: 10px;
 }
