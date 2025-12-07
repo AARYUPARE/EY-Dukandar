@@ -1,11 +1,29 @@
 import css from "../styles/FullSidebar.module.css"
+import { TbLayoutSidebarLeftCollapseFilled } from "react-icons/tb";
+import { TbHexagonLetterD } from "react-icons/tb"; 
+import {useDispatch} from 'react-redux'
+import {sideBarAction} from "../store/store.js"
 
 const FullSidebar = () => {
+    const dispatch = useDispatch()
+
+    const handleCollapse = () =>
+    {
+        dispatch(sideBarAction.collapse());
+    }
+
     return (
         <div className={css.sidebar} id={css.sidebarWrapper}>
-            <a href="/" className={css.brand}>
-                <span className={css.brandText}>Sidebar</span>
-            </a>
+            
+            <div className={css.brandRow}>
+                <div className={css.logoContainer}>
+                    <TbHexagonLetterD />
+                </div>
+
+                <div className={css.collapseIcon} onClick={handleCollapse}>
+                    <TbLayoutSidebarLeftCollapseFilled />
+                </div>
+            </div>
 
             <ul className={css.navList}>
                 <li>

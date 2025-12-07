@@ -1,25 +1,63 @@
-.message-container
-{
+:root {
+    --accent: #8e24ff;
+    --accent2: #39e6ff;
+    --white: #ffffff;
+    --user-bg: linear-gradient(135deg, #8e24ff 0%, #39e6ff 100%);
+    --bot-bg: rgba(255, 255, 255, 0.08);
+    --bot-border: rgba(255, 255, 255, 0.15);
+}
+
+.message-container {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
+/* USER MESSAGE (RIGHT SIDE, NEON GLOW) */
 .user-message {
-    width: fit-content;
     align-self: flex-end;
-    background: #d1e7ff;
-    padding: 10px 15px;
-    margin: 8px 0;
-    border-radius: 10px;
     max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 14px 14px 4px 14px;
+    color: var(--white);
+    background: var(--user-bg);
+    box-shadow: 
+        0 0 12px rgba(142, 36, 255, 0.4),
+        0 0 24px rgba(57, 230, 255, 0.25);
+    font-size: 0.95rem;
+    margin: 8px 0;
+    animation: pop-in 0.2s ease;
 }
 
+/* BOT MESSAGE (LEFT SIDE, GLASS EFFECT) */
 .robot-message {
-    width: fit-content;
     align-self: flex-start;
-    background: #e8e8e8;
-    padding: 10px 15px;
-    margin: 8px 0;
-    border-radius: 10px;
     max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 14px 14px 14px 4px;
+
+    background: var(--bot-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--bot-border);
+    color: var(--white);
+
+    box-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.05),
+        inset 0 0 8px rgba(255, 255, 255, 0.03);
+
+    font-size: 0.95rem;
+    margin: 8px 0;
+    animation: pop-in 0.2s ease;
+}
+
+/* SMOOTH POP-IN ANIMATION */
+@keyframes pop-in {
+    0% { 
+        transform: scale(0.9); 
+        opacity: 0; 
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
 }

@@ -20,17 +20,22 @@
 
 #sidebarWrapper {
     height: 100vh;
+    max-width: 280px;
 }
 
 .brand {
     text-decoration: none;
     margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.brandText {
+.collapseIcon {
     color: var(--white);
     font-size: 1.25rem;
     font-weight: 600;
+    
 }
 
 .navList {
@@ -81,4 +86,36 @@
 .profileName {
     color: var(--white);
     font-size: 0.95rem;
+}
+
+.brandRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding: 0 4px;
+}
+
+/* LOGO GRADIENT MATCHES NAVBAR BRAND TEXT */
+.logoContainer {
+    font-size: 2rem;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    display: flex;
+    align-items: center;
+}
+
+/* Move collapse icon to right and make clickable */
+.collapseIcon {
+    font-size: 1.5rem;
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.collapseIcon:hover {
+    transform: scale(1.15);
+    color: var(--accent2);
 }

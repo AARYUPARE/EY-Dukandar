@@ -1,25 +1,79 @@
-#product-details
-{
-    border: 2px solid red;
-    grid-row: span 4;
+#product-details {
+    color: white;
+    padding: 20px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+
+    box-shadow: 
+        inset 0 0 15px rgba(142, 36, 255, 0.15),
+        0 0 25px rgba(0,0,0,0.25);
+    grid-row: span 2;
+    display: flex;
+    flex-direction: column;
 }
 
-#product-title
-{
-    color: white;
-    padding: 10px;
-    margin: 5px 40px;
-    border-bottom: 2px solid white;
+#product-title {
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
 }
 
-#product-straigths
-{
-    color: white;
-    padding: 25px;
+#product-title h2 {
+    font-size: 1.7rem;
+    background: linear-gradient(90deg, #8e24ff, #39e6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-#product-description
-{
-    color: white;
-    padding: 25px;
+
+#product-straigths,
+#product-description {
+    margin-top: 20px;
+}
+
+#product-straigths h6,
+#product-description h6 {
+    color: #aee1ff;
+    margin-bottom: 8px;
+}
+
+#product-straigths li {
+    opacity: 0.85;
+    margin-bottom: 5px;
+}
+
+#product-description {
+    margin-top: 20px;
+
+    flex: 2;         
+    overflow-y: auto;
+
+    padding-right: 6px;
+    scroll-behavior: smooth;
+
+    /* Glassy look */
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+/* Beautiful thin neon scrollbar */
+#product-description::-webkit-scrollbar {
+    width: 6px;
+}
+
+#product-description::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+#product-description::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8e24ff, #39e6ff);
+    border-radius: 10px;
+}
+
+#product-description::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a533ff, #50f0ff);
 }

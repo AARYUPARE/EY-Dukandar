@@ -1,12 +1,35 @@
-#price-details
-{
-    border: 2px solid yellow;
-    padding: 20px;
+#price-details {
     color: white;
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px;
+
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 20px rgba(142,36,255,0.2);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
 }
 
-#offer-bubble
-{
-    font-size: 2rem;
-    margin-bottom: 10px;
+#price-details h5 span {
+    color: #8e24ff;
+    font-weight: 600;
+}
+
+#offer-bubble {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+#offer-bubble span {
+    background: linear-gradient(90deg, #8e24ff, #39e6ff);
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(142,36,255,0.5);
 }

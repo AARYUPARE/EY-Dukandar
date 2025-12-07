@@ -1,7 +1,7 @@
 .chat-field {
     padding: 15px 20px;
-    border: 2px solid red;
-    max-height: 82vh;
+    /* border: 2px solid red; */
+    max-height: 78vh;
     min-height: 250px;          
     /* max-width: 80vw; */
     overflow-y: auto;      

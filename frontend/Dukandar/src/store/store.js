@@ -96,7 +96,7 @@ const productsSlice = createSlice({
         details: {
           summary: "Recommended item 1",
           strengths: ["Best Quality", "King"],
-          description: "",
+          description: "A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.",
         },
         extraDetails: {
           originalPrice: 1000,
@@ -151,12 +151,16 @@ const showcaseSlice = createSlice(
 
     initialState:
     {
-      
+
     },
     reducers:
     {
       setShowcase(state, action) {
         return action.payload;
+      },
+
+      clearShowcase(state, action) {
+        return {}
       }
     }
 

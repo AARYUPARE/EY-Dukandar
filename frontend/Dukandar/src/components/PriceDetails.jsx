@@ -5,7 +5,7 @@ const PriceDetails = ({ extraDetails }) => {
         <h5>Original Price: <span style={{ textDecoration: "line-through" }}>{extraDetails.originalPrice}</span>
         </h5>
         <div id={`${css["offer-bubble"]}`}>
-            <span class="badge rounded-pill text-bg-light">{extraDetails.offers}</span>
+            <span className="badge rounded-pill text-bg-light">{extraDetails.offers}</span>
         </div>
         <h5>Final Price: <span >{extraDetails.finalPrice}</span>
         </h5>

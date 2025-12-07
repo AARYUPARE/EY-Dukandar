@@ -1,11 +1,10 @@
 import css from "../styles/ProductDetails.module.css"
 
-const ProductDetails = ({details, title}) =>
-{
+const ProductDetails = ({ details, title }) => {
     return <div id={`${css["product-details"]}`}>
         <div id={`${css["product-title"]}`}>
-        <h2>{title}</h2>
-        <p className="m-0">{details.summary}</p>
+            <h2>{title}</h2>
+            <p className="m-0">{details.summary}</p>
         </div>
         <div id={`${css["product-straigths"]}`}>
             <h6>Strengths: </h6>
@@ -15,6 +14,7 @@ const ProductDetails = ({details, title}) =>
         </div>
         <div id={`${css["product-description"]}`}>
             <h6>Description: </h6>
+            <p id={`${css["product-description-text"]}`}>{details.description}</p>
         </div>
     </div>
 }
