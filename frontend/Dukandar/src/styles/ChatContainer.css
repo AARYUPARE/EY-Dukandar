@@ -3,9 +3,15 @@
     border: 2px solid red;
     max-height: 82vh;
     min-height: 250px;          
-    max-width: 80vw;
+    /* max-width: 80vw; */
     overflow-y: auto;      
     scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
+    flex: 2;
+}
+
+.field-container
+{
+    flex: 2;
 }

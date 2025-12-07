@@ -1,0 +1,10 @@
+.main-container
+{
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    height: 100vh;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 20px 30px;
+}

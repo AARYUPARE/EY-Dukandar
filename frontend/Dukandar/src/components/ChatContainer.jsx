@@ -22,7 +22,7 @@ const ChatContainer = () => {
         
     }
 
-    return <>
+    return <div className="field-container">
         <div className="chat-field">
             {chatSlice.messages.map((m) => {
                 return m.sender == "user" ? <ChatBubble message={m} cls="user-message" key={m.id} /> : m.isLoading ? <Loader key={m.id} /> : <ChatBubble message={m} cls="robot-message" key={m.id} />
@@ -32,7 +32,7 @@ const ChatContainer = () => {
         </div>
 
         <InputBar sendPromt={sendPromt}></InputBar>
-    </>
+    </div>
 }
 
 export default ChatContainer;

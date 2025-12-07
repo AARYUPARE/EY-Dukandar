@@ -1,8 +1,9 @@
 #nav-bar
 {
     width: 100%;
-    flex: 1;
-    min-width: 80vw;
+    flex: 2;
+    flex-grow: 2;
+    min-width: 55vw;
 }
 
 .nav-container

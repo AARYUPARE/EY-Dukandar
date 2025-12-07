@@ -1,35 +1,37 @@
 import { useSelector } from "react-redux";
 import Card from "./Card";
 import { useState } from "react";
+import css from "../styles/CardContainer.module.css"
 
 const CardContainer = () => {
-    const [search, setSearch] = useState("");
-
     const products = useSelector(store => store.products.products);
+
+    if(!products || products.length == 0) return "";
+
+    const [search, setSearch] = useState("");
 
     const filtered = (products).filter((item) =>
         item.title.toLowerCase().includes(search.toLowerCase())
     );
 
-    return <>
-        <div className="container-fluid p-0 m-0">   
+    return <div>
+            <div className={`container-fluid m-0 ${css["main-container"]}`}>
+                <input
+                    className="form-control mb-4"
+                    type="text"
+                    placeholder="Search for items..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
 
-            <input
-                className="form-control mb-4"
-                type="text"
-                placeholder="Search for items..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
+                <div className="d-flex flex-column align-items-start">
+                    {filtered.map((item) => (
+                        <Card title={item.title} imageUrl={item.image} description={item.description} key={item.id} />
+                    ))}
+                </div>
 
-            <div className="d-flex flex-column align-items-start">
-                {filtered.map((item) => (
-                    <Card title={item.title} imageUrl={item.image} description={item.description} key={item.id}/>
-                ))}
-            </div>
-
-        </div>
-    </>
+            </div>   
+    </div>
 }
 
 export default CardContainer;
