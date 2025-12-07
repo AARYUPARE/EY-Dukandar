@@ -1,4 +1,4 @@
-export default function Card({title,imageUrl, description}) 
+export default function Card({title,imageUrl,description}) 
 {
   return (
     <>

@@ -94,7 +94,7 @@ const productsSlice = createSlice({
         image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
         modelUrl: "/models/Shirt2.glb",
         details: {
-          summay: "Recommended item 1",
+          summary: "Recommended item 1",
           strengths: ["Best Quality", "King"],
           extraDetails: [],
           description: "",
@@ -106,7 +106,7 @@ const productsSlice = createSlice({
         image: "https://picsum.photos/300",
         modelUrl: "",
         details: {
-          summay: "Recommended item 2",
+          summary: "Recommended item 2",
           strengths: [],
           extraDetails: [],
           description: "",
@@ -118,7 +118,7 @@ const productsSlice = createSlice({
         image: "https://picsum.photos/310",
         modelUrl: "",
         details: {
-          summay: "Recommended item 3",
+          summary: "Recommended item 3",
           strengths: [],
           extraDetails: [],
           description: "",
@@ -143,7 +143,7 @@ const showcaseSlice = createSlice(
       image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
       modelUrl: "/models/Shirt2.glb",
       details: {
-          summay: "Recommended item 1",
+          summary: "Recommended item 1",
           strengths: ["Best Quality", "King"],
           extraDetails: [],
           description: "",
