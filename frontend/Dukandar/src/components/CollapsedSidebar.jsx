@@ -4,16 +4,23 @@ import { MdDashboard } from "react-icons/md";
 import { BsTable } from "react-icons/bs";
 import { TbGridDots } from "react-icons/tb";
 import { CgProfile } from "react-icons/cg";
+import { RiExpandLeftRightFill } from "react-icons/ri";
+import { sideBarAction } from "../store/store";
+import { useDispatch } from "react-redux";
 
 const CollapsedSidebar = () => {
+const dispatch = useDispatch();
+
+    const handleExpand = () => 
+    {
+        dispatch(sideBarAction.expand());
+    }
+
     return <>
         <div className="d-flex flex-column flex-shrink-0 bg-body-tertiary" id="sidebar">
-            <a href="/" className="d-block p-3 link-body-emphasis text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only">
-                <svg className="bi pe-none" width="40" height="32" aria-hidden="true">
-                    <use xlinkHref="#bootstrap"></use>
-                </svg>
-                <span className="visually-hidden">Icon-only</span>
-            </a>
+            <div href="/" className="d-block p-3 link-body-emphasis text-decoration-none text-center" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only" id="expand-button" onClick={handleExpand}>
+                <RiExpandLeftRightFill />
+            </div>
             <ul className="nav nav-pills nav-flush flex-column mb-auto text-center">
                 <li className="nav-item">
                     <a href="#" className="nav-link active py-3 border-bottom rounded-0" aria-current="page" data-bs-toggle="tooltip" data-bs-placement="right" aria-label="Home" data-bs-original-title="Home">

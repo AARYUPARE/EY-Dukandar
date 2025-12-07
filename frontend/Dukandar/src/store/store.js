@@ -94,10 +94,14 @@ const productsSlice = createSlice({
         image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
         modelUrl: "/models/Shirt2.glb",
         details: {
-          summay: "Recommended item 1",
+          summary: "Recommended item 1",
           strengths: ["Best Quality", "King"],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
       {
@@ -106,10 +110,14 @@ const productsSlice = createSlice({
         image: "https://picsum.photos/300",
         modelUrl: "",
         details: {
-          summay: "Recommended item 2",
+          summary: "Recommended item 2",
           strengths: [],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
       {
@@ -118,17 +126,21 @@ const productsSlice = createSlice({
         image: "https://picsum.photos/310",
         modelUrl: "",
         details: {
-          summay: "Recommended item 3",
+          summary: "Recommended item 3",
           strengths: [],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
     ],
   },
   reducers: {
     addProducts(state, action) {
-      state.products = [...state.products, ...action.payload];
+      state.products = [...state.products, ...action.payload.products];
     },
   },
 });
@@ -136,18 +148,18 @@ const productsSlice = createSlice({
 const showcaseSlice = createSlice(
   {
     name: "Showcase Product",
-    initialState: 
-    { 
+
+    initialState:
+    {
       
     },
     reducers:
     {
-      setShowcase(state, action)
-      {
+      setShowcase(state, action) {
         return action.payload;
-      },
-      
-    },
+      }
+    }
+
   }
 )
 

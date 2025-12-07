@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { IoMdSend } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { sideBarAction } from "../store/store";
+import { productsAction } from "../store/store";
 import "../styles/InputBar.css"
 
 const InputBar = ({ sendPromt }) => {
@@ -14,7 +15,6 @@ const InputBar = ({ sendPromt }) => {
         // Code to send prompt to backend and receive responce
         sendPromt(prompt.current.value);
         prompt.current.value = "";
-        dispatch(sideBarAction.collapse());
     }
 
     return <>

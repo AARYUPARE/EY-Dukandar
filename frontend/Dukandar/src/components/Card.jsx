@@ -1,4 +1,6 @@
+
 export default function Card({ title, imageUrl, description, onClick }) {
+
   return (
     <div
       role="button"
