@@ -1,15 +1,16 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Card from "./Card";
 import { useState } from "react";
+import { sideBarAction } from "../store/store";
 import css from "../styles/CardContainer.module.css"
 
 const CardContainer = () => {
     const products = useSelector(store => store.products.products);
-
+    const dispatch = useDispatch();
+    const [search, setSearch] = useState("");
     if (!products || products.length == 0) return "";
 
-    const [search, setSearch] = useState("");
-
+    dispatch(sideBarAction.collapse());
     const filtered = (products).filter((item) =>
         item.title.toLowerCase().includes(search.toLowerCase())
     );
@@ -29,7 +30,6 @@ const CardContainer = () => {
                     return <Card title={item.title} imageUrl={item.image} description={item.details.summary} key={i} />
                 })}
             </div>
-
         </div>
     </div>
 }

@@ -1,5 +1,6 @@
 import ModelDisplay from "./ModelDisplay";
 import ProductDetails from "./ProductDetails";
+import PriceDetails from "./PriceDetails";
 import { useSelector } from "react-redux"
 import css from "../styles/ProductDisplay.module.css"
 
@@ -12,7 +13,7 @@ const ProductDisplay = () => {
         <div className={`${css["display-container"]}`}>
             <ModelDisplay modelUrl={product.modelUrl}></ModelDisplay>
             <ProductDetails details={product.details} title={product.title}/>
-            <div id={`${css["price-details"]}`}></div>
+            <PriceDetails extraDetails={product.extraDetails}/>
         </div>
     </div>
 }

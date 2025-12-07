@@ -96,8 +96,12 @@ const productsSlice = createSlice({
         details: {
           summary: "Recommended item 1",
           strengths: ["Best Quality", "King"],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
       {
@@ -108,8 +112,12 @@ const productsSlice = createSlice({
         details: {
           summary: "Recommended item 2",
           strengths: [],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
       {
@@ -120,15 +128,19 @@ const productsSlice = createSlice({
         details: {
           summary: "Recommended item 3",
           strengths: [],
-          extraDetails: [],
           description: "",
+        },
+        extraDetails: {
+          originalPrice: 1000,
+          offers: "",
+          finalPrcice: 500,
         },
       },
     ],
   },
   reducers: {
     addProducts(state, action) {
-      state.products = [...state.products, ...action.payload];
+      state.products = [...state.products, ...action.payload.products];
     },
   },
 });
@@ -136,31 +148,27 @@ const productsSlice = createSlice({
 const showcaseSlice = createSlice(
   {
     name: "Showcase Product",
-    initialState: 
-    { 
+    initialState:
+    {
       grn: 1,
       title: "Virat Kohli",
       image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
       modelUrl: "/models/Shirt2.glb",
       details: {
-          summary: "Recommended item 1",
-          strengths: ["Best Quality", "King"],
-          extraDetails: [],
-          description: "",
-        },
+        summary: "Recommended item 1",
+        strengths: ["Best Quality", "King"],
+        description: "",
+      },
+      extraDetails: {
+        originalPrice: 1000,
+        offers: "",
+        finalPrcice: 500,
+      },
     },
     reducers:
     {
-      setGRN(state, action)
-      {
-        for(p in store.products.products)
-        {
-          if(p.grn == action.payload)
-          {
-            state = p;
-            break;
-          }
-        }
+      setShowcase(state, action) {
+        return action.payload;
       }
     }
   }
