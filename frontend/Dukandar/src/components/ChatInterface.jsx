@@ -1,16 +1,15 @@
-import Navbar from "./Navbar"
-import Sidebar from "./Sidebar"
-import "../styles/ChatInterface.css"
+import SidebarContianer from "./SidebarContainer"
+import Main from "./Main"
 import CardContainer from "./CardContainer"
 
-const ChatInterface = () =>
-{
+
+import "../styles/ChatInterface.css"
+
+const ChatInterface = () => {
     return <div className="container">
-        <Sidebar></Sidebar>
-        <div>
-        <Navbar></Navbar>
-        <CardContainer></CardContainer>
-        </div>
+        <SidebarContianer></SidebarContianer>
+        <Main></Main>
+        <CardContainer />
     </div>
 }
 

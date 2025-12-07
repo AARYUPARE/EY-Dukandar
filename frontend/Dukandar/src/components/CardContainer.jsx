@@ -1,31 +1,13 @@
+import { useSelector } from "react-redux";
 import Card from "./Card";
 import { useState } from "react";
 
 const CardContainer = () => {
     const [search, setSearch] = useState("");
 
-    const products = [
-        {
-            id: 1,
-            title: "Virat Kohli",
-            image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
-            description: "Recommended item 1."
-        },
-        {
-            id: 2,
-            title: "Laptop",
-            image: "https://picsum.photos/300",
-            description: "Recommended item 2."
-        },
-        {
-            id: 3,
-            title: "Shoes",
-            image: "https://picsum.photos/310",
-            description: "Recommended item 3."
-        }
-    ];
+    const products = useSelector(store => store.products.products);
 
-    const filtered = products.filter((item) =>
+    const filtered = (products).filter((item) =>
         item.title.toLowerCase().includes(search.toLowerCase())
     );
 
