@@ -1,0 +1,19 @@
+#product-details
+{
+    border: 2px solid red;
+    grid-row: span 4;
+}
+
+#product-title
+{
+    color: white;
+    padding: 10px;
+    margin: 5px 40px;
+    border-bottom: 2px solid white;
+}
+
+#product-straigths
+{
+    color: white;
+    padding: 25px;
+}

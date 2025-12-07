@@ -89,22 +89,40 @@ const productsSlice = createSlice({
   initialState: {
     products: [
       {
-        id: 1,
+        grn: 1,
         title: "Virat Kohli",
         image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
-        description: "Recommended item 1.",
+        modelUrl: "/models/Shirt2.glb",
+        details: {
+          summay: "Recommended item 1",
+          strengths: ["Best Quality", "King"],
+          extraDetails: [],
+          description: "",
+        },
       },
       {
-        id: 2,
+        grn: 2,
         title: "Laptop",
         image: "https://picsum.photos/300",
-        description: "Recommended item 2.",
+        modelUrl: "",
+        details: {
+          summay: "Recommended item 2",
+          strengths: [],
+          extraDetails: [],
+          description: "",
+        },
       },
       {
-        id: 3,
+        grn: 3,
         title: "Shoes",
         image: "https://picsum.photos/310",
-        description: "Recommended item 3.",
+        modelUrl: "",
+        details: {
+          summay: "Recommended item 3",
+          strengths: [],
+          extraDetails: [],
+          description: "",
+        },
       },
     ],
   },
@@ -115,18 +133,34 @@ const productsSlice = createSlice({
   },
 });
 
-const grnSlice = createSlice(
+const showcaseSlice = createSlice(
   {
-    name: "GRN",
+    name: "Showcase Product",
     initialState: 
-    {
-      grn: 100
+    { 
+      grn: 1,
+      title: "Virat Kohli",
+      image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
+      modelUrl: "/models/Shirt2.glb",
+      details: {
+          summay: "Recommended item 1",
+          strengths: ["Best Quality", "King"],
+          extraDetails: [],
+          description: "",
+        },
     },
     reducers:
     {
       setGRN(state, action)
       {
-        state.grn = action.payload;
+        for(p in store.products.products)
+        {
+          if(p.grn == action.payload)
+          {
+            state = p;
+            break;
+          }
+        }
       }
     }
   }
@@ -135,14 +169,14 @@ const grnSlice = createSlice(
 export const chatAction = chatSlice.actions;
 export const sideBarAction = toggleSideSlice.actions;
 export const productsAction = productsSlice.actions;
-export const grnAction = grnSlice.actions;
+export const showcaseAction = showcaseSlice.actions;
 
 const store = configureStore({
   reducer: {
     chat: chatSlice.reducer,
     sideBar: toggleSideSlice.reducer,
     products: productsSlice.reducer,
-    grn: grnSlice.reducer,
+    showcase: showcaseSlice.reducer,
   },
 });
 

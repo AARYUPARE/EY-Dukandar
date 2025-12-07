@@ -25,8 +25,8 @@ const CardContainer = () => {
                 />
 
                 <div className="d-flex flex-column align-items-start">
-                    {filtered.map((item) => (
-                        <Card title={item.title} imageUrl={item.image} description={item.description} key={item.id} />
+                    {filtered.map((item, i) => (
+                        <Card title={item.title} imageUrl={item.image} description={item.description} key={i} />
                     ))}
                 </div>
 

@@ -6,7 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 
-const ModelDisplay = () => {
+const ModelDisplay = ({modelUrl}) => {
     const mountRef = useRef(null);
     const canvasRef = useRef(null);
 
@@ -61,7 +61,7 @@ const ModelDisplay = () => {
         scene.add(ambient);
 
         loader.load(
-            "/models/Shirt2.glb",
+            modelUrl,
             (gltf) => {
                 model = gltf.scene;
 
@@ -84,7 +84,6 @@ const ModelDisplay = () => {
                 camera.lookAt(0, 0, 0);
                 controls.update();
 
-                console.log("Model centered:", model);
             },
             undefined,
             (err) => console.error("GLB Load Error:", err)
@@ -103,12 +102,11 @@ const ModelDisplay = () => {
             frameId = requestAnimationFrame(animate);
 
             if (model) {
-                // model.rotation.y += 0.005; // spin model slowly
+                model.rotation.y += 0.005; // spin model slowly
             }
 
             controls.update();
-            renderer.render(scene, camera);
-            if (model) console.log("Model Loaded:", model);
+            renderer.render(scene, camera);;
         };
 
         animate();

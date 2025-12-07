@@ -21,14 +21,7 @@
 }
 
 
-
-#product-details
-{
-    border: 2px solid red;
-    grid-row: span 4;
-}
-
-#main-info
+#price-details
 {
     border: 2px solid yellow;
 }

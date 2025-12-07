@@ -1,21 +1,18 @@
 import ModelDisplay from "./ModelDisplay";
+import ProductDetails from "./ProductDetails";
 import { useSelector } from "react-redux"
 import css from "../styles/ProductDisplay.module.css"
 
 const ProductDisplay = () => {
-    const grn = useSelector(store => store.grn.grn);
+    const product = useSelector(store => store.showcase);
 
-    if (grn == -1) return null;
-
-    //get product details from backend
-
-
+    if(!product || Object.keys(product).length == 0) return;
 
     return <div className={`${css["background"]}`}>
         <div className={`${css["display-container"]}`}>
-            <ModelDisplay></ModelDisplay>
-            <div id={`${css["product-details"]}`}></div>
-            <div id={`${css["main-info"]}`}></div>
+            <ModelDisplay modelUrl={product.modelUrl}></ModelDisplay>
+            <ProductDetails details={product.details} title={product.title}/>
+            <div id={`${css["price-details"]}`}></div>
         </div>
     </div>
 }
