@@ -1,5 +1,84 @@
-.sidebar
-{
+:root{
+    --accent: #8e24ff;
+    --accent2: #39e6ff;
+    --muted: #98a0b4;
+    --white: #ffffff;
+}
+
+.sidebar {
+    flex:2;
     height: 100vh;
-    min-width: 300px;
+    min-width: 260px;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    backdrop-filter: blur(6px) saturate(120%);
+    border-right: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 0 28px rgba(0,0,0,0.25);
+}
+
+#sidebarWrapper {
+    height: 100vh;
+}
+
+.brand {
+    text-decoration: none;
+    margin-bottom: 16px;
+}
+
+.brandText {
+    color: var(--white);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.navList {
+    list-style: none;
+    padding: 0;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.navItem {
+    padding: 12px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.95rem;
+    transition: 0.25s ease;
+    display: block;
+}
+
+.navItem:hover {
+    background: linear-gradient(90deg, rgba(142,36,255,0.14), rgba(57,230,255,0.07));
+    color: var(--white);
+    transform: translateX(4px);
+}
+
+.active {
+    background: linear-gradient(90deg, rgba(142,36,255,0.2), rgba(57,230,255,0.1));
+    color: var(--white);
+    box-shadow: 0 8px 25px rgba(142,36,255,0.2);
+}
+
+.footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.avatar {
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.08);
+}
+
+.profileName {
+    color: var(--white);
+    font-size: 0.95rem;
 }

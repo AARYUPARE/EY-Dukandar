@@ -1,5 +1,4 @@
-.main-container
-{
+.main-container {
     flex: 1;
     overflow-y: auto;
     scroll-behavior: smooth;
@@ -7,4 +6,13 @@
     box-sizing: border-box;
     margin: 0;
     padding: 20px 30px;
+
+    background: linear-gradient(
+        135deg,
+        #0a0f1f 0%,
+        #0d1224 20%,
+        #131b35 50%,
+        #1b2345 80%,
+        #231a40 100%
+    );
 }

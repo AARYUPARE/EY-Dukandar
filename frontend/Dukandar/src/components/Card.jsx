@@ -1,4 +1,4 @@
-
+import "../styles/Card.css"
 export default function Card({ title, imageUrl, description, onClick }) {
 
   return (
@@ -8,7 +8,8 @@ export default function Card({ title, imageUrl, description, onClick }) {
       onClick={onClick}
       onKeyDown={(e) => e.key === "Enter" && onClick()}
       className="card mb-3"
-      style={{ width: "18rem", height: "28rem", cursor: "pointer" }}
+      style={{  }}
+      id="card-container"
     >
       <img
         src={imageUrl}
@@ -20,16 +21,7 @@ export default function Card({ title, imageUrl, description, onClick }) {
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
         <p className="card-text">{description}</p>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-        >
-          View
-        </button>
+        
       </div>
     </div>
   );
