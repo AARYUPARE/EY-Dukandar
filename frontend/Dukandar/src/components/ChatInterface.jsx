@@ -1,11 +1,11 @@
-import Sidebar from "./Sidebar"
+import SidebarContianer from "./SidebarContainer"
 import Main from "./Main"
 
 import "../styles/ChatInterface.css"
 
 const ChatInterface = () => {
     return <div className="container">
-        <Sidebar></Sidebar>
+        <SidebarContianer></SidebarContianer>
         <Main></Main>
     </div>
 }

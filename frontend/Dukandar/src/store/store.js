@@ -5,7 +5,6 @@ export const sendMessageAsync = createAsyncThunk(
     "chat/sendMessage",
     async ({ prompt }, { dispatch, getState }) => {
 
-        console.log("Async Call")
         const loaderId = Date.now() + "-loader";
 
         // Add user message
@@ -25,7 +24,6 @@ export const sendMessageAsync = createAsyncThunk(
 
         // Backend call
         // const res = await axios.post("http://localhost:5000/chat", { prompt });
-        console.log("Waiting")
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         // 🔥 Fake response (always same, or echo)
@@ -59,17 +57,56 @@ const chatSlice = createSlice(
                     msg.text = action.payload.text;
                     msg.isLoading = false;
                 }
+            },
+        }
+    }
+)
+
+const toggleSideSlice = createSlice({
+    name: "toggleSide",
+    initialState:
+    {
+        sideBar : "full"
+    },
+    reducers:
+    {
+        expand(state, action)
+        {
+            state.sideBar = "full"
+        },
+
+        collapse(state, action)
+        {
+            state.sideBar = "collapse"
+        }
+    }
+})
+
+const products = createSlice(
+    {
+        name: "products",
+        initialState: 
+        {
+            products: []
+        },
+        reducers:
+        {
+            addProducts(state, action)
+            {
+                state.products = [...state.products, ...action.payload]
             }
         }
     }
 )
 
 export const chatAction = chatSlice.actions;
+export const sideBarAction = toggleSideSlice.actions;
 
 const store = configureStore({
     reducer:
     {
-        chat: chatSlice.reducer
+        chat: chatSlice.reducer,
+        sideBar: toggleSideSlice.reducer
     }
 })
 
