@@ -1,0 +1,5 @@
+#model-display
+{
+    border: 2px solid blue;
+    grid-row: span 3;
+}

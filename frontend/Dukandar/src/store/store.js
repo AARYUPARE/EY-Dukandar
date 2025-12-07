@@ -115,15 +115,34 @@ const productsSlice = createSlice({
   },
 });
 
+const grnSlice = createSlice(
+  {
+    name: "GRN",
+    initialState: 
+    {
+      grn: 100
+    },
+    reducers:
+    {
+      setGRN(state, action)
+      {
+        state.grn = action.payload;
+      }
+    }
+  }
+)
+
 export const chatAction = chatSlice.actions;
 export const sideBarAction = toggleSideSlice.actions;
 export const productsAction = productsSlice.actions;
+export const grnAction = grnSlice.actions;
 
 const store = configureStore({
   reducer: {
     chat: chatSlice.reducer,
     sideBar: toggleSideSlice.reducer,
     products: productsSlice.reducer,
+    grn: grnSlice.reducer,
   },
 });
 
