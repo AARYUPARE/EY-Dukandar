@@ -138,31 +138,16 @@ const showcaseSlice = createSlice(
     name: "Showcase Product",
     initialState: 
     { 
-      grn: 1,
-      title: "Virat Kohli",
-      image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
-      modelUrl: "/models/Shirt2.glb",
-      details: {
-          summay: "Recommended item 1",
-          strengths: ["Best Quality", "King"],
-          extraDetails: [],
-          description: "",
-        },
+      
     },
     reducers:
     {
-      setGRN(state, action)
+      setShowcase(state, action)
       {
-        for(p in store.products.products)
-        {
-          if(p.grn == action.payload)
-          {
-            state = p;
-            break;
-          }
-        }
-      }
-    }
+        return action.payload;
+      },
+      
+    },
   }
 )
 
