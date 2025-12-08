@@ -4,6 +4,8 @@
     width: 18rem;
     height: fit-content;
     cursor: pointer;
+    display: inline-block;
+    min-width: 250px;
 
     background: linear-gradient(
         135deg,

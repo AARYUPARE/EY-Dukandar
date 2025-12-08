@@ -1,6 +1,7 @@
 .main-container {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     scroll-behavior: smooth;
     height: 100vh;
     box-sizing: border-box;
@@ -16,3 +17,11 @@
         #231a40 100%
     );
 }
+
+#card-list {
+    display: flex;
+    flex-wrap: wrap;              /* allow cards to move to next row */
+    gap: 20px;                    /* spacing between cards */
+    justify-content: flex-start;  /* align cards to the left */
+}
+

@@ -1,0 +1,36 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
+    overflow: hidden;
+
+    background: linear-gradient(145deg, rgba(20,20,30,0.7), rgba(10,10,20,0.9));
+}
+
+/* LEFT HALF */
+.left {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    border-right: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    min-width: 50vw;
+}
+
+/* RIGHT HALF */
+.right {
+    display: flex;
+    flex-direction: column;
+
+    background: rgba(255,255,255,0.02);
+    backdrop-filter: blur(14px);
+    border-left: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Add smooth scroll inside both panels */
+.left, 
+.right {
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}

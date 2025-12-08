@@ -29,7 +29,7 @@ const CardContainer = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-                <div className="d-flex flex-column align-items-start">
+                <div className="d-flex  align-items-start" id={`${css["card-list"]}`}>
                     {filtered.map((item, i) => (
                         <Card
                             key={item.grn ?? i}
