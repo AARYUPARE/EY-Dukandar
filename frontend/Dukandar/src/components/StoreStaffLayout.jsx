@@ -1,10 +1,12 @@
 import SidebarContainer from "./SidebarContainer";
+import StoreStaffSidebar from "./StoreStaffSideBar";
 import DashboardMain from "./DashboardMain";
 
 const StoreStaffLayout = () => {
     return (
         <div className="container">
-            <SidebarContainer />
+            <StoreStaffSidebar />
+            {/* <Navbar />  */}
             <DashboardMain />
         </div>
     );

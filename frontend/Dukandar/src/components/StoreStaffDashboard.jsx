@@ -1,13 +1,21 @@
 import css from "../styles/StoreStaffDashboard.module.css";
+import { useNavigate } from "react-router-dom";
 import { FaPlusCircle, FaClipboardList, FaTruckLoading, FaCashRegister } from "react-icons/fa";
 
-const StoreStaffDashboard = ({ onAction }) => {
+const StoreStaffDashboard = () => {
   const actions = [
-    { id: "add-stock", title: "Add Stock", icon: <FaPlusCircle /> },
-    { id: "check-stock", title: "Check Stock", icon: <FaClipboardList /> },
-    { id: "send-order", title: "Send Order to Company", icon: <FaTruckLoading /> },
-    { id: "sale-product", title: "Sale Product", icon: <FaCashRegister /> }
-  ];
+        { id: "add-stock", title: "Add Stock", icon: <FaPlusCircle /> },
+        { id: "check-stock", title: "Check Stock", icon: <FaClipboardList /> },
+        { id: "send-order", title: "Send Order to Company", icon: <FaTruckLoading /> },
+        { id: "sale-product", title: "Sale Product", icon: <FaCashRegister /> }
+      ];
+  
+    const navigate = useNavigate();
+  
+    const onAction = (id) =>
+    {
+      navigate(id)
+    }
 
   return (
     <div className={css.wrapper}>

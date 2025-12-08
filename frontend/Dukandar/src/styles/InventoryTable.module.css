@@ -8,6 +8,15 @@
   --radius: 12px;
 }
 
+.table-container
+{
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
 .wrapper{
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border: 1px solid var(--panel-border);
@@ -158,3 +167,20 @@
   .table{ min-width: 620px; }
   .search{ min-width: 180px; }
 }
+
+.backBtn {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  color: var(--white);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.backBtn:hover {
+  transform: scale(1.1);
+  color: var(--accent2);
+}
+

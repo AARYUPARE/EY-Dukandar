@@ -1,5 +1,4 @@
 .main-container {
-    /* flex: 1; */
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
@@ -22,7 +21,6 @@
     display: flex;
     flex-wrap: wrap;              /* allow cards to move to next row */
     gap: 20px;                    /* spacing between cards */
-    justify-content: flex-start; 
-    flex-direction: column; /* align cards to the left */
+    justify-content: flex-start;  /* align cards to the left */
 }
 

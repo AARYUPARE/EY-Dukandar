@@ -145,6 +145,39 @@ const productsSlice = createSlice({
   },
 });
 
+const storeOffersSlice = createSlice(
+  {
+    name: "storeOffers",
+    initialState: {
+        list: [
+            {
+                grn: 1,
+                title: "Buy 1 Get 1 Free - Men's Shirts",
+                image: "https://www.pixelstalk.net/wp-content/uploads/2016/07/Wallpapers-pexels-photo.jpg",
+                modelUrl: "",
+                details: {
+                    summary: "BOGO Offer",
+                    strengths: ["Limited Stock", "In-store Only"],
+                    description: "Buy 1 shirt and get another free.",
+                }
+            },
+            {
+                grn: 2,
+                title: "Flat ₹500 off on Shoes",
+                image: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
+                modelUrl: "",
+                details: {
+                    summary: "Festival Discount",
+                    strengths: ["Best Price", "Exclusive"],
+                    description: "Valid only for offline customers.",
+                }
+            },
+        ],
+    },
+    reducers: {}
+  }
+)
+
 const showcaseSlice = createSlice(
   {
     name: "Showcase Product",
@@ -171,6 +204,7 @@ export const chatAction = chatSlice.actions;
 export const sideBarAction = toggleSideSlice.actions;
 export const productsAction = productsSlice.actions;
 export const showcaseAction = showcaseSlice.actions;
+export const storeOffersAction = storeOffersSlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -178,6 +212,7 @@ const store = configureStore({
     sideBar: toggleSideSlice.reducer,
     products: productsSlice.reducer,
     showcase: showcaseSlice.reducer,
+    offers: storeOffersSlice.reducer,
   },
 });
 

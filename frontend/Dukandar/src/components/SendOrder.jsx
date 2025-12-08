@@ -1,7 +1,16 @@
 import { useState, useMemo } from "react";
 import "../styles/SendOrder.css";
+import { IoArrowBackCircle } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
-export default function SendOrder() {
+export default function SendOrder({  }) {
+const navigate = useNavigate()
+
+  const onBack = () => 
+  {
+    navigate("../")
+  }
+  
   const [form, setForm] = useState({
     company: "",
     contact: "",
@@ -18,7 +27,7 @@ export default function SendOrder() {
     { grn: "GRN599", title: "Headset", quantity: 0, specs: "Mic, 3.5mm" }
   ];
 
-  const exhausted = useMemo(() => sampleInventory.filter(i => i.quantity <= 0 || i.quantity === 1), []);
+  const exhausted = useMemo(() => sampleInventory.filter(i => i.quantity <= 1), []);
 
   const [selected, setSelected] = useState({});
   const [sentOrders, setSentOrders] = useState([]);
@@ -44,60 +53,73 @@ export default function SendOrder() {
   function sendSelected() {
     const toSend = exhausted.filter(it => selected[it.grn]);
     if (toSend.length === 0) return;
+
     const payload = {
       company: form.company,
       contact: form.contact,
       note: form.note,
       items: toSend
     };
+
     setSentOrders(s => [payload, ...s]);
     clearSelection();
     setForm({ company: "", contact: "", note: "", item: "", quantity: "" });
   }
 
   return (
-    <div className="container-fluid p-3 send-order-root">
+    <div className="container-fluid p-12 send-order-root">
+
+      {/* 🔙 Back Button */}
+      <button className="back-btn" onClick={onBack}>
+        <IoArrowBackCircle size={42} />
+      </button>
+
       <div className="row g-3">
+
+        {/* LEFT PANEL — Send Order Form */}
         <div className="col-12 col-md-6">
           <div className="card panel">
             <div className="card-body">
-              <h4 className="card-title">Send Order to Company</h4>
+              <h4 className="card-title neon-title">Send Order to Company</h4>
 
+              {/* form fields */}
               <div className="mb-3">
                 <label className="form-label">Company name</label>
-                <input className="form-control" value={form.company} onChange={e => updateField("company", e.target.value)} placeholder="Company name" />
+                <input className="form-control neon-input" value={form.company} onChange={e => updateField("company", e.target.value)} placeholder="Company name" />
               </div>
 
               <div className="mb-3">
                 <label className="form-label">Contact / Phone</label>
-                <input className="form-control" value={form.contact} onChange={e => updateField("contact", e.target.value)} placeholder="Contact details" />
+                <input className="form-control neon-input" value={form.contact} onChange={e => updateField("contact", e.target.value)} placeholder="Contact details" />
               </div>
 
               <div className="mb-3 row g-2">
                 <div className="col">
                   <label className="form-label">Item (optional)</label>
-                  <input className="form-control" value={form.item} onChange={e => updateField("item", e.target.value)} placeholder="Item name" />
+                  <input className="form-control neon-input" value={form.item} onChange={e => updateField("item", e.target.value)} placeholder="Item name" />
                 </div>
                 <div className="col-4">
                   <label className="form-label">Quantity</label>
-                  <input type="number" min="0" className="form-control" value={form.quantity} onChange={e => updateField("quantity", e.target.value)} placeholder="Qty" />
+                  <input type="number" min="0" className="form-control neon-input" value={form.quantity} onChange={e => updateField("quantity", e.target.value)} placeholder="Qty" />
                 </div>
               </div>
 
               <div className="mb-3">
                 <label className="form-label">Note</label>
-                <textarea className="form-control" rows="3" value={form.note} onChange={e => updateField("note", e.target.value)} placeholder="Optional message to supplier" />
+                <textarea className="form-control neon-input" rows="3" value={form.note} onChange={e => updateField("note", e.target.value)} placeholder="Optional message" />
               </div>
 
+              {/* buttons */}
               <div className="d-flex gap-2">
-                <button type="button" className="btn btn-outline-light" onClick={selectAll}>Select all exhausted</button>
-                <button type="button" className="btn btn-outline-secondary" onClick={clearSelection}>Clear</button>
-                <button type="button" className="btn btn-primary ms-auto" onClick={sendSelected}>Send Selected</button>
+                <button type="button" className="btn ghost-btn" onClick={selectAll}>Select all exhausted</button>
+                <button type="button" className="btn ghost-grey" onClick={clearSelection}>Clear</button>
+                <button type="button" className="btn neon-btn ms-auto" onClick={sendSelected}>Send Selected</button>
               </div>
 
+              {/* recent orders */}
               {sentOrders.length > 0 && (
                 <div className="mt-3">
-                  <div className="small text-muted">Recent orders (frontend only)</div>
+                  <div className="small text-muted">Recent orders</div>
                   <ul className="list-unstyled recent-orders">
                     {sentOrders.map((o, idx) => (
                       <li key={idx} className="order-item">
@@ -107,27 +129,28 @@ export default function SendOrder() {
                   </ul>
                 </div>
               )}
-
             </div>
           </div>
         </div>
 
+        {/* RIGHT PANEL — Exhausted Table */}
         <div className="col-12 col-md-6">
           <div className="card panel">
             <div className="card-body">
-              <h4 className="card-title">Exhausted Items</h4>
+              <h4 className="card-title neon-title">Exhausted Items</h4>
 
               <div className="table-responsive">
-                <table className="table table-borderless table-hover align-middle">
+                <table className="table table-borderless table-hover align-middle neon-table">
                   <thead>
                     <tr>
-                      <th scope="col"><input type="checkbox" onChange={e => e.target.checked ? selectAll() : clearSelection()} /></th>
-                      <th scope="col">GRN</th>
-                      <th scope="col">Item</th>
-                      <th scope="col">Quantity</th>
-                      <th scope="col">Specs</th>
+                      <th><input type="checkbox" onChange={e => e.target.checked ? selectAll() : clearSelection()} /></th>
+                      <th>GRN</th>
+                      <th>Item</th>
+                      <th>Qty</th>
+                      <th>Specs</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {exhausted.map(it => (
                       <tr key={it.grn} className={selected[it.grn] ? "table-selected" : ""}>
@@ -135,17 +158,19 @@ export default function SendOrder() {
                         <td>{it.grn}</td>
                         <td>{it.title}</td>
                         <td className={it.quantity <= 0 ? "text-danger" : ""}>{it.quantity}</td>
-                        <td className="text-muted">{it.specs}</td>
+                        <td >{it.specs}</td>
                       </tr>
                     ))}
                   </tbody>
+
                 </table>
               </div>
 
-              <div className="mt-3 small text-muted">Rows are frontend-only sample data. Integrate with inventory state when ready.</div>
+              
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

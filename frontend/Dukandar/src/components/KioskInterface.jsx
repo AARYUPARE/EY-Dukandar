@@ -1,9 +1,11 @@
 import SidebarContainer from "./SidebarContainer";
 import ChatContainer from "./ChatContainer";
-import CardContainer from "./CardContainer";
+// import CardContainer from "./CardContainer";
+import OffersContainer from "./OfferContainer";
 import Navbar from "./Navbar";
 
 import css from "../styles/KioskInterface.module.css";
+import { Outlet } from "react-router-dom";
 
 const KioskInterface = () => {
     return (
@@ -11,12 +13,12 @@ const KioskInterface = () => {
             {/* LEFT SIDE - Cards */}
             <div className={css.left}>
                 <Navbar />
-                <CardContainer />
+                <OffersContainer />
             </div>
 
             {/* RIGHT SIDE - Chat */}
             <div className={css.right}>
-                <ChatContainer />
+                <Outlet />
             </div>
         </div>
     );

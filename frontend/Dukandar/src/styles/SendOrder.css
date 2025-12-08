@@ -1,25 +1,152 @@
 .send-order-root {
-  color: #ffffff;
+  color: var(--white);
+  position: relative;
+  padding-top: 60px;
 }
 
+/* 🔙 Back Button */
+.back-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  transition: 0.25s ease;
+  z-index: 10;
+}
+
+.back-btn:hover {
+  transform: scale(1.12);
+  color: var(--accent2);
+}
+
+/* Panels (glassmorphic) */
 .panel {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.04);
-  box-shadow: 0 12px 30px rgba(2,6,23,0.6);
-  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.45),
+              0 0 25px rgba(142,36,255,0.15);
 }
 
-.card-title {
-  margin-bottom: 14px;
-  color: #ffffff;
+/* Neon Titles */
+.neon-title {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Inputs */
+.neon-input {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: var(--white);
+  border-radius: 10px;
+}
+
+.neon-input:focus {
+  border-color: var(--accent2) !important;
+  box-shadow: 0 0 18px rgba(57,230,255,0.25);
+}
+
+/* Neon Buttons */
+.neon-btn {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(142,36,255,0.4);
+}
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  border-radius: 10px;
+}
+
+.ghost-grey {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #b3b3b3;
+  border-radius: 10px;
+}
+
+/* Table Styling */
+.neon-table tbody tr:hover {
+  background: rgba(142,36,255,0.07);
 }
 
 .table-selected {
-  background: linear-gradient(90deg, rgba(142,36,255,0.05), rgba(57,230,255,0.03));
+  background: rgba(57,230,255,0.1);
 }
 
-.recent-orders .order-item {
+/* Orders List */
+.order-item {
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(255,255,255,0.03);
-  font-size: 0.95rem;
+  border-bottom: 1px dashed rgba(255,255,255,0.1);
 }
+
+.glow-note {
+  opacity: 0.7;
+  text-shadow: 0 0 8px rgba(57,230,255,0.3);
+}
+
+/* FORCE all labels in this page to be white */
+.send-order-root label,
+.send-order-root .form-label {
+  color: var(--white) !important;
+}
+
+/* Make ALL input & textarea text white */
+.send-order-root input,
+.send-order-root textarea,
+.send-order-root select {
+  color: var(--white) !important;
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+}
+
+/* Placeholder text neon faint */
+.send-order-root input::placeholder,
+.send-order-root textarea::placeholder {
+  color: rgba(200, 220, 255, 0.5) !important;
+}
+
+/* Focus glow */
+.send-order-root input:focus,
+.send-order-root textarea:focus {
+  border-color: var(--accent2) !important;
+  box-shadow: 0 0 10px rgba(57, 230, 255, 0.45) !important;
+}
+
+/* Fix black text inside Bootstrap .card-title */
+.send-order-root .card-title {
+  color: var(--white) !important;
+}
+
+/* Fix recent orders text color */
+.send-order-root .recent-orders,
+.send-order-root .recent-orders .order-item,
+.send-order-root .text-muted {
+  color: rgba(220, 230, 255, 0.75) !important;  /* soft neon white */
+}
+
+/* Hover effect for recent orders */
+.send-order-root .recent-orders .order-item:hover {
+  color: var(--white) !important;
+  transform: translateX(4px);
+  transition: 0.25s ease;
+}
+
+/* Specifically style specs column */
+.send-order-root td.specs,
+.send-order-root .specs {
+  color: rgba(66, 115, 180, 0.88) 
+}
+
+

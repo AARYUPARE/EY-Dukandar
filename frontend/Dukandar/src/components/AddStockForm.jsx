@@ -1,100 +1,112 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import css from "../styles/AddStockForm.module.css";
+import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
-export default function AddStockForm({ onAdd, onDone }) {
-  const [form, setForm] = useState({
-    grn: "",
-    title: "",
-    quantity: "",
-    price: "",
-    specifications: ""
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+export default function AddStockSheet({ onSubmit }) {
 
-  function update(field, value) {
-    setForm((s) => ({ ...s, [field]: value }));
-    setError("");
-    setSuccess("");
+  const navigate = useNavigate();
+  const productList = useSelector((store) => store.products.products);
+
+  const [rows, setRows] = useState([
+    { grn: "", title: "", quantity: "" }
+  ]);
+
+  function updateRow(index, field, value) {
+    const newRows = [...rows];
+    newRows[index][field] = value;
+
+    if (field === "grn") {
+      const found = productList.find((p) => String(p.grn) === String(value));
+      newRows[index].title = found ? found.title : "";
+    }
+
+    setRows(newRows);
   }
 
-  function validate() {
-    if (!String(form.grn).trim()) return "GRN is required";
-    if (!String(form.title).trim()) return "Item name is required";
-    if (!/^\d+$/.test(String(form.quantity).trim())) return "Quantity must be an integer";
-    if (!/^\d+(\.\d{1,2})?$/.test(String(form.price).trim())) return "Price must be a number (up to 2 decimals)";
-    return "";
+  function addRow() {
+    setRows([...rows, { grn: "", title: "", quantity: "" }]);
   }
 
-  async function handleSubmit(e) {
+  function removeRow(index) {
+    if (rows.length === 1) return;
+    setRows(rows.filter((_, i) => i !== index));
+  }
+
+  function handleSubmit(e) {
     e.preventDefault();
-    const v = validate();
-    if (v) {
-      setError(v);
-      return;
-    }
-    setLoading(true);
-    setError("");
-    const payload = {
-      grn: isNaN(Number(form.grn)) ? form.grn : Number(form.grn),
-      title: form.title.trim(),
-      quantity: Number(form.quantity),
-      price: Number(form.price),
-      specifications: form.specifications.trim()
-    };
+    if (onSubmit) onSubmit(rows);
+  }
 
-    try {
-      const result = onAdd ? onAdd(payload) : null;
-      if (result && typeof result.then === "function") await result;
-      setSuccess("Item added");
-      setForm({ grn: "", title: "", quantity: "", price: "", specifications: "" });
-      if (typeof onDone === "function") onDone(payload);
-    } catch (err) {
-      setError(err?.message || "Failed to add item");
-    } finally {
-      setLoading(false);
-    }
+  const onBack = () =>
+  {
+    navigate("../")
   }
 
   return (
-    <form className={css.form} onSubmit={handleSubmit}>
-      <h3 className={css.title}>Add Stock</h3>
+    <div className={css.wrapper}>
 
-      <div className={css.row}>
-        <label>GRN</label>
-        <input value={form.grn} onChange={(e) => update("grn", e.target.value)} placeholder="e.g. 101" />
+      {/* --- Back Button --- */}
+      <button className={css.backBtn} onClick={onBack}>
+        <IoArrowBackCircle size={32} />
+      </button>
+
+      <div className={css.panel}>
+        <h2 className={css.title}>Add Stock (Excel Style)</h2>
+
+        <form onSubmit={handleSubmit}>
+
+          <div className={css.tableHeader}>
+            <span>GRN</span>
+            <span>Item Name</span>
+            <span>Quantity</span>
+            <span>Action</span>
+          </div>
+
+          {rows.map((row, i) => (
+            <div key={i} className={css.tableRow}>
+
+              <input
+                className={css.input}
+                placeholder="Enter GRN"
+                value={row.grn}
+                onChange={(e) => updateRow(i, "grn", e.target.value)}
+              />
+
+              <input
+                className={css.input}
+                value={row.title}
+                disabled
+                placeholder="Auto-filled"
+              />
+
+              <input
+                className={css.input}
+                placeholder="Qty"
+                value={row.quantity}
+                onChange={(e) => updateRow(i, "quantity", e.target.value)}
+              />
+
+              <button type="button" className={css.deleteBtn} onClick={() => removeRow(i)}>
+                <IoTrashOutline size={22} />
+              </button>
+
+            </div>
+          ))}
+
+          <div className={css.actions}>
+            <button type="button" className={css.addRowBtn} onClick={addRow}>
+              <IoAddCircleOutline size={26} /> Add Row
+            </button>
+
+            <button type="submit" className={css.submitBtn}>
+              Submit Stock
+            </button>
+          </div>
+
+        </form>
       </div>
-
-      <div className={css.row}>
-        <label>Item Name</label>
-        <input value={form.title} onChange={(e) => update("title", e.target.value)} placeholder="Item name" />
-      </div>
-
-      <div className={css.rowGrid}>
-        <div className={css.col}>
-          <label>Quantity</label>
-          <input value={form.quantity} onChange={(e) => update("quantity", e.target.value)} placeholder="0" />
-        </div>
-
-        <div className={css.col}>
-          <label>Price per item</label>
-          <input value={form.price} onChange={(e) => update("price", e.target.value)} placeholder="0.00" />
-        </div>
-      </div>
-
-      <div className={css.row}>
-        <label>Specifications</label>
-        <textarea value={form.specifications} onChange={(e) => update("specifications", e.target.value)} placeholder="Comma separated or free text" />
-      </div>
-
-      {error && <div className={css.error}>{error}</div>}
-      {success && <div className={css.success}>{success}</div>}
-
-      <div className={css.actions}>
-        <button type="button" className={css.ghost} onClick={() => { if (typeof onDone === "function") onDone(); }}>Cancel</button>
-        <button type="submit" className={css.primary} disabled={loading}>{loading ? "Adding..." : "Add Stock"}</button>
-      </div>
-    </form>
+    </div>
   );
 }

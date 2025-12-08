@@ -1,201 +1,132 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import css from "../styles/SaleProduct.module.css";
+import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
-export default function SaleProduct({ items: initialItems, onSell }) {
-  const sample = [
-    { grn: "GRN101", title: "Virat Kohli Shirt", quantity: 12, price: 499, specifications: "Size:M;Color:White" },
-    { grn: "GRN205", title: "Laptop", quantity: 5, price: 45000, specifications: "16GB RAM;512GB SSD" },
-    { grn: "GRN334", title: "Shoes", quantity: 8, price: 2499, specifications: "Size:9;Black" },
-    { grn: "GRN412", title: "SSD 256GB", quantity: 2, price: 1999, specifications: "SATA" }
-  ];
+export default function SaleProduct() {
 
-  const [items, setItems] = useState(Array.isArray(initialItems) && initialItems.length ? initialItems : sample);
-  useEffect(() => {
-    if (Array.isArray(initialItems) && initialItems.length) setItems(initialItems);
-  }, [initialItems]);
+  const onSubmit = () => {}
 
-  const [query, setQuery] = useState("");
-  const [selectedGrn, setSelectedGrn] = useState("");
-  const selectedItem = useMemo(() => items.find(i => i.grn === selectedGrn) ?? null, [items, selectedGrn]);
+  const navigate = useNavigate();
+  const productList = useSelector((store) => store.products.products);
 
-  const [qty, setQty] = useState("");
-  const [error, setError] = useState("");
-  const [selling, setSelling] = useState(false);
-  const [history, setHistory] = useState([]);
+  const [rows, setRows] = useState([
+    { grn: "", title: "", price: "", quantity: "", total: "" }
+  ]);
 
-  const filtered = useMemo(() => {
-    const q = (query ?? "").trim().toLowerCase();
-    if (!q) return items;
-    return items.filter(i => String(i.grn).toLowerCase().includes(q) || (i.title ?? "").toLowerCase().includes(q));
-  }, [items, query]);
+  function updateRow(index, field, value) {
+    const updated = [...rows];
+    updated[index][field] = value;
 
-  useEffect(() => {
-    setError("");
-    setQty("");
-  }, [selectedGrn]);
+    // Autofill name & price when GRN matches
+    if (field === "grn") {
+      const found = productList.find((p) => String(p.grn) === String(value));
+      updated[index].title = found ? found.title : "";
+      updated[index].price = found ? found.extraDetails.finalPrice : "";
+    }
 
-  function validate() {
-    if (!selectedItem) return "Select an item to sell";
-    if (!String(qty).trim()) return "Enter quantity";
-    const n = Number(qty);
-    if (!Number.isFinite(n) || n <= 0) return "Quantity must be a positive number";
-    if (n > (selectedItem.quantity ?? 0)) return `Insufficient stock. Available: ${selectedItem.quantity}`;
-    return "";
+    // Auto calculate total
+    if (field === "quantity") {
+      const price = Number(updated[index].price || 0);
+      updated[index].total = price * Number(value || 0);
+    }
+
+    setRows(updated);
   }
 
-  async function handleSell(e) {
+  function addRow() {
+    setRows([...rows, { grn: "", title: "", price: "", quantity: "", total: "" }]);
+  }
+
+  function removeRow(index) {
+    if (rows.length === 1) return;
+    setRows(rows.filter((_, i) => i !== index));
+  }
+
+  function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-    const v = validate();
-    if (v) {
-      setError(v);
-      return;
-    }
-    setSelling(true);
-    const payload = {
-      grn: selectedItem.grn,
-      title: selectedItem.title,
-      quantity: Number(qty),
-      pricePerItem: Number(selectedItem.price ?? 0),
-      total: Number(qty) * Number(selectedItem.price ?? 0),
-      timestamp: new Date().toISOString()
-    };
-    try {
-      if (onSell) {
-        const maybePromise = onSell(payload);
-        if (maybePromise && typeof maybePromise.then === "function") await maybePromise;
-      }
-      setItems(prev => prev.map(it => it.grn === selectedItem.grn ? { ...it, quantity: (it.quantity ?? 0) - Number(qty) } : it));
-      setHistory(h => [{ ...payload }, ...h]);
-      setQty("");
-      setError("");
-    } catch (err) {
-      setError(err?.message || "Failed to process sale");
-    } finally {
-      setSelling(false);
-    }
+    if (onSubmit) onSubmit(rows);
   }
 
   return (
-    <div className={`container-fluid p-3 ${css.root}`}>
-      <div className="row g-3">
-        <div className="col-12 col-lg-5">
-          <div className="card" style={{ borderRadius: 12 }}>
-            <div className="card-body">
-              <h5 className="card-title">Sell Product</h5>
+    <div className={css.wrapper}>
 
-              <div className="mb-3">
-                <label className="form-label">Search item (GRN or name)</label>
-                <input className="form-control" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search..." />
-              </div>
+      {/* BACK BUTTON */}
+      <button className={css.backBtn} onClick={() => navigate("../")}>
+        <IoArrowBackCircle size={32} />
+      </button>
 
-              <div className="mb-3">
-                <label className="form-label">Select item</label>
-                <select className="form-select" value={selectedGrn} onChange={e => setSelectedGrn(e.target.value)}>
-                  <option value="">-- choose an item --</option>
-                  {filtered.map(it => (
-                    <option key={it.grn} value={it.grn}>
-                      {it.grn} — {it.title} ({it.quantity ?? 0} in stock)
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <div className={css.panel}>
+        <h2 className={css.title}>Sell Product (Excel Sheet)</h2>
 
-              <div className="mb-3">
-                <label className="form-label">Price per item</label>
-                <input className="form-control" readOnly value={selectedItem ? `₹${Number(selectedItem.price ?? 0).toLocaleString()}` : ""} />
-              </div>
+        <form onSubmit={handleSubmit}>
 
-              <div className="mb-3 row g-2">
-                <div className="col">
-                  <label className="form-label">Quantity to sell</label>
-                  <input type="number" min="1" className="form-control" value={qty} onChange={e => setQty(e.target.value)} />
-                </div>
-                <div className="col-6">
-                  <label className="form-label">Total</label>
-                  <input className="form-control" readOnly value={selectedItem ? `₹${(Number(selectedItem.price ?? 0) * Number(qty || 0)).toLocaleString()}` : ""} />
-                </div>
-              </div>
-
-              {error && <div className="alert alert-danger py-2" role="alert">{error}</div>}
-
-              <div className="d-flex gap-2">
-                <button className="btn btn-outline-secondary" onClick={() => { setSelectedGrn(""); setQty(""); setError(""); }}>Reset</button>
-                <button className="btn btn-primary ms-auto" onClick={handleSell} disabled={selling || !selectedItem}>
-                  {selling ? "Processing..." : "Sell"}
-                </button>
-              </div>
-
-              <div className="mt-3 small text-muted">This UI is frontend-only. Supply an <code>onSell(payload)</code> prop to integrate with your backend.</div>
-            </div>
+          <div className={css.tableHeader}>
+            <span>GRN</span>
+            <span>Item Name</span>
+            <span>Price</span>
+            <span>Qty</span>
+            <span>Total</span>
+            <span>Action</span>
           </div>
-        </div>
 
-        <div className="col-12 col-lg-7">
-          <div className="card" style={{ borderRadius: 12 }}>
-            <div className="card-body">
-              <h5 className="card-title">Recent Sales</h5>
+          {rows.map((row, i) => (
+            <div key={i} className={css.tableRow}>
 
-              <div className="table-responsive">
-                <table className="table table-borderless">
-                  <thead>
-                    <tr>
-                      <th>Time</th>
-                      <th>GRN</th>
-                      <th>Item</th>
-                      <th className="text-center">Qty</th>
-                      <th className="text-end">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {history.length === 0 ? (
-                      <tr>
-                        <td colSpan="5" className="text-muted">No sales yet</td>
-                      </tr>
-                    ) : (
-                      history.map((s, idx) => (
-                        <tr key={idx}>
-                          <td style={{ width: 180 }}>{new Date(s.timestamp).toLocaleString()}</td>
-                          <td>{s.grn}</td>
-                          <td>{s.title}</td>
-                          <td className="text-center">{s.quantity}</td>
-                          <td className="text-end">₹{Number(s.total).toLocaleString()}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              <input
+                className={css.input}
+                placeholder="Enter GRN"
+                value={row.grn}
+                onChange={(e) => updateRow(i, "grn", e.target.value)}
+              />
 
-              <div className="mt-3">
-                <h6 className="mb-2">Current stock snapshot</h6>
-                <div className="table-responsive">
-                  <table className="table table-sm table-hover">
-                    <thead>
-                      <tr>
-                        <th>GRN</th>
-                        <th>Item</th>
-                        <th className="text-center">In stock</th>
-                        <th className="text-muted">Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map(it => (
-                        <tr key={it.grn}>
-                          <td>{it.grn}</td>
-                          <td>{it.title}</td>
-                          <td className={`text-center ${it.quantity <= 0 ? "text-danger" : ""}`}>{it.quantity}</td>
-                          <td className="text-muted">₹{Number(it.price ?? 0).toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <input
+                className={css.input}
+                value={row.title}
+                disabled
+                placeholder="Auto-filled"
+              />
+
+              <input
+                className={css.input}
+                value={row.price}
+                disabled
+                placeholder="₹ Price"
+              />
+
+              <input
+                className={css.input}
+                placeholder="Qty"
+                value={row.quantity}
+                onChange={(e) => updateRow(i, "quantity", e.target.value)}
+              />
+
+              <input
+                className={css.input}
+                disabled
+                value={row.total}
+                placeholder="₹ Total"
+              />
+
+              <button type="button" className={css.deleteBtn} onClick={() => removeRow(i)}>
+                <IoTrashOutline size={22} />
+              </button>
 
             </div>
+          ))}
+
+          <div className={css.actions}>
+            <button type="button" className={css.addRowBtn} onClick={addRow}>
+              <IoAddCircleOutline size={26} /> Add Row
+            </button>
+
+            <button type="submit" className={css.submitBtn}>
+              Sell Now
+            </button>
           </div>
-        </div>
+
+        </form>
       </div>
     </div>
   );
