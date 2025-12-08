@@ -12,8 +12,8 @@ const App = () => {
       <ProductDisplay></ProductDisplay>
       {/* <Login></Login> */}
       {/* <ChatInterface></ChatInterface> */}
-      {/* <StoreStaffLayout /> */}
-      <KioskInterface></KioskInterface>
+      <StoreStaffLayout />
+      {/* <KioskInterface></KioskInterface> */}
     </>
   );
 };

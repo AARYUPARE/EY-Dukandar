@@ -1,0 +1,25 @@
+.send-order-root {
+  color: #ffffff;
+}
+
+.panel {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 12px 30px rgba(2,6,23,0.6);
+  border-radius: 12px;
+}
+
+.card-title {
+  margin-bottom: 14px;
+  color: #ffffff;
+}
+
+.table-selected {
+  background: linear-gradient(90deg, rgba(142,36,255,0.05), rgba(57,230,255,0.03));
+}
+
+.recent-orders .order-item {
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.03);
+  font-size: 0.95rem;
+}
