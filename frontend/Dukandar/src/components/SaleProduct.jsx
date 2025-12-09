@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import css from "../styles/SaleProduct.module.css";
 import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
@@ -6,10 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 export default function SaleProduct() {
 
-  const onSubmit = () => {}
 
   const navigate = useNavigate();
-  const productList = useSelector((store) => store.products.products);
+  const inventoryList = [];
+
+  useEffect(() => {
+    //fetch inventory of the store and put it into the inventory list
+  }, [])
 
   const [rows, setRows] = useState([
     { grn: "", title: "", price: "", quantity: "", total: "" }
@@ -21,15 +24,28 @@ export default function SaleProduct() {
 
     // Autofill name & price when GRN matches
     if (field === "grn") {
-      const found = productList.find((p) => String(p.grn) === String(value));
-      updated[index].title = found ? found.title : "";
-      updated[index].price = found ? found.extraDetails.finalPrice : "";
+      const found = inventoryList.find((p) => String(p.grn) === String(value));
+      if(found.title == "")
+      {
+        alert("Invalid Item number");
+        return;
+      }
+      updated[index].title = found.title;
+      updated[index].price = found.extraDetails.finalPrice;
     }
 
     // Auto calculate total
-    if (field === "quantity") {
+    if (field === "quantity") 
+    {
+      const found = inventoryList.find((p) => String(p.grn) === String(updated[index].grn));
+      if(value > found.stock) 
+      {
+        alert("Item quantity exceeded the present stock Quantity")
+        return;
+      }
       const price = Number(updated[index].price || 0);
       updated[index].total = price * Number(value || 0);
+      found.stock -= value;
     }
 
     setRows(updated);
@@ -46,7 +62,8 @@ export default function SaleProduct() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (onSubmit) onSubmit(rows);
+
+    //we will get rows, update those in the Data base.
   }
 
   return (

@@ -30,11 +30,11 @@ export const sendMessageAsync = createAsyncThunk(
     );
 
     // Backend call
-    // const res = await axios.post("http://localhost:5000/chat", { prompt });
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const res = await axios.post("http://localhost:5000/chat", { prompt });
+    // await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // 🔥 Fake response (always same, or echo)
-    const res = "This is a fake bot reply for: " + prompt;
+    // const res = "This is a fake bot reply for: " + prompt;
 
     // Update loader to real message
     dispatch(

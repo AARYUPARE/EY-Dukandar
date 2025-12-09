@@ -61,7 +61,7 @@ const ModelDisplay = ({modelUrl}) => {
         scene.add(ambient);
 
         loader.load(
-            modelUrl,
+            "/models/rainCoat1.glb",
             (gltf) => {
                 model = gltf.scene;
 

@@ -3,9 +3,9 @@ import css from "../styles/InventoryTable.module.css";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-export default function InventoryTable({ items: initialItems }) {
-  const [items, setItems] = useState(initialItems ?? []);
-  const [loading, setLoading] = useState(!initialItems);
+export default function InventoryTable() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "grn", dir: "asc" });
   const [page, setPage] = useState(1);
@@ -18,18 +18,21 @@ export default function InventoryTable({ items: initialItems }) {
   }
 
   useEffect(() => {
-    if (initialItems) return;
     let mounted = true;
     setLoading(true);
 
-    fetch("/api/inventory")
-      .then((r) => r.json())
-      .then((data) => mounted && setItems(Array.isArray(data) ? data : []))
-      .catch(() => mounted && setItems([]))
-      .finally(() => mounted && setLoading(false));
+    // fetch("/api/inventory")
+    //   .then((r) => r.json())
+    //   .then((data) => mounted && setItems(Array.isArray(data) ? data : []))
+    //   .catch(() => mounted && setItems([]))
+    //   .finally(() => mounted && setLoading(false));
+
+    //use axios to fetch the store inventory
+    //set it into items array
+    if(mounted) setLoading(false)
 
     return () => (mounted = false);
-  }, [initialItems]);
+  }, );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

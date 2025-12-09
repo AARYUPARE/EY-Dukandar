@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import "../styles/SendOrder.css";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -19,15 +19,13 @@ const navigate = useNavigate()
     quantity: ""
   });
 
-  const sampleInventory = [
-    { grn: "GRN101", title: "Mouse", quantity: 0, specs: "Optical, USB" },
-    { grn: "GRN205", title: "Keyboard", quantity: 1, specs: "Mechanical, Blue" },
-    { grn: "GRN334", title: "Monitor", quantity: 0, specs: "24\", 1080p" },
-    { grn: "GRN412", title: "SSD 256GB", quantity: 2, specs: "SATA" },
-    { grn: "GRN599", title: "Headset", quantity: 0, specs: "Mic, 3.5mm" }
-  ];
+  const inventoryList = [ ];
 
-  const exhausted = useMemo(() => sampleInventory.filter(i => i.quantity <= 1), []);
+  useEffect(() => {
+    //fetch inventory, and put it into inventory list
+  })
+
+  const exhausted = useMemo(() => inventoryList.filter(i => i.quantity <= 1), []);
 
   const [selected, setSelected] = useState({});
   const [sentOrders, setSentOrders] = useState([]);
@@ -60,6 +58,8 @@ const navigate = useNavigate()
       note: form.note,
       items: toSend
     };
+
+    //Send order to company
 
     setSentOrders(s => [payload, ...s]);
     clearSelection();

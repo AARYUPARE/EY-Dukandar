@@ -1,13 +1,12 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import css from "../styles/AddStockForm.module.css";
 import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-export default function AddStockSheet({ onSubmit }) {
+export default function AddStockSheet() {
 
   const navigate = useNavigate();
-  const productList = useSelector((store) => store.products.products);
+  const productList = useState([])
 
   const [rows, setRows] = useState([
     { grn: "", title: "", quantity: "" }
@@ -25,6 +24,14 @@ export default function AddStockSheet({ onSubmit }) {
     setRows(newRows);
   }
 
+  useEffect(() => {
+
+    //fetch company-product list
+    //fetch the store order list and set to rows so it will show the ordered stock directly
+
+  },[])
+
+
   function addRow() {
     setRows([...rows, { grn: "", title: "", quantity: "" }]);
   }
@@ -36,7 +43,9 @@ export default function AddStockSheet({ onSubmit }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (onSubmit) onSubmit(rows);
+    // if (onSubmit) onSubmit(rows);
+
+    //we will get rows in this, just add those in the stores inventory
   }
 
   const onBack = () =>
