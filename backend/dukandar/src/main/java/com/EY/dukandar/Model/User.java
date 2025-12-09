@@ -1,4 +1,4 @@
-package com.EY.dukandar.Entity;
+package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
 
@@ -20,17 +20,21 @@ public class User {
     private String phone;
 
     private int loyaltyPoints;
+    private String imageUrl;
+    private String password;
 
     // Default constructor
     public User() {}
 
     // All-args constructor
-    public User(Long id, String name, String email, String phone, int loyaltyPoints) {
+    public User(Long id, String name, String email, String phone, int loyaltyPoints, String imageUrl, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.loyaltyPoints = loyaltyPoints;
+        this.imageUrl = imageUrl;
+        this.password = password;
     }
 
     // Getters & Setters
@@ -48,4 +52,14 @@ public class User {
 
     public int getLoyaltyPoints() { return loyaltyPoints; }
     public void setLoyaltyPoints(int loyaltyPoints) { this.loyaltyPoints = loyaltyPoints; }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

@@ -1,4 +1,4 @@
-package com.EY.dukandar.Entity;
+package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
 

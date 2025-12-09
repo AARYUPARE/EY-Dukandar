@@ -1,4 +1,4 @@
-package com.EY.dukandar.Entity;
+package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
 
@@ -18,20 +18,22 @@ public class Store {
 
     private String phone;         // Store contact number
 
-    private double latitude;      // For nearest-store calculation
-    private double longitude;
+    private Double latitude;      // For nearest-store calculation
+    private Double longitude;
+    private String imageUrl;
 
     // Default constructor
     public Store() {}
 
     // Constructor
-    public Store(Long id, String name, String address, String phone, double latitude, double longitude) {
+    public Store(Long id, String name, String address, String phone, Double latitude, Double longitude, String imageUrl) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.imageUrl = imageUrl;
     }
 
     // Getters & Setters
@@ -47,9 +49,12 @@ public class Store {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
-    public double getLatitude() { return latitude; }
-    public void setLatitude(double latitude) { this.latitude = latitude; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
 
-    public double getLongitude() { return longitude; }
-    public void setLongitude(double longitude) { this.longitude = longitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

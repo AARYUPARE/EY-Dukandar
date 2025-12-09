@@ -1,5 +1,6 @@
-package com.EY.dukandar.Entity;
+package com.EY.dukandar.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,41 +11,21 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // FK → Order table
-    @Column(nullable = false)
-    private Long orderId;
-
-    // FK → Product table
-    @Column(nullable = false)
     private Long productId;
-
-    @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
     private double pricePerUnit;
-
-    @Column(nullable = false)
     private double totalPrice;
 
-    public OrderItem() {}
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    @JsonBackReference
+    private Order order;
 
-    public OrderItem(Long id, Long orderId, Long productId, int quantity,
-                     double pricePerUnit, double totalPrice) {
-        this.id = id;
-        this.orderId = orderId;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.pricePerUnit = pricePerUnit;
-        this.totalPrice = totalPrice;
-    }
 
     // Getters & Setters
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public Long getOrderId() { return orderId; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
 
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
@@ -57,5 +38,7 @@ public class OrderItem {
 
     public double getTotalPrice() { return totalPrice; }
     public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
-}
 
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
+}
