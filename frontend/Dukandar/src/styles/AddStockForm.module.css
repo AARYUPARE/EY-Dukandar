@@ -1,0 +1,99 @@
+:root {
+  --accent: #8e24ff;
+  --accent2: #39e6ff;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.75);
+  --panel-bg: rgba(255,255,255,0.03);
+  --panel-border: rgba(255,255,255,0.06);
+}
+
+.wrapper {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  color: var(--white);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 30px;
+  border-radius: 16px;
+  width: 900px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+}
+
+.title {
+  color: var(--white);
+  margin-bottom: 20px;
+}
+
+.tableHeader, .tableRow {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 0.6fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tableHeader span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--panel-border);
+  color: var(--white);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.input:disabled {
+  opacity: 0.65;
+}
+
+.deleteBtn {
+  background: transparent;
+  border: none;
+  color: #ff8080;
+  cursor: pointer;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.addRowBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--panel-border);
+  background: none;
+  color: var(--white);
+  cursor: pointer;
+}
+
+.submitBtn {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: var(--white);
+  border: none;
+  cursor: pointer;
+}

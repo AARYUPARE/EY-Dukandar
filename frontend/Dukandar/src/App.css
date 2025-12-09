@@ -1,0 +1,57 @@
+:root{
+  /* Colors */
+  --bg-0: #0b0f1a;        /* page background (very dark) */
+  --bg-1: #0f1626;        /* main container deep */
+  --panel: linear-gradient(135deg,#0a0f2c 0%,#3d22b3 60%,#8e24ff 100%); /* card gradient */
+  --muted: #98a0b4;       /* secondary text */
+  --glass: rgba(255,255,255,0.04);
+  --card-glow: rgba(138,43,226,0.14); /* purple glow */
+  --accent: #8e24ff;      /* primary accent (purple) */
+  --accent-2: #39e6ff;    /* cyan neon accent */
+  --white: #ffffff;
+
+  /* Shadows */
+  --shadow-soft: 0 8px 20px rgba(2,6,23,0.6);
+  --shadow-neon: 0 8px 40px rgba(138,43,226,0.14);
+
+  /* Typography */
+  --font-sans: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  --radius: 12px;
+}
+html,body,#root{height:100%}
+body{
+  font-family: var(--font-sans);
+  background: radial-gradient(circle at 10% 10%, rgba(138,43,226,0.06), transparent 12%),
+              linear-gradient(180deg,var(--bg-0),var(--bg-1));
+  color: var(--white);
+  margin: 0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* GLOBAL SCROLLBAR (NEON + MINIMAL) */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #8e24ff, #39e6ff);
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(142, 36, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #a64cff, #54f0ff);
+    box-shadow: 0 0 16px rgba(142, 36, 255, 0.8);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #8e24ff rgba(255,255,255,0.08);
+}

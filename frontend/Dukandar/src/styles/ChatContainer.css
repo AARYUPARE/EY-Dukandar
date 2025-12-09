@@ -1,0 +1,17 @@
+.chat-field {
+    padding: 15px 20px;
+    /* border: 2px solid red; */
+    max-height: 78vh;
+    min-height: 250px;          
+    /* max-width: 80vw; */
+    overflow-y: auto;      
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+}
+
+.field-container
+{
+    flex: 2;
+}
