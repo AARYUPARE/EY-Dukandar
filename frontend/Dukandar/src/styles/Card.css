@@ -1,5 +1,5 @@
 #card-container {
-    color:white;
+    color: white;
     padding: 10px;
     width: 18rem;
     height: fit-content;
@@ -9,30 +9,35 @@
 
     background: linear-gradient(
         135deg,
-        #030712 0%,      /* almost black navy */
-        #061229 10%,     /* deep ocean blue */
-        #0b1e47 20%,     /* navy-blue */
-        #142b66 30%,     /* rich blue */
-        #1c3480 40%,     /* brightened blue */
-        #2b2c99 50%,     /* indigo shift */
-        #3d22b3 60%,     /* purple-indigo */
-        #5220c9 70%,     /* glowing purple */
-        #6a1fd8 80%,     /* neon violet */
-        #8e24ff 90%,     /* electric violet */
-        #c347ff 100%     /* bright magenta glow */
+        #020617 0%,     /* near-black navy */
+        #04112a 15%,    /* deep midnight blue */
+        #0a1f47 35%,    /* heavy marine blue */
+        #123a72 55%,    /* refined blue */
+        #1d5ca3 75%,    /* faint blue */
+        #53a8ff 100%    /* soft glowing blue */
     );
 
     border-radius: 14px;
-    box-shadow:
-        0 0 20px rgba(125, 50, 255, 0.3),   /* outer purple glow */
-        0 0 40px rgba(90, 20, 255, 0.25);   /* soft neon rim glow */
 
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-#card-container:hover {
-    transform: translateY(-6px) scale(1.03);
+    /* Blue glow instead of purple */
     box-shadow:
-        0 0 30px rgba(150, 60, 255, 0.6),
-        0 0 70px rgba(120, 40, 255, 0.5),
-        0 0 90px rgba(100, 20, 255, 0.45);
+        0 0 20px rgba(50, 130, 255, 0.25),
+        0 0 40px rgba(40, 110, 255, 0.18);
+
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+#card-container:hover {
+    transform: translateY(-6px) scale(1.001);
+
+    box-shadow:
+        0 0 30px rgba(80, 150, 255, 0.45),
+        0 0 70px rgba(50, 130, 255, 0.35),
+        0 0 90px rgba(30, 110, 255, 0.28);
+}
+
+/* If using tilt wrapper */
+.tilt-wrapper {
+    display: inline-block;
+    will-change: transform;
 }
