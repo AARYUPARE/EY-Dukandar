@@ -14,6 +14,8 @@ import './App.css'
 import ChatContainer from './components/ChatContainer';
 import Sales from './components/Sales';
 import OffersContainer from './components/OfferContainer';
+import Profile from './components/Profile';
+import Orders from './components/Orders';
 
 const appRouter = createBrowserRouter([
   {
@@ -29,7 +31,22 @@ const appRouter = createBrowserRouter([
     element: <>
       <ProductDisplay />
       <ChatInterface />
-    </>
+    </>,
+    children:[
+      {
+        path: "",
+        element:<ChatContainer />
+      },
+      {
+        path: "profile",
+        element:<Profile />
+      },
+      {
+        path: "orders",
+        element:<Orders/>
+      }
+    ]
+
   },
   {
     path: "/store-staff",

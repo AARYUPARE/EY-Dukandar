@@ -13,7 +13,11 @@ const InputBar = ({ sendPromt }) => {
         if (prompt.current.value == "") return;
 
         // Code to send prompt to backend and receive responce
-        sendPromt(prompt.current.value);
+        let sent=sendPromt(prompt.current.value);
+        if(!sent)
+        {
+            return;
+        }
         prompt.current.value = "";
     }
 
