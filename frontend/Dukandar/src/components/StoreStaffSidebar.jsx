@@ -1,19 +1,22 @@
 import css from "../styles/StoreStaffSidebar.module.css";
-import { TbLayoutSidebarLeftCollapseFilled } from "react-icons/tb";
 import { TbHexagonLetterD } from "react-icons/tb";
-import { MdPointOfSale, MdInventory, MdOutlineAddBox, MdOutlineLocalShipping } from "react-icons/md";
+import { MdPointOfSale, MdOutlineLocalShipping } from "react-icons/md";
 import { AiOutlineHome } from "react-icons/ai";
 import { RiCoupon2Fill } from "react-icons/ri";
-import { useDispatch } from "react-redux";
-import { sideBarAction } from "../store/store";
+import { Link, useLocation } from "react-router-dom";
 
 const StoreStaffSidebar = () => {
 
-    
+    const location = useLocation();
+    const path = location.pathname;
+
+    // helper to check active route
+    const isActive = (route) => path.includes(route);
+
     return (
         <div className={css.sidebar} id={css.sidebarWrapper}>
 
-            {/* BRAND + COLLAPSE */}
+            {/* BRAND */}
             <div className={css.brandRow}>
                 <div className={css.logoContainer}>
                     <TbHexagonLetterD />
@@ -24,32 +27,44 @@ const StoreStaffSidebar = () => {
             <ul className={css.navList}>
 
                 <li>
-                    <a href="/store-staff" className={`${css.navItem} ${css.active}`}>
+                    <Link
+                        to="/store-staff"
+                        className={`${css.navItem} ${path === "/store-staff" ? css.active : ""}`}
+                    >
                         <AiOutlineHome /> Home
-                    </a>
+                    </Link>
                 </li>
 
                 <li>
-                    <a href="/store-staff/sales" className={css.navItem}>
+                    <Link
+                        to="/store-staff/sales"
+                        className={`${css.navItem} ${isActive("sales") ? css.active : ""}`}
+                    >
                         <MdPointOfSale /> Sales
-                    </a>
+                    </Link>
                 </li>
 
                 <li>
-                    <a href="/store-staff/send-order" className={css.navItem}>
+                    <Link
+                        to="/store-staff/send-order"
+                        className={`${css.navItem} ${isActive("send-order") ? css.active : ""}`}
+                    >
                         <MdOutlineLocalShipping /> Order
-                    </a>
+                    </Link>
                 </li>
 
                 <li>
-                    <a href="/store-staff/offers" className={css.navItem}>
+                    <Link
+                        to="/store-staff/offers"
+                        className={`${css.navItem} ${isActive("offers") ? css.active : ""}`}
+                    >
                         <RiCoupon2Fill /> Offers
-                    </a>
+                    </Link>
                 </li>
 
             </ul>
 
-            {/* FOOTER PROFILE */}
+            {/* FOOTER */}
             <div className={css.footer}>
                 <img
                     src="https://github.com/mdo.png"

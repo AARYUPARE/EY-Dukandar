@@ -12,6 +12,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import ChatContainer from './components/ChatContainer';
+import Sales from './components/Sales';
+import OffersContainer from './components/OfferContainer';
 
 const appRouter = createBrowserRouter([
   {
@@ -52,6 +54,14 @@ const appRouter = createBrowserRouter([
       {
         path: "sale-product",
         element: <SaleProduct />
+      },
+      {
+        path:"sales",
+        element:<Sales></Sales>
+      },
+      {
+        path:"offers",
+        element:<OffersContainer />
       }
     ]
   },
