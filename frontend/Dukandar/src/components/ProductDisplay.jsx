@@ -5,7 +5,7 @@ import { showcaseAction } from "../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import css from "../styles/ProductDisplay.module.css";
 
-const ProductDisplay = ({ onClose }) => {
+const ProductDisplay = () => {
     const product = useSelector((store) => store.showcase);
     const dispatch = useDispatch();
 
@@ -24,8 +24,8 @@ const ProductDisplay = ({ onClose }) => {
 
             <div className={css["display-container"]}>
                 <ModelDisplay modelUrl={product.modelUrl} />
-                <ProductDetails details={product.details} title={product.title} />
-                <PriceDetails extraDetails={product.extraDetails} />
+                <ProductDetails description={product.description} title={product.name} category={product.category} subCategory={product.subCategory} brand={product.brand}/>
+                <PriceDetails price={product.price} />
             </div>
 
         </div>

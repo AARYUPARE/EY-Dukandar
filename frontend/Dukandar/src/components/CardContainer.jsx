@@ -15,7 +15,7 @@ const CardContainer = () => {
     const [search, setSearch] = useState("");
 
     const filtered = products.filter((item) =>
-        (item.title ?? "").toLowerCase().includes(search.toLowerCase())
+        (item.name ?? "").toLowerCase().includes(search.toLowerCase())
     );
     dispatch(sideBarAction.collapse());
 
@@ -32,11 +32,12 @@ const CardContainer = () => {
                 <div className="d-flex  align-items-start" id={`${css["card-list"]}`}>
                     {filtered.map((item, i) => (
                         <Card
-                            key={item.grn ?? i}
-                            title={item.title}
-                            imageUrl={item.image}
-                            description={item.details?.summary ?? ""}
+                            key={item.id ?? i}
+                            title={item.name}
+                            imageUrl={item.imageUrl}
+                            description={item.description ?? ""}
                             onClick={() => dispatch(showcaseAction.setShowcase(item))}
+                            brand={item.brand}
                         />
                     ))}
                 </div>

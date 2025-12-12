@@ -1,7 +1,7 @@
 import "../styles/Card.css";
 import Tilty from "../utils/Tilty.jsx";   // <-- add this import
 
-export default function Card({ title, imageUrl, description, onClick }) {
+export default function Card({ title, imageUrl, description, onClick, brand }) {
   return (
     <Tilty
       max={25}
@@ -33,6 +33,7 @@ export default function Card({ title, imageUrl, description, onClick }) {
 
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
+          <p className="card-text">Brand: {brand}</p>
           <p className="card-text">{description}</p>
         </div>
       </div>

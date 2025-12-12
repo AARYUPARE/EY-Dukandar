@@ -5,8 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-
-const ModelDisplay = ({modelUrl}) => {
+const ModelDisplay = ({ modelUrl }) => {
     const mountRef = useRef(null);
     const canvasRef = useRef(null);
 
@@ -29,70 +28,61 @@ const ModelDisplay = ({modelUrl}) => {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(width, height);
 
-        // --- LIGHTS ---
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 10);
-        directionalLight.position.set(5, 10, 7.5);
-        scene.add(directionalLight);
+        // -----------------------------------------------------
+        // 🔥🔥🔥 CLEAN, REALISTIC, COLOR-ACCURATE LIGHTING 🔥🔥🔥
+        // -----------------------------------------------------
 
-        const ambientLight = new THREE.AmbientLight(0x404040, 2);
-        scene.add(ambientLight);
+        // Soft ambient environment light (natural bounce)
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 1.2);
+        hemiLight.position.set(0, 20, 0);
+        scene.add(hemiLight);
+
+        // Main studio key light — like Amazon/Myntra showroom
+        const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+        keyLight.position.set(5, 10, 7);
+        scene.add(keyLight);
+
+        // Gentle fill light to soften shadows
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        fillLight.position.set(-5, 5, -3);
+        scene.add(fillLight);
+
+        // -----------------------------------------------------
+        // END LIGHTS
+        // -----------------------------------------------------
 
         const controls = new OrbitControls(camera, renderer.domElement);
-        // --- LOAD GLB MODEL ---
+
         const loader = new GLTFLoader();
         let model = null;
 
-        const keyLight = new THREE.DirectionalLight(0xffffff, 3);
-        keyLight.position.set(5, 5, 5);
-        scene.add(keyLight);
-
-        // Back rim light
-        const backLight = new THREE.DirectionalLight(0xffffff, 2);
-        backLight.position.set(-5, 5, -5);
-        scene.add(backLight);
-
-        // Side fill light
-        const fillLight = new THREE.DirectionalLight(0xffffff, 1.5);
-        fillLight.position.set(-3, 2, 3);
-        scene.add(fillLight);
-
-        // Soft ambient
-        const ambient = new THREE.AmbientLight(0xffffff, 1);
-        scene.add(ambient);
-
         loader.load(
-            "/models/Shirt2.glb",
+            modelUrl,
             (gltf) => {
                 model = gltf.scene;
 
-                // Fix insane Sketchfab transforms
+                // Fix Sketchfab scale issues
                 model.scale.set(50, 50, 50);
                 model.rotation.set(0, 0, 0);
                 model.position.set(0, 0, 0);
 
-                // Center geometry
+                // Center the model
                 const box = new THREE.Box3().setFromObject(model);
                 const center = new THREE.Vector3();
                 box.getCenter(center);
                 model.position.sub(center);
 
-                // Add to scene
                 scene.add(model);
 
-                // Focus camera on model
                 controls.target.set(0, 0, 0);
                 camera.lookAt(0, 0, 0);
                 controls.update();
-
             },
             undefined,
             (err) => console.error("GLB Load Error:", err)
         );
 
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 3);
-        scene.add(hemiLight);
-
-        // Orbit Controls
+        // Orbit control settings
         controls.enableDamping = true;
         controls.enablePan = false;
         controls.enableZoom = true;
@@ -100,20 +90,14 @@ const ModelDisplay = ({modelUrl}) => {
         let frameId;
         const animate = () => {
             frameId = requestAnimationFrame(animate);
-
-            if (model) {
-                model.rotation.y += 0.005; // spin model slowly
-            }
-
             controls.update();
-            renderer.render(scene, camera);;
+            renderer.render(scene, camera);
         };
 
         animate();
 
         const handleResize = () => {
             if (!mountRef.current) return;
-
             const newWidth = mountRef.current.clientWidth;
             const newHeight = mountRef.current.clientHeight;
 
@@ -130,13 +114,13 @@ const ModelDisplay = ({modelUrl}) => {
             renderer.dispose();
             controls.dispose();
         };
-    }, []);
+    }, [modelUrl]);
 
-    return <>
-        <div ref={mountRef} id={`${css["model-display"]}`}>
+    return (
+        <div ref={mountRef} id={css["model-display"]}>
             <canvas ref={canvasRef}></canvas>
         </div>
-    </>
-}
+    );
+};
 
 export default ModelDisplay;

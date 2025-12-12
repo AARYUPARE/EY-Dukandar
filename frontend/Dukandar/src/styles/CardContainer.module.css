@@ -6,7 +6,7 @@
     height: 100vh;
     box-sizing: border-box;
     margin: 0;
-    padding: 20px 30px;
+    padding: 20px 10px;
 
     background: linear-gradient(
         135deg,
@@ -20,9 +20,9 @@
 
 #card-list {
     display: flex;
-    flex-wrap: wrap;              /* allow cards to move to next row */
-    gap: 20px;                    /* spacing between cards */
+    flex-wrap: wrap;              
+    gap: 20px;                    
     justify-content: flex-start; 
-    flex-direction: column; /* align cards to the left */
+    max-width: 39.006vw;
 }
 
