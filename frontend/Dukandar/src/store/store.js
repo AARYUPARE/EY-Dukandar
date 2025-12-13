@@ -9,16 +9,47 @@ const CHAT_API_URL = "http://localhost:8080/api/chat";
 
 const userSlice = createSlice({
   name: "user",
-  initialState: {
+  initialState: 
+  {
     id: 1,
+    name: "Amit Sharma",
+    gender: "M",
+    DOB: "1995-06-18",
+    email: "amit.sharma@example.com",
+    phone: "+91 98765 43210",
+    loyaltyPoints: 1,
+    imageUrl: "https://i.pravatar.cc/300?img=12",
+    pass: "",
   },
-  reducers: {
-    setUser(state, action) {
-      state.id = action.payload.id;
-    }
+  reducers: 
+  {
+    setUser(state, action) 
+    {
+      return action.payload;
+    },
   }
-}
-)
+})
+
+const storeSlice = createSlice({
+  name: "store",
+  initialState:
+  {
+    id: 1,
+    name: "",
+    address: "",
+    phone: "",
+    latitude: 100.00,
+    longitude: 100.00,
+    imageUrl: "",
+  },
+  reducers: 
+  {
+    setStore(state, action)
+    {
+      return action.payload;
+    },
+  },
+})
 
 const sessionSlice = createSlice({
   name: "session",
@@ -34,16 +65,16 @@ const sessionSlice = createSlice({
 
 export const sendMessageAsync = createAsyncThunk(
   "chat/sendMessage",
-  async ({ prompt }, { dispatch, getState }) => {
-    console.log("sendMessageAsync called with prompt:", prompt);
-    const loaderId = Date.now() + "-loader";
+  async ({ prompt }, { dispatch, getState }) => 
+  {
+    const time = Date.now().toString();
+    const loaderId = time + "-loader";
 
     let sessionState = getState().session || {};
     let sessionId = sessionState.id;
 
-    console.log("1");
-    if (!sessionId) {
-      // generate and save new sessionId if none exists yet
+    if (!sessionId) 
+    {
       sessionId = Date.now().toString();
       dispatch(sessionActions.setSessionId(sessionId));
     }
@@ -51,7 +82,7 @@ export const sendMessageAsync = createAsyncThunk(
     // add user message
     dispatch(
       chatAction.addMessage({
-        id: Date.now(),
+        id: time,
         sender: "user",
         text: prompt,
       })
@@ -65,25 +96,33 @@ export const sendMessageAsync = createAsyncThunk(
         isLoading: true,
       })
     );
-    let res = null;  // Use let instead of const
+    let res = {
+      session_id: "",
+      reply: "",
+      products: []
+    };  
 
-    try {
+    try 
+    {
       res = await axios.post(CHAT_API_URL, {
         userId: getState().user.id,
         sessionId: sessionId,
         message: prompt,
       });
+
       console.log("Response from backend:", res.data);
 
       // Update loader message to real response text
       dispatch(
         chatAction.updateMessage({
           id: loaderId,
-          text: res.data,
+          text: res.reply ?? "No reply, from Agent",
           isLoading: false,
         })
       );
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       console.error("Error sending message:", error);
 
       // Update loader message to show error message

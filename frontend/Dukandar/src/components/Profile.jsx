@@ -1,15 +1,21 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import css from "../styles/Profile.module.css";
+import { useSelector } from "react-redux";
 
-export default function Profile({ user: initialUser, wishlist: initialWishlist }) {
+export default function Profile() {
+
+  const user = useSelector(store => store.user);
+
   const sampleUser = {
-    id: "USR-1001",
+    id: 1,
     name: "Amit Sharma",
+    gender: "M",
+    DOB: "1995-06-18",
     email: "amit.sharma@example.com",
     phone: "+91 98765 43210",
-    dob: "1995-06-18",
-    address: "12B, MG Road, Pune, Maharashtra, India - 411001",
-    avatar: "https://i.pravatar.cc/300?img=12"
+    loyaltyPoints: 1,
+    imageUrl: "https://i.pravatar.cc/300?img=12",
+    pass: "",
   };
 
   const sampleWishlist = [
@@ -20,8 +26,7 @@ export default function Profile({ user: initialUser, wishlist: initialWishlist }
     { grn: "GRN599", title: "Gaming Mouse", price: 799, addedOn: "2025-12-03", notes: "RGB" }
   ];
 
-  const [user] = useState(initialUser ?? sampleUser);
-  const [wishlist] = useState(Array.isArray(initialWishlist) ? initialWishlist : sampleWishlist);
+  const [wishlist] = useState(sampleWishlist);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "addedOn", dir: "desc" });
   const [page, setPage] = useState(1);
@@ -80,13 +85,13 @@ export default function Profile({ user: initialUser, wishlist: initialWishlist }
           <div className="col-12 col-lg-4">
             <div className={css.profileCard}>
               <div className={css.avatarWrap}>
-                <img src={user.avatar} alt={user.name} className={css.avatar} />
+                <img src={user.imageUrl} alt={user.name} className={css.avatar} />
               </div>
               <h4 className={css.name}>{user.name}</h4>
               <div className={css.meta}><span className={css.label}>User ID</span><span className={css.value}>{user.id}</span></div>
               <div className={css.meta}><span className={css.label}>Email</span><span className={css.value}>{user.email}</span></div>
               <div className={css.meta}><span className={css.label}>Phone</span><span className={css.value}>{user.phone}</span></div>
-              <div className={css.meta}><span className={css.label}>DOB</span><span className={css.value}>{user.dob}</span></div>
+              <div className={css.meta}><span className={css.label}>DOB</span><span className={css.value}>{user.DOB}</span></div>
               <div className={css.meta}><span className={css.label}>Address</span><span className={css.value}>{user.address}</span></div>
 
               <div className="d-flex gap-2 mt-3">
