@@ -5,12 +5,50 @@ import {
 } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const CHAT_API_URL = "http://localhost:8080/api/chat";
+
+const userSlice = createSlice({
+  name: "user",
+  initialState: {
+    id: 1,
+  },
+  reducers: {
+    setUser(state, action) {
+      state.id = action.payload.id;
+    }
+  }
+}
+)
+
+const sessionSlice = createSlice({
+  name: "session",
+  initialState: {
+    id: null,
+  },
+  reducers: {
+    setSessionId(state, action) {
+      state.id = action.payload;
+    }
+  }
+});
+
 export const sendMessageAsync = createAsyncThunk(
   "chat/sendMessage",
   async ({ prompt }, { dispatch, getState }) => {
+    console.log("sendMessageAsync called with prompt:", prompt);
     const loaderId = Date.now() + "-loader";
 
-    // Add user message
+    let sessionState = getState().session || {};
+    let sessionId = sessionState.id;
+
+    console.log("1");
+    if (!sessionId) {
+      // generate and save new sessionId if none exists yet
+      sessionId = Date.now().toString();
+      dispatch(sessionActions.setSessionId(sessionId));
+    }
+
+    // add user message
     dispatch(
       chatAction.addMessage({
         id: Date.now(),
@@ -19,7 +57,7 @@ export const sendMessageAsync = createAsyncThunk(
       })
     );
 
-    // Add loader message
+    // add loader
     dispatch(
       chatAction.addMessage({
         id: loaderId,
@@ -29,21 +67,36 @@ export const sendMessageAsync = createAsyncThunk(
       })
     );
 
-    // Backend call
-    const res = await axios.post("http://localhost:5000/chat", { prompt });
-    // await new Promise((resolve) => setTimeout(resolve, 1500));
+    let res = null;  // Use let instead of const
 
-    // 🔥 Fake response (always same, or echo)
-    // const res = "This is a fake bot reply for: " + prompt;
+    try {
+      res = await axios.post(CHAT_API_URL, {
+        userId: getState().user.id,
+        sessionId: sessionId,
+        message: prompt,
+      });
+      console.log("Response from backend:", res.data);
 
-    // Update loader to real message
-    dispatch(
-      chatAction.updateMessage({
-        id: loaderId,
-        text: res,
-        isLoading: false,
-      })
-    );
+      // Update loader message to real response text
+      dispatch(
+        chatAction.updateMessage({
+          id: loaderId,
+          text: res.data,
+          isLoading: false,
+        })
+      );
+    } catch (error) {
+      console.error("Error sending message:", error);
+
+      // Update loader message to show error message
+      dispatch(
+        chatAction.updateMessage({
+          id: loaderId,
+          text: "Failed to send message. Please try again.",
+          isLoading: false,
+        })
+      );
+    }
   }
 );
 
@@ -149,30 +202,30 @@ const storeOffersSlice = createSlice(
   {
     name: "storeOffers",
     initialState: {
-        list: [
-            {
-                grn: 1,
-                title: "Buy 1 Get 1 Free - Men's Shirts",
-                image: "https://www.pixelstalk.net/wp-content/uploads/2016/07/Wallpapers-pexels-photo.jpg",
-                modelUrl: "",
-                details: {
-                    summary: "BOGO Offer",
-                    strengths: ["Limited Stock", "In-store Only"],
-                    description: "Buy 1 shirt and get another free.",
-                }
-            },
-            {
-                grn: 2,
-                title: "Flat ₹500 off on Shoes",
-                image: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
-                modelUrl: "",
-                details: {
-                    summary: "Festival Discount",
-                    strengths: ["Best Price", "Exclusive"],
-                    description: "Valid only for offline customers.",
-                }
-            },
-        ],
+      list: [
+        {
+          grn: 1,
+          title: "Buy 1 Get 1 Free - Men's Shirts",
+          image: "https://www.pixelstalk.net/wp-content/uploads/2016/07/Wallpapers-pexels-photo.jpg",
+          modelUrl: "",
+          details: {
+            summary: "BOGO Offer",
+            strengths: ["Limited Stock", "In-store Only"],
+            description: "Buy 1 shirt and get another free.",
+          }
+        },
+        {
+          grn: 2,
+          title: "Flat ₹500 off on Shoes",
+          image: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
+          modelUrl: "",
+          details: {
+            summary: "Festival Discount",
+            strengths: ["Best Price", "Exclusive"],
+            description: "Valid only for offline customers.",
+          }
+        },
+      ],
     },
     reducers: {}
   }
@@ -205,6 +258,7 @@ export const sideBarAction = toggleSideSlice.actions;
 export const productsAction = productsSlice.actions;
 export const showcaseAction = showcaseSlice.actions;
 export const storeOffersAction = storeOffersSlice.actions;
+export const sessionActions = sessionSlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -213,7 +267,10 @@ const store = configureStore({
     products: productsSlice.reducer,
     showcase: showcaseSlice.reducer,
     offers: storeOffersSlice.reducer,
+    session: sessionSlice.reducer,
+    user: userSlice.reducer,
   },
 });
+
 
 export default store;

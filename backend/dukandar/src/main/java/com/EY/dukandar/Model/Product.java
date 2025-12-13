@@ -2,6 +2,9 @@ package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "products")
 public class Product {
@@ -13,11 +16,8 @@ public class Product {
     @Column(nullable = false)
     private String name;               // Example: "Black Formal Shirt"
 
-    @Column(nullable = false)
-    private String sku;     // Unique product code
-
-    @Column(nullable = false)
-    private String size;        // or private String size; with getter/setter
+    @Column(nullable = false, unique = true)
+    private String sku;                // Unique product code
 
     @Column(nullable = false)
     private double price;
@@ -29,28 +29,29 @@ public class Product {
     private String category;           // Example: "Shirts", "Winter Wear"
 
     @Column(nullable = false)
-    private String subCategory;        // Example: "Formal", "Casual"
+    private List<String> subCategory = new ArrayList<>();;
+    // Example: "Formal", "Casual"
 
     @Column(length = 1000)
-    private String description;        // Used for Vector DB embeddings
+    private String description;        // Used for vector DB search or embeddings
 
-    private String imageUrl;// For UI
-    private String modelUrl;
+    private String imageUrl;           // For UI display
+    private String modelUrl;           // Optional 3D model
 
     // Default constructor
     public Product() {}
 
-    // Constructor
+    // All-args constructor
     public Product(Long id, String name, String sku, double price,
-                   String size, String brand, String category, String subCategory, String description, String imageUrl, String modelUrl) {
+                    String brand, String category, String description,
+                   String imageUrl, String modelUrl) {
+
         this.id = id;
         this.name = name;
         this.sku = sku;
-        this.size = size;
         this.price = price;
         this.brand = brand;
         this.category = category;
-        this.subCategory = subCategory;
         this.description = description;
         this.imageUrl = imageUrl;
         this.modelUrl = modelUrl;
@@ -66,9 +67,6 @@ public class Product {
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
 
-    public String getSize() { return size; }
-    public void setSize(String size) { this.size = size; }
-
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
@@ -78,9 +76,6 @@ public class Product {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
-    public String getSubCategory() { return subCategory; }
-    public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
@@ -89,5 +84,11 @@ public class Product {
 
     public String getModelUrl() { return modelUrl; }
     public void setModelUrl(String modelUrl) { this.modelUrl = modelUrl; }
-}
 
+    public List<String> getSubCategory() {
+        return subCategory;
+    }
+    public void setSubCategory(List<String> subCategory) {
+        this.subCategory = subCategory;
+    }
+}

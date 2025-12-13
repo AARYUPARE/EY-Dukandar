@@ -35,24 +35,6 @@ public class ProductServiceImplementation implements ProductService {
     }
 
     @Override
-    public List<Product> searchProducts(String name, String size) {
-        // Normalize empty strings to null to trigger the correct query logic
-        if (name != null && name.trim().isEmpty()) {
-            name = null;
-        }
-        if (size != null && size.trim().isEmpty()) {
-            size = null;
-        }
-
-        // If both are null, optionally return empty list or all products
-        if (name == null && size == null) {
-            return List.of(); // or productRepository.findAll();
-        }
-
-        return productRepository.searchByNameAndSize(name, size);
-    }
-
-    @Override
     public Product updateProduct(Long id, Product productDetails) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
@@ -65,9 +47,6 @@ public class ProductServiceImplementation implements ProductService {
 
         if (productDetails.getPrice() > 0)
             product.setPrice(productDetails.getPrice());
-
-        if (productDetails.getSize() != null)
-            product.setSize(productDetails.getSize());
 
         if (productDetails.getBrand() != null)
             product.setBrand(productDetails.getBrand());

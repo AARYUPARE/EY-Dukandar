@@ -41,10 +41,42 @@ public class InventoryController {
         return inventoryService.updateStock(storeId, productId, stock);
     }
 
+    @PostMapping("/{storeId}/{productId}/reduce")
+    public Inventory reduceStock(@PathVariable Long storeId,
+                                 @PathVariable Long productId,
+                                 @RequestParam int qty) {
+        Inventory inv = inventoryService.reduceStock(storeId, productId, qty);
+        if (inv == null) {
+            throw new RuntimeException("Insufficient stock or inventory not found");
+        }
+        return inv;
+    }
+
+    @PostMapping("/{storeId}/{productId}/reserve")
+    public Inventory reserveStock(@PathVariable Long storeId,
+                                  @PathVariable Long productId,
+                                  @RequestParam int qty) {
+        Inventory inv = inventoryService.reserveStock(storeId, productId, qty);
+        if (inv == null) {
+            throw new RuntimeException("Insufficient stock or inventory not found");
+        }
+        return inv;
+    }
+
+    @PostMapping("/{storeId}/{productId}/add")
+    public Inventory addStock(@PathVariable Long storeId,
+                              @PathVariable Long productId,
+                              @RequestParam int qty) {
+        Inventory inv = inventoryService.increaseStock(storeId, productId, qty);
+        if (inv == null) {
+            throw new RuntimeException("Failed to add stock");
+        }
+        return inv;
+    }
+
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         inventoryService.deleteInventory(id);
         return "Inventory deleted.";
     }
 }
-

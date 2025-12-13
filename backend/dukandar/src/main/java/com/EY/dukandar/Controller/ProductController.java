@@ -19,7 +19,7 @@ public class ProductController {
         return productService.createProduct(product);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public Product getById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
@@ -29,19 +29,12 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
-    @GetMapping("/search")
-    public List<Product> searchProducts(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String size) {
-        return productService.searchProducts(name, size);
-    }
-
-    @PutMapping("/id/{id}")
+    @PutMapping("/{id}")
     public Product update(@PathVariable Long id, @RequestBody Product product) {
         return productService.updateProduct(id, product);
     }
 
-    @DeleteMapping("/id/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         productService.deleteProduct(id);
         return "Product deleted successfully.";

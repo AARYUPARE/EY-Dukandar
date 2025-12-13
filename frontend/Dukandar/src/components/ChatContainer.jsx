@@ -18,6 +18,7 @@ const ChatContainer = () => {
 
     const sendPromt = (prompt) => 
     {
+        console.log("Dispatching prompt:", prompt);
         dispatch(sendMessageAsync({ prompt: prompt }));
         
     }

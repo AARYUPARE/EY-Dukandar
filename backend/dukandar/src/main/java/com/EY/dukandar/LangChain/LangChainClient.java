@@ -1,47 +1,35 @@
 package com.EY.dukandar.LangChain;
 
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.http.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class LangChainClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final String PYTHON_SERVER_URL = "http://localhost:8000/query";
 
-    // URL of your Python backend LangChain orchestrator API
-    private final String AGENT_URL = "http://localhost:5000/agent/chat";
+    public Map<String, Object> sendToAgent(String context, String message) {
 
-    /**
-     * Sends chat context and user message to Python LangChain agent,
-     * returns the agent's response as String.
-     */
-    public String sendToAgent(String context, String message) {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("context", context);
+        payload.put("query", message);
 
-        // Prepare JSON body
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("context", context);
-        requestBody.put("message", message);
-
-        // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // Create HTTP entity with body + headers
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
 
-        // Send POST request to Python API
-        ResponseEntity<String> response = restTemplate.exchange(
-                AGENT_URL,
+        ResponseEntity<Map> response = restTemplate.exchange(
+                PYTHON_SERVER_URL,
                 HttpMethod.POST,
-                requestEntity,
-                String.class
+                entity,
+                Map.class
         );
 
-        // Return the response body (chatbot reply)
         return response.getBody();
     }
 }
