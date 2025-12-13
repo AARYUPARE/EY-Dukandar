@@ -14,9 +14,9 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping
-    public Product create(@RequestBody Product product) {
-        return productService.createProduct(product);
+    @PostMapping()
+    public List<Product> create(@RequestBody List<Product> products) {
+        return productService.createProducts(products);
     }
 
     @GetMapping("/{id}")

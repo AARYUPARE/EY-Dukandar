@@ -24,6 +24,8 @@ public class ChatController {
         // Service already returns ChatResponse → just return it
         ChatResponse response = chatService.processMessage(request);
 
+        System.out.println(response);
+
         return response;
     }
 }

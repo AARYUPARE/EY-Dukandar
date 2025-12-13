@@ -5,7 +5,8 @@ import com.EY.dukandar.Model.Product;
 import java.util.List;
 
 public interface ProductService {
-    Product createProduct(Product product);
+    List<Product> createProducts(List<Product> products);
+
 
     Product getProductById(Long id);
 

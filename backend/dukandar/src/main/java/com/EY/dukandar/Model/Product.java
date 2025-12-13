@@ -28,9 +28,13 @@ public class Product {
     @Column(nullable = false)
     private String category;           // Example: "Shirts", "Winter Wear"
 
-    @Column(nullable = false)
-    private List<String> subCategory = new ArrayList<>();;
-    // Example: "Formal", "Casual"
+    @ElementCollection
+    @CollectionTable(
+            name = "product_subcategories",
+            joinColumns = @JoinColumn(name = "product_id")
+    )
+    @Column(name = "sub_category")
+    private List<String> subCategory = new ArrayList<>();
 
     @Column(length = 1000)
     private String description;        // Used for vector DB search or embeddings

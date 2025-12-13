@@ -2,6 +2,10 @@ package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -12,6 +16,12 @@ public class User {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    private LocalDate dob;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -27,7 +37,7 @@ public class User {
     public User() {}
 
     // All-args constructor
-    public User(Long id, String name, String email, String phone, int loyaltyPoints, String imageUrl, String password) {
+    public User(Long id, String name, String email, String phone, int loyaltyPoints, String imageUrl, String password, String gender, LocalDate dob) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -35,6 +45,8 @@ public class User {
         this.loyaltyPoints = loyaltyPoints;
         this.imageUrl = imageUrl;
         this.password = password;
+        this.dob = dob;
+        this.gender = gender;
     }
 
     // Getters & Setters
@@ -62,4 +74,10 @@ public class User {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+
+    public LocalDate getDob() { return dob; }
+    public void setDob(LocalDate dob) { this.dob = dob; }
 }

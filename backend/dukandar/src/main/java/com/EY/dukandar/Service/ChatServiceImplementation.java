@@ -48,8 +48,6 @@ public class ChatServiceImplementation implements ChatService {
         // Build conversation context for agent
         String context = buildContext(history);
 
-        System.out.println(context);
-
         // Call LangChain Python agent
         Map<String, Object> agentResult =
                 langChainClient.sendToAgent(context, request.getMessage());

@@ -2,9 +2,11 @@ package com.EY.dukandar.Service;
 
 import com.EY.dukandar.Model.Product;
 import com.EY.dukandar.Repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +21,20 @@ public class ProductServiceImplementation implements ProductService {
     }
 
     @Override
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    @Transactional
+    public List<Product> createProducts(List<Product> products) {
+
+        List<Product> saved = new ArrayList<>();
+
+        for (Product product : products) {
+            if (!productRepository.existsBySku(product.getSku())) {
+                saved.add(productRepository.save(product));
+            }
+        }
+
+        return saved;
     }
+
 
     @Override
     public Product getProductById(Long id) {
