@@ -1,0 +1,6 @@
+sentence-transformers==2.3.2
+pinecone==5.2.0
+python-dotenv==1.0.1
+mysql-connector-python==8.1.0
+langchain-core==0.0.1  # replace with your actual langchain_core package if different
+numpy==1.25.2

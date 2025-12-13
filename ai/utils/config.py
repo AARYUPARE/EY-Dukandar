@@ -1,0 +1,4 @@
+# core/config.py
+PINECONE_INDEX = "dukandar"
+EMBED_DIM = 384
+DEFAULT_PINECONE_TOPK = 12
