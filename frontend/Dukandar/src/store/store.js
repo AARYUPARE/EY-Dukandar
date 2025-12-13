@@ -142,52 +142,49 @@ const productsSlice = createSlice({
   initialState: {
     products: [
       {
-        grn: 1,
-        title: "Virat Kohli",
-        image: "https://static.sociofyme.com/photo/151616345/151616345.jpg",
-        modelUrl: "/models/Shirt2.glb",
-        details: {
-          summary: "Recommended item 1",
-          strengths: ["Best Quality", "King"],
-          description: "A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.A paragraph is a group of sentences that collectively express a single idea or theme. It serves as a building block in writing, helping to organize thoughts and make the text easier to read and understand. Each paragraph should focus on one main idea, supported by additional details or examples that enhance the reader's comprehension.",
-        },
-        extraDetails: {
-          originalPrice: 1000,
-          offers: "50% off",
-          finalPrice: 500,
-        },
+        id: 1,
+        name: "Formal Shirt",
+        sku: "",
+        price: 1000.0000,
+        brand: "Cotton King",
+        category: "Shirt",
+        subCategory: [
+          "Formal",
+          "Men"
+        ],
+        description: "Best shirt for formal wear",
+        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/formalShirt1.png",
+        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
       },
       {
-        grn: 2,
-        title: "Laptop",
-        image: "https://picsum.photos/300",
-        modelUrl: "",
-        details: {
-          summary: "Recommended item 2",
-          strengths: [],
-          description: "",
-        },
-        extraDetails: {
-          originalPrice: 1000,
-          offers: "",
-          finalPrice: 500,
-        },
+        id: 2,
+        name: "Business Suit",
+        sku: "",
+        price: 1000.0000,
+        brand: "Ramesh Dieing",
+        category: "Suit",
+        subCategory: [
+          "Whole Outfit",
+          "Black"
+        ],
+        description: "This is full outfit created for business meetings",
+        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/businessSuit1.png",
+        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
       },
       {
-        grn: 3,
-        title: "Shoes",
-        image: "https://picsum.photos/310",
-        modelUrl: "",
-        details: {
-          summary: "Recommended item 3",
-          strengths: [],
-          description: "",
-        },
-        extraDetails: {
-          originalPrice: 1000,
-          offers: "",
-          finalPrice: 500,
-        },
+        id: 3,
+        name: "Sports Shoes",
+        sku: "",
+        price: 1000.0000,
+        brand: "Nike",
+        category: "Shoes",
+        subCategory: [
+          "Sprots",
+          "Nike"
+        ],
+        description: "Best product for running shoes",
+        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/nikeShoes1.png",
+        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/nikeShoes1.glb",
       },
     ],
   },
@@ -204,26 +201,34 @@ const storeOffersSlice = createSlice(
     initialState: {
       list: [
         {
-          grn: 1,
-          title: "Buy 1 Get 1 Free - Men's Shirts",
-          image: "https://www.pixelstalk.net/wp-content/uploads/2016/07/Wallpapers-pexels-photo.jpg",
+          id: 1,
+          name: "Buy 1 Get 1 Free - Men's Shirts",
+          sku: "",
+          price: 1000.0000,
+          brand: "Brand name 3",
+          category: "Main Category 3",
+          subCategory: [
+            "Sub Category 1",
+            "Sub Category 2"
+          ],
+          description: "Buy 1 shirt and get another free.",
+          imageUrl: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
           modelUrl: "",
-          details: {
-            summary: "BOGO Offer",
-            strengths: ["Limited Stock", "In-store Only"],
-            description: "Buy 1 shirt and get another free.",
-          }
         },
         {
-          grn: 2,
-          title: "Flat ₹500 off on Shoes",
-          image: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
-          modelUrl: "",
-          details: {
-            summary: "Festival Discount",
-            strengths: ["Best Price", "Exclusive"],
-            description: "Valid only for offline customers.",
-          }
+          id: 2,
+          name: "Flat ₹500 off on Shoes",
+          sku: "",
+          price: 1000.0000,
+          brand: "Brand name 3",
+          category: "Main Category 3",
+          subCategory: [
+            "Sub Category 1",
+            "Sub Category 2"
+          ],
+          description: "Valid only for offline customers. Best Price, Exclusive",
+          imageUrl: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
+          modelUrl: "", 
         },
       ],
     },
@@ -237,7 +242,7 @@ const showcaseSlice = createSlice(
 
     initialState:
     {
-
+      
     },
     reducers:
     {

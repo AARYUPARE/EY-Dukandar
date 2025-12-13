@@ -6,7 +6,6 @@ const StoreStaffLayout = () => {
     return (
         <div className="container">
             <StoreStaffSidebar />
-            {/* <Navbar />  */}
             <DashboardMain />
         </div>
     );

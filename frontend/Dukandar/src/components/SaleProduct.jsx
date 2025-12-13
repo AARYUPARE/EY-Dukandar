@@ -8,11 +8,81 @@ export default function SaleProduct() {
 
 
   const navigate = useNavigate();
-  const inventoryList = [];
+
+  const inventoryList = [
+    {
+      grn: "101",
+      title: "Virat Kohli Shirt",
+      stock: 12,
+      extraDetails: {
+        finalPrice: 499,
+        originalPrice: 799,
+        offers: "35% OFF",
+      }
+    },
+    {
+      grn: "205",
+      title: "Gaming Laptop",
+      stock: 5,
+      extraDetails: {
+        finalPrice: 45000,
+        originalPrice: 52000,
+        offers: "13% OFF",
+      }
+    },
+    {
+      grn: "334",
+      title: "Running Shoes",
+      stock: 8,
+      extraDetails: {
+        finalPrice: 2499,
+        originalPrice: 2899,
+        offers: "14% OFF",
+      }
+    },
+    {
+      grn: "412",
+      title: "SSD 256GB",
+      stock: 2,
+      extraDetails: {
+        finalPrice: 1999,
+        originalPrice: 2499,
+        offers: "20% OFF",
+      }
+    },
+    {
+      grn: "599",
+      title: "Wireless Headset",
+      stock: 0,
+      extraDetails: {
+        finalPrice: 1599,
+        originalPrice: 1999,
+        offers: "20% OFF",
+      }
+    }
+  ];
 
   useEffect(() => {
     //fetch inventory of the store and put it into the inventory list
   }, [])
+
+  if (!inventoryList || inventoryList.length === 0) {
+    return (
+      <div className={css.wrapper}>
+        <button className={css.backBtn} onClick={() => navigate("../")}>
+          <IoArrowBackCircle size={32} />
+        </button>
+
+        <div className={css.panel}>
+          <h2 className={css.title}>Inventory Exhausted</h2>
+          <p className={css.emptyMsg}>
+            No items available to sell. Please restock inventory first.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
 
   const [rows, setRows] = useState([
     { grn: "", title: "", price: "", quantity: "", total: "" }
@@ -20,36 +90,41 @@ export default function SaleProduct() {
 
   function updateRow(index, field, value) {
     const updated = [...rows];
-    updated[index][field] = value;
+    updated[index][field] = value; // ALWAYS update input
 
-    // Autofill name & price when GRN matches
+    const found = inventoryList.find((p) => String(p.grn) === String(updated[index].grn));
+
+    // GRN → Autofill Name & Price
     if (field === "grn") {
-      const found = inventoryList.find((p) => String(p.grn) === String(value));
-      if(found.title == "")
-      {
-        alert("Invalid Item number");
-        return;
+      if (found) {
+        updated[index].title = found.title;
+        updated[index].price = found.extraDetails.finalPrice;
+      } else {
+        // allow typing even when invalid
+        updated[index].title = "";
+        updated[index].price = "";
       }
-      updated[index].title = found.title;
-      updated[index].price = found.extraDetails.finalPrice;
     }
 
-    // Auto calculate total
-    if (field === "quantity") 
-    {
-      const found = inventoryList.find((p) => String(p.grn) === String(updated[index].grn));
-      if(value > found.stock) 
-      {
-        alert("Item quantity exceeded the present stock Quantity")
-        return;
+    // Quantity → Validate and calculate
+    if (field === "quantity") {
+      if (!found) {
+        alert("Invalid GRN! Enter a valid item first.");
+        updated[index].quantity = "";
+        updated[index].total = "";
+      } else if (Number(value) > found.stock) {
+        alert("Item quantity exceeded present stock!");
+        updated[index].quantity = "";
+        updated[index].total = "";
+      } else {
+        const price = Number(updated[index].price || 0);
+        updated[index].total = price * Number(value || 0);
       }
-      const price = Number(updated[index].price || 0);
-      updated[index].total = price * Number(value || 0);
-      found.stock -= value;
     }
 
     setRows(updated);
   }
+
 
   function addRow() {
     setRows([...rows, { grn: "", title: "", price: "", quantity: "", total: "" }]);

@@ -18,9 +18,18 @@ const ChatContainer = () => {
 
     const sendPromt = (prompt) => 
     {
+<<<<<<< HEAD
         console.log("Dispatching prompt:", prompt);
+=======
+        let ch=chatSlice.messages.at(-1);
+        if(ch && ch.isLoading)
+        {
+            return false;
+        }
+
+>>>>>>> 464fc68f8e4903a5d12fd159661bd310ff4bf80b
         dispatch(sendMessageAsync({ prompt: prompt }));
-        
+        return true;
     }
 
     return <div className="field-container">
