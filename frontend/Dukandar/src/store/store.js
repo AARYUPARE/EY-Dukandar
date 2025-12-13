@@ -57,7 +57,6 @@ export const sendMessageAsync = createAsyncThunk(
       })
     );
 
-    // add loader
     dispatch(
       chatAction.addMessage({
         id: loaderId,
@@ -66,7 +65,6 @@ export const sendMessageAsync = createAsyncThunk(
         isLoading: true,
       })
     );
-
     let res = null;  // Use let instead of const
 
     try {
@@ -97,6 +95,7 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
     }
+
   }
 );
 
@@ -148,13 +147,13 @@ const productsSlice = createSlice({
         price: 1000.0000,
         brand: "Cotton King",
         category: "Shirt",
-        subCategory: [
+        sub_category: [
           "Formal",
           "Men"
         ],
         description: "Best shirt for formal wear",
-        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/formalShirt1.png",
-        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
+        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/formalShirt1.png",
+        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
       },
       {
         id: 2,
@@ -163,13 +162,13 @@ const productsSlice = createSlice({
         price: 1000.0000,
         brand: "Ramesh Dieing",
         category: "Suit",
-        subCategory: [
+        sub_category: [
           "Whole Outfit",
           "Black"
         ],
         description: "This is full outfit created for business meetings",
-        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/businessSuit1.png",
-        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
+        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/businessSuit1.png",
+        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
       },
       {
         id: 3,
@@ -178,13 +177,13 @@ const productsSlice = createSlice({
         price: 1000.0000,
         brand: "Nike",
         category: "Shoes",
-        subCategory: [
+        sub_category: [
           "Sprots",
           "Nike"
         ],
         description: "Best product for running shoes",
-        imageUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/nikeShoes1.png",
-        modelUrl: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/nikeShoes1.glb",
+        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/nikeShoes1.png",
+        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/nikeShoes1.glb",
       },
     ],
   },
@@ -207,13 +206,13 @@ const storeOffersSlice = createSlice(
           price: 1000.0000,
           brand: "Brand name 3",
           category: "Main Category 3",
-          subCategory: [
+          sub_category: [
             "Sub Category 1",
             "Sub Category 2"
           ],
           description: "Buy 1 shirt and get another free.",
-          imageUrl: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
-          modelUrl: "",
+          image_url: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
+          model_url: "",
         },
         {
           id: 2,
@@ -222,13 +221,14 @@ const storeOffersSlice = createSlice(
           price: 1000.0000,
           brand: "Brand name 3",
           category: "Main Category 3",
-          subCategory: [
+          sub_category: [
             "Sub Category 1",
             "Sub Category 2"
           ],
           description: "Valid only for offline customers. Best Price, Exclusive",
           imageUrl: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
           modelUrl: "", 
+
         },
       ],
     },

@@ -34,7 +34,7 @@ const CardContainer = () => {
                         <Card
                             key={item.id ?? i}
                             title={item.name}
-                            imageUrl={item.imageUrl}
+                            image_url={item.image_url}
                             description={item.description ?? ""}
                             onClick={() => dispatch(showcaseAction.setShowcase(item))}
                             brand={item.brand}

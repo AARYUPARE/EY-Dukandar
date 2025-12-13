@@ -23,8 +23,8 @@ const ProductDisplay = () => {
             <button className={css.closeBtn} onClick={handelClose}>×</button>
 
             <div className={css["display-container"]}>
-                <ModelDisplay modelUrl={product.modelUrl} />
-                <ProductDetails description={product.description} title={product.name} category={product.category} subCategory={product.subCategory} brand={product.brand}/>
+                <ModelDisplay model_url={product.model_url} />
+                <ProductDetails description={product.description} title={product.name} category={product.category} sub_category={product.sub_category} brand={product.brand}/>
                 <PriceDetails price={product.price} />
             </div>
 

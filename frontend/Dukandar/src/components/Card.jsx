@@ -1,7 +1,7 @@
 import "../styles/Card.css";
 import Tilty from "../utils/Tilty.jsx";   // <-- add this import
 
-export default function Card({ title, imageUrl, description, onClick, brand }) {
+export default function Card({ title, image_url, description, onClick, brand }) {
   return (
     <Tilty
       max={25}
@@ -21,7 +21,7 @@ export default function Card({ title, imageUrl, description, onClick, brand }) {
         id="card-container"
       >
         <img
-          src={imageUrl}
+          src={image_url}
           alt={title}
           className="card-img-top"
           style={{

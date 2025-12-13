@@ -1,6 +1,6 @@
 import css from "../styles/ProductDetails.module.css"
 
-const ProductDetails = ({ description, title, brand, category, subCategory }) => {
+const ProductDetails = ({ description, title, brand, category, sub_category }) => {
     return <div id={`${css["product-details"]}`}>
         <div id={`${css["product-title"]}`}>
             <h2>{title}</h2>
@@ -11,7 +11,7 @@ const ProductDetails = ({ description, title, brand, category, subCategory }) =>
             <p>{category}</p>
             <h6>Sub Catogory: </h6>
             <ul>
-                {subCategory.map((m, i) => <li key={i}>{m}</li>)}
+                {sub_category.map((m, i) => <li key={i}>{m}</li>)}
             </ul>
         </div>
         <div id={`${css["product-description"]}`}>

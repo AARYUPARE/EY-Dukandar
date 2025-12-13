@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const ModelDisplay = ({ modelUrl }) => {
+const ModelDisplay = ({ model_url }) => {
     const mountRef = useRef(null);
     const canvasRef = useRef(null);
 
@@ -57,7 +57,7 @@ const ModelDisplay = ({ modelUrl }) => {
         let model = null;
 
         loader.load(
-            modelUrl,
+            model_url,
             (gltf) => {
                 model = gltf.scene;
 
@@ -114,7 +114,7 @@ const ModelDisplay = ({ modelUrl }) => {
             renderer.dispose();
             controls.dispose();
         };
-    }, [modelUrl]);
+    }, [model_url]);
 
     return (
         <div ref={mountRef} id={css["model-display"]}>
