@@ -1,7 +1,5 @@
 # main.py
 
-
-
 # LangChain
 from langchain_core.runnables import RunnableSequence
 from langchain_core.prompts import PromptTemplate

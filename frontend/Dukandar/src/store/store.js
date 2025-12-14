@@ -116,10 +116,12 @@ export const sendMessageAsync = createAsyncThunk(
       dispatch(
         chatAction.updateMessage({
           id: loaderId,
-          text: res.reply ?? "No reply, from Agent",
+          text: res.data.reply ?? "No reply, from Agent",
           isLoading: false,
         })
       );
+
+      dispatch(productsAction.addProducts({products: res.data.products || []}));
     } 
     catch (error) 
     {
@@ -180,7 +182,7 @@ const productsSlice = createSlice({
   initialState: {
     products: [
       {
-        id: 1,
+        id: 100,
         name: "Formal Shirt",
         sku: "",
         price: 1000.0000,
@@ -195,7 +197,7 @@ const productsSlice = createSlice({
         model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
       },
       {
-        id: 2,
+        id: 200,
         name: "Business Suit",
         sku: "",
         price: 1000.0000,
@@ -210,7 +212,7 @@ const productsSlice = createSlice({
         model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
       },
       {
-        id: 3,
+        id: 300,
         name: "Sports Shoes",
         sku: "",
         price: 1000.0000,
@@ -228,7 +230,9 @@ const productsSlice = createSlice({
   },
   reducers: {
     addProducts(state, action) {
-      state.products = [...state.products, ...action.payload.products];
+      let newProducts = [...state.products, ...action.payload.products];
+
+      return newProducts;    
     },
   },
 });

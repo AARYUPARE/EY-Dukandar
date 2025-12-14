@@ -53,6 +53,12 @@ public class UserServiceImplementation implements UserService {
         if (userDetails.getPassword() != null)
             user.setPassword(userDetails.getPassword());
 
+        if (userDetails.getGender() != null)
+            user.setGender(userDetails.getGender());
+
+        if (userDetails.getDob() != null)
+            user.setDob(userDetails.getDob());
+
         return userRepository.save(user);
     }
 
