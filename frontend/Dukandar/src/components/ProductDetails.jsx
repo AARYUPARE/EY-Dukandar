@@ -10,9 +10,9 @@ const ProductDetails = ({ description, title, brand, category, sub_category }) =
             <h6>Main Catogory: </h6>
             <p>{category}</p>
             <h6>Sub Catogory: </h6>
-            <ul>
+            {/* <ul>
                 {sub_category.map((m, i) => <li key={i}>{m}</li>)}
-            </ul>
+            </ul> */}
         </div>
         <div id={`${css["product-description"]}`}>
             <h6>Description: </h6>

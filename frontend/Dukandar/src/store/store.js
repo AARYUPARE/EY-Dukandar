@@ -9,7 +9,7 @@ const CHAT_API_URL = "http://localhost:8080/api/chat";
 
 const userSlice = createSlice({
   name: "user",
-  initialState: 
+  initialState:
   {
     id: 1,
     name: "Amit Sharma",
@@ -21,10 +21,9 @@ const userSlice = createSlice({
     imageUrl: "https://i.pravatar.cc/300?img=12",
     pass: "",
   },
-  reducers: 
+  reducers:
   {
-    setUser(state, action) 
-    {
+    setUser(state, action) {
       return action.payload;
     },
   }
@@ -42,10 +41,9 @@ const storeSlice = createSlice({
     longitude: 100.00,
     imageUrl: "",
   },
-  reducers: 
+  reducers:
   {
-    setStore(state, action)
-    {
+    setStore(state, action) {
       return action.payload;
     },
   },
@@ -65,16 +63,14 @@ const sessionSlice = createSlice({
 
 export const sendMessageAsync = createAsyncThunk(
   "chat/sendMessage",
-  async ({ prompt }, { dispatch, getState }) => 
-  {
+  async ({ prompt }, { dispatch, getState }) => {
     const time = Date.now().toString();
     const loaderId = time + "-loader";
 
     let sessionState = getState().session || {};
     let sessionId = sessionState.id;
 
-    if (!sessionId) 
-    {
+    if (!sessionId) {
       sessionId = Date.now().toString();
       dispatch(sessionActions.setSessionId(sessionId));
     }
@@ -100,10 +96,9 @@ export const sendMessageAsync = createAsyncThunk(
       session_id: "",
       reply: "",
       products: []
-    };  
+    };
 
-    try 
-    {
+    try {
       res = await axios.post(CHAT_API_URL, {
         userId: getState().user.id,
         sessionId: sessionId,
@@ -121,10 +116,9 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
 
-      dispatch(productsAction.addProducts({products: res.data.products || []}));
-    } 
-    catch (error) 
-    {
+      dispatch(productsAction.addProducts({ products: res.data.products || [] }));
+    }
+    catch (error) {
       console.error("Error sending message:", error);
 
       // Update loader message to show error message
@@ -181,58 +175,68 @@ const productsSlice = createSlice({
   name: "products",
   initialState: {
     products: [
-      {
-        id: 100,
-        name: "Formal Shirt",
-        sku: "",
-        price: 1000.0000,
-        brand: "Cotton King",
-        category: "Shirt",
-        sub_category: [
-          "Formal",
-          "Men"
-        ],
-        description: "Best shirt for formal wear",
-        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/formalShirt1.png",
-        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
-      },
-      {
-        id: 200,
-        name: "Business Suit",
-        sku: "",
-        price: 1000.0000,
-        brand: "Ramesh Dieing",
-        category: "Suit",
-        sub_category: [
-          "Whole Outfit",
-          "Black"
-        ],
-        description: "This is full outfit created for business meetings",
-        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/businessSuit1.png",
-        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
-      },
-      {
-        id: 300,
-        name: "Sports Shoes",
-        sku: "",
-        price: 1000.0000,
-        brand: "Nike",
-        category: "Shoes",
-        sub_category: [
-          "Sprots",
-          "Nike"
-        ],
-        description: "Best product for running shoes",
-        image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/nikeShoes1.png",
-        model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/nikeShoes1.glb",
-      },
+      // {
+      //   id: 100,
+      //   name: "Formal Shirt",
+      //   sku: "",
+      //   price: 1000.0000,
+      //   brand: "Cotton King",
+      //   category: "Shirt",
+      //   sub_category: [
+      //     "Formal",
+      //     "Men"
+      //   ],
+      //   description: "Best shirt for formal wear",
+      //   image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/formalShirt1.png",
+      //   model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/formalShirt1.glb",
+      // },
+      // {
+      //   id: 200,
+      //   name: "Business Suit",
+      //   sku: "",
+      //   price: 1000.0000,
+      //   brand: "Ramesh Dieing",
+      //   category: "Suit",
+      //   sub_category: [
+      //     "Whole Outfit",
+      //     "Black"
+      //   ],
+      //   description: "This is full outfit created for business meetings",
+      //   image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/businessSuit1.png",
+      //   model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/businessSuit1.glb",
+      // },
+      // {
+      //   id: 300,
+      //   name: "Sports Shoes",
+      //   sku: "",
+      //   price: 1000.0000,
+      //   brand: "Nike",
+      //   category: "Shoes",
+      //   sub_category: [
+      //     "Sprots",
+      //     "Nike"
+      //   ],
+      //   description: "Best product for running shoes",
+      //   image_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/images/nikeShoes1.png",
+      //   model_url: "https://raw.githubusercontent.com/AARYUPARE/EY-Dukandar-Assets/main/models/nikeShoes1.glb",
+      // },
     ],
   },
   reducers: {
     addProducts(state, action) {
-      let newProducts = [...state.products, ...action.payload.products];
+      const seenIds = new Set(state.products.map(p => p.id));
 
-      return newProducts;    
+      const uniqueProducts = [];
+
+      for (const product of action.payload.products) {
+        if (!seenIds.has(product.id)) {
+          seenIds.add(product.id);
+          uniqueProducts.push(product);
+        }
+      }
+
+      state.products.push(...uniqueProducts);
+      console.log(state.products);
     },
   },
 });
@@ -270,7 +274,7 @@ const storeOffersSlice = createSlice(
           ],
           description: "Valid only for offline customers. Best Price, Exclusive",
           imageUrl: "https://tse1.mm.bing.net/th/id/OIP.O87oS-9nFstg741tkap5GwHaEK?cb=ucfimg2&ucfimg=1&w=1920&h=1080&rs=1&pid=ImgDetMain&o=7&rm=3",
-          modelUrl: "", 
+          modelUrl: "",
 
         },
       ],
@@ -285,7 +289,7 @@ const showcaseSlice = createSlice(
 
     initialState:
     {
-      
+
     },
     reducers:
     {

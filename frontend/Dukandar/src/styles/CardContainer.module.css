@@ -6,6 +6,7 @@
     height: 100vh;
     box-sizing: border-box;
     margin: 0;
+    max-width: fit-content;
     padding: 20px 10px;
 
     background: linear-gradient(
