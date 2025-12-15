@@ -18,6 +18,9 @@ public class User {
     private String name;
 
     @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
     private String gender;
 
     @Column(nullable = false)
@@ -37,9 +40,10 @@ public class User {
     public User() {}
 
     // All-args constructor
-    public User(Long id, String name, String email, String phone, int loyaltyPoints, String imageUrl, String password, String gender, LocalDate dob) {
+    public User(Long id, String name, String location, String email, String phone, int loyaltyPoints, String imageUrl, String password, String gender, LocalDate dob) {
         this.id = id;
         this.name = name;
+        this.location = location;
         this.email = email;
         this.phone = phone;
         this.loyaltyPoints = loyaltyPoints;
@@ -55,6 +59,9 @@ public class User {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

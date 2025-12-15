@@ -42,6 +42,11 @@ public class ProductServiceImplementation implements ProductService {
         return productOpt.orElse(null);
     }
 
+    public List<Product> searchByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+
     @Override
     public List<Product> getAllProducts() {
         return productRepository.findAll();

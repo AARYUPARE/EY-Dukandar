@@ -14,30 +14,43 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // CREATE USER
     @PostMapping
     public User create(@RequestBody User user) {
         return userService.createUser(user);
     }
 
+    // GET USER BY ID
     @GetMapping("/{id}")
     public User getById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
+    // GET ALL USERS
     @GetMapping
     public List<User> getAll() {
         return userService.getAllUsers();
     }
 
+    // UPDATE USER
     @PutMapping("/{id}")
     public User update(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
+    // DELETE USER
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         userService.deleteUser(id);
         return "User deleted successfully.";
     }
-}
 
+    // ⭐ ADD LOYALTY POINTS (NEW — USED BY FULFILLMENT)
+    @PutMapping("/{id}/loyalty/add")
+    public User addLoyaltyPoints(
+            @PathVariable Long id,
+            @RequestParam int points
+    ) {
+        return userService.addLoyaltyPoints(id, points);
+    }
+}

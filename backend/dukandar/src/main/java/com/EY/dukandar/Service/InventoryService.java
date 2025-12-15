@@ -23,4 +23,6 @@ public interface InventoryService {
     Inventory increaseStock(Long storeId, Long productId, int qty);
 
     Inventory reserveStock(Long storeId, Long productId, int qty);
+
+    List<Inventory> checkInventory(Long productId, String size);
 }

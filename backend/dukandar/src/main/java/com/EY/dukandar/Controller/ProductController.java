@@ -19,6 +19,12 @@ public class ProductController {
         return productService.createProducts(products);
     }
 
+    @GetMapping("/search")
+    public List<Product> search(@RequestParam String name) {
+        return productService.searchByName(name);
+    }
+
+
     @GetMapping("/{id}")
     public Product getById(@PathVariable Long id) {
         return productService.getProductById(id);

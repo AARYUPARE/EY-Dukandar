@@ -37,35 +37,40 @@ public class UserServiceImplementation implements UserService {
 
         if (userDetails.getName() != null)
             user.setName(userDetails.getName());
-
+        if (userDetails.getLocation() != null)
+            user.setLocation(userDetails.getLocation());
         if (userDetails.getEmail() != null)
             user.setEmail(userDetails.getEmail());
-
         if (userDetails.getPhone() != null)
             user.setPhone(userDetails.getPhone());
-
-        if (userDetails.getLoyaltyPoints() != 0)
-            user.setLoyaltyPoints(userDetails.getLoyaltyPoints());
-
         if (userDetails.getImageUrl() != null)
             user.setImageUrl(userDetails.getImageUrl());
-
         if (userDetails.getPassword() != null)
             user.setPassword(userDetails.getPassword());
-
         if (userDetails.getGender() != null)
             user.setGender(userDetails.getGender());
-
         if (userDetails.getDob() != null)
             user.setDob(userDetails.getDob());
 
         return userRepository.save(user);
     }
 
-
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-}
 
+    // ----------------------------------------------------------
+    // ⭐ NEW METHOD (added without changing existing code)
+    // ----------------------------------------------------------
+    @Override
+    public User addLoyaltyPoints(Long userId, int points) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        int updatedPoints = user.getLoyaltyPoints() + points;
+        user.setLoyaltyPoints(updatedPoints);
+
+        return userRepository.save(user);
+    }
+}

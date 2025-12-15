@@ -34,6 +34,16 @@ public class InventoryController {
         return inventoryService.getInventoryForStore(storeId);
     }
 
+    @GetMapping("/check")
+    public List<Inventory> checkInventory(
+            @RequestParam Long productId,
+            @RequestParam(required = false) String size
+    ) {
+        return inventoryService.checkInventory(productId, size);
+    }
+
+
+
     @PutMapping("/{storeId}/{productId}")
     public Inventory updateStock(@PathVariable Long storeId,
                                  @PathVariable Long productId,

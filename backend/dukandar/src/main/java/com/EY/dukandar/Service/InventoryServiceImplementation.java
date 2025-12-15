@@ -50,6 +50,14 @@ public class InventoryServiceImplementation implements InventoryService {
         return null;
     }
 
+    public List<Inventory> checkInventory(Long productId, String size) {
+        if(size == null || size.isEmpty()) {
+            return inventoryRepository.findByProductId(productId);
+        }
+        return inventoryRepository.findByProductIdAndSize(productId, size);
+    }
+
+
     /** BUY OR RESERVE → Reduce stock atomically */
     @Override
     public Inventory reduceStock(Long storeId, Long productId, int qty) {

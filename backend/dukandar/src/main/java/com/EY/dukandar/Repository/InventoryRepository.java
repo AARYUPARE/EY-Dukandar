@@ -16,6 +16,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Inventory findByStoreIdAndProductId(Long storeId, Long productId);
 
+    List<Inventory> findByProductIdAndSize(Long productId, String size);
+
     /**
      * Atomically reduce stock (prevents oversell). Returns number of rows updated (0 or 1).
      * Requires calling method to be transactional.
