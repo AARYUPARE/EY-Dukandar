@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import css from "../styles/Login.module.css";
 
 const Login = ({ onLogin }) => {
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -19,7 +21,7 @@ const Login = ({ onLogin }) => {
                 <form className={css.form} onSubmit={handleSubmit}>
                     <div className={css.field}>
                         <FaUser className={css.icon} />
-                        <input 
+                        <input
                             type="email"
                             placeholder="Email"
                             value={email}
@@ -30,7 +32,7 @@ const Login = ({ onLogin }) => {
 
                     <div className={css.field}>
                         <FaLock className={css.icon} />
-                        <input 
+                        <input
                             type="password"
                             placeholder="Password"
                             value={pass}
@@ -44,6 +46,15 @@ const Login = ({ onLogin }) => {
                     </button>
 
                     <p className={css.forgot}>Forgot password?</p>
+
+                    {/* CREATE ACCOUNT BUTTON */}
+                    <button
+                        type="button"
+                        className={css.createBtn}
+                        onClick={() => navigate("/create-account")}
+                    >
+                        Create Account
+                    </button>
                 </form>
             </div>
         </div>

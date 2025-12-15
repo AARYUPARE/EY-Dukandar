@@ -4,54 +4,71 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat_session")
 public class ChatSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;        // owner of session (nullable for guest)
-    private String sessionId;   // unique session id string
+    private Long userId;
 
-    private LocalDateTime createdAt;    // when session started
-    private LocalDateTime lastActiveAt; // last chat activity time
+    @Column(unique = true, nullable = false)
+    private String sessionId;
 
-    public ChatSession() {}
+    private LocalDateTime createdAt;
+    private LocalDateTime lastActiveAt;
 
-    // Getters & Setters
+    // 🔥 NEW: Store last shown products as JSON
+    @Column(columnDefinition = "TEXT")
+    private String lastProductSnapshot;
+
+    // ---------- Getters & Setters ----------
+
     public Long getId() {
         return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getUserId() {
         return userId;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getSessionId() {
         return sessionId;
-    }
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public LocalDateTime getLastActiveAt() {
         return lastActiveAt;
     }
+
+    public String getLastProductSnapshot() {
+        return lastProductSnapshot;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public void setLastActiveAt(LocalDateTime lastActiveAt) {
         this.lastActiveAt = lastActiveAt;
+    }
+
+    public void setLastProductSnapshot(String lastProductSnapshot) {
+        this.lastProductSnapshot = lastProductSnapshot;
     }
 }

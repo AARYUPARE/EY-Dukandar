@@ -2,34 +2,32 @@ package com.EY.dukandar.LangChain;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.*;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class LangChainClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String PYTHON_SERVER_URL = "http://localhost:8000/query";
+    private final String AGENT_URL = "http://localhost:8000/query";
 
-    public Map<String, Object> sendToAgent(String context, String message) {
+    public Map<String, Object> sendToAgent(
+            String context,
+            String message,
+            List<?> lastProducts
+    ) {
 
-        Map<String, String> payload = new HashMap<>();
+        Map<String, Object> payload = new HashMap<>();
         payload.put("context", context);
-        payload.put("query", message);
+        payload.put("message", message);
+        payload.put("lastProducts", lastProducts);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                PYTHON_SERVER_URL,
-                HttpMethod.POST,
-                entity,
+        return restTemplate.postForObject(
+                AGENT_URL,
+                payload,
                 Map.class
         );
-
-        return response.getBody();
     }
 }

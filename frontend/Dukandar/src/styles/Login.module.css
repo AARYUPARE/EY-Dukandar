@@ -144,3 +144,21 @@
 .forgot:hover {
     text-decoration: underline;
 }
+
+.createBtn {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.createBtn:hover {
+    background: linear-gradient(90deg, #8e24ff, #39e6ff);
+    box-shadow: 0 0 20px rgba(142,36,255,0.4);
+    transform: translateY(-1px);
+}

@@ -1,5 +1,12 @@
 import css from "../styles/FullSidebar.module.css";
-import { TbLayoutSidebarLeftCollapseFilled, TbHexagonLetterD } from "react-icons/tb";
+import {
+  TbLayoutSidebarLeftCollapseFilled,
+  TbHexagonLetterD,
+  TbHome2,
+  TbUserCircle,
+  TbReceipt2,
+  TbShoppingCart
+} from "react-icons/tb";
 import { useDispatch } from "react-redux";
 import { sideBarAction } from "../store/store.js";
 import { Link, useLocation } from "react-router-dom";
@@ -12,9 +19,8 @@ const FullSidebar = () => {
     dispatch(sideBarAction.collapse());
   };
 
-  // helper: if exact=true do strict equality, otherwise check prefix (so subroutes count)
   const isActive = (path, exact = false) => {
-    const current = location.pathname.replace(/\/+$/, ""); // strip trailing slash
+    const current = location.pathname.replace(/\/+$/, "");
     const target = path.replace(/\/+$/, "");
     if (exact) return current === target;
     return current === target || current.startsWith(target + "/");
@@ -22,6 +28,7 @@ const FullSidebar = () => {
 
   return (
     <div className={css.sidebar} id={css.sidebarWrapper}>
+      {/* Brand */}
       <div className={css.brandRow}>
         <div className={css.logoContainer}>
           <TbHexagonLetterD />
@@ -32,12 +39,14 @@ const FullSidebar = () => {
         </div>
       </div>
 
+      {/* Navigation */}
       <ul className={css.navList}>
         <li>
           <Link
             to=""
             className={`${css.navItem} ${isActive("", true) ? css.active : ""}`}
           >
+            <TbHome2 className={css.navIcon} />
             Home
           </Link>
         </li>
@@ -47,6 +56,7 @@ const FullSidebar = () => {
             to="profile"
             className={`${css.navItem} ${isActive("profile") ? css.active : ""}`}
           >
+            <TbUserCircle className={css.navIcon} />
             Profile
           </Link>
         </li>
@@ -56,15 +66,30 @@ const FullSidebar = () => {
             to="orders"
             className={`${css.navItem} ${isActive("orders") ? css.active : ""}`}
           >
+            <TbReceipt2 className={css.navIcon} />
             Orders
           </Link>
         </li>
 
-        
+        <li>
+          <Link
+            to="cart"
+            className={`${css.navItem} ${isActive("cart") ? css.active : ""}`}
+          >
+            <TbShoppingCart className={css.navIcon} />
+            Cart
+          </Link>
+        </li>
       </ul>
 
+      {/* Footer */}
       <div className={css.footer}>
-        <img src="https://github.com/mdo.png" width="36" height="36" className={css.avatar} />
+        <img
+          src="https://github.com/mdo.png"
+          width="36"
+          height="36"
+          className={css.avatar}
+        />
         <strong className={css.profileName}>mdo</strong>
       </div>
     </div>

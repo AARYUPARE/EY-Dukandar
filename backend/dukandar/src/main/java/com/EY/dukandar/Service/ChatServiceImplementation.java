@@ -1,13 +1,11 @@
 package com.EY.dukandar.Service;
 
 import com.EY.dukandar.LangChain.LangChainClient;
-import com.EY.dukandar.Model.ChatHistory;
-import com.EY.dukandar.Model.ChatRequest;
-import com.EY.dukandar.Model.ChatResponse;
-import com.EY.dukandar.Model.ChatSession;
-import com.EY.dukandar.Model.Product;
+import com.EY.dukandar.Model.*;
 import com.EY.dukandar.Repository.ChatHistoryRepository;
 import com.EY.dukandar.Repository.ChatSessionRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +26,12 @@ public class ChatServiceImplementation implements ChatService {
     @Autowired
     private LangChainClient langChainClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public ChatResponse processMessage(ChatRequest request) {
 
-        // Basic validations
         if (request.getSessionId() == null || request.getSessionId().isEmpty()) {
             throw new IllegalArgumentException("SessionId cannot be null or empty");
         }
@@ -41,25 +40,49 @@ public class ChatServiceImplementation implements ChatService {
             throw new IllegalArgumentException("UserId cannot be null");
         }
 
-        // Load conversation history
+        // Load history
         List<ChatHistory> history =
-                chatHistoryRepository.findBySessionIdOrderByTimestampAsc(request.getSessionId());
+                chatHistoryRepository.findBySessionIdOrderByTimestampAsc(
+                        request.getSessionId()
+                );
 
-        // Build conversation context for agent
         String context = buildContext(history);
 
-        // Call LangChain Python agent
-        Map<String, Object> agentResult =
-                langChainClient.sendToAgent(context, request.getMessage());
+        // 🔥 Load last product list from session
+        ChatSession session =
+                getOrCreateChatSession(request.getUserId(), request.getSessionId());
 
-        // Extract reply & products
-        String reply = (String) agentResult.getOrDefault("reply",
-                "Sorry, I couldn't understand that.");
+        List<Product> lastProducts = Collections.emptyList();
+
+        if (session.getLastProductSnapshot() != null) {
+            try {
+                lastProducts = objectMapper.readValue(
+                        session.getLastProductSnapshot(),
+                        new TypeReference<List<Product>>() {}
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 🔥 Send context + message + lastProducts to Python agent
+        Map<String, Object> agentResult =
+                langChainClient.sendToAgent(
+                        context,
+                        request.getMessage(),
+                        lastProducts
+                );
+
+        String reply = (String) agentResult.getOrDefault(
+                "reply", "Sorry, I couldn't understand that."
+        );
 
         List<Product> products =
-                (List<Product>) agentResult.getOrDefault("products", Collections.emptyList());
+                (List<Product>) agentResult.getOrDefault(
+                        "products", Collections.emptyList()
+                );
 
-        // Save user message + bot reply
+        // Save chat history
         ChatHistory entry = new ChatHistory();
         entry.setUserId(request.getUserId());
         entry.setSessionId(request.getSessionId());
@@ -68,12 +91,21 @@ public class ChatServiceImplementation implements ChatService {
         entry.setTimestamp(LocalDateTime.now());
         chatHistoryRepository.save(entry);
 
-        // Update chat session activity
-        ChatSession session = getOrCreateChatSession(request.getUserId(), request.getSessionId());
+        // 🔥 Update session
         session.setLastActiveAt(LocalDateTime.now());
+
+        if (products != null && !products.isEmpty()) {
+            try {
+                String snapshot = objectMapper.writeValueAsString(products);
+                session.setLastProductSnapshot(snapshot);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         chatSessionRepository.save(session);
 
-        // Build final ChatResponse for frontend
+        // Response
         ChatResponse response = new ChatResponse();
         response.setSessionId(request.getSessionId());
         response.setReply(reply);
@@ -82,17 +114,16 @@ public class ChatServiceImplementation implements ChatService {
         return response;
     }
 
-
     @Override
     public List<ChatHistory> getChatHistoryBySession(String sessionId) {
         return chatHistoryRepository.findBySessionIdOrderByTimestampAsc(sessionId);
     }
 
-
     @Override
     public ChatSession getOrCreateChatSession(Long userId, String sessionId) {
 
-        ChatSession session = chatSessionRepository.findBySessionId(sessionId);
+        ChatSession session =
+                chatSessionRepository.findBySessionId(sessionId);
 
         if (session == null) {
             session = new ChatSession();
@@ -109,10 +140,10 @@ public class ChatServiceImplementation implements ChatService {
         return session;
     }
 
-
     @Override
     public void updateSessionActivity(String sessionId) {
-        ChatSession session = chatSessionRepository.findBySessionId(sessionId);
+        ChatSession session =
+                chatSessionRepository.findBySessionId(sessionId);
 
         if (session != null) {
             session.setLastActiveAt(LocalDateTime.now());
@@ -120,8 +151,6 @@ public class ChatServiceImplementation implements ChatService {
         }
     }
 
-
-    // Build AI context from previous chat history
     private String buildContext(List<ChatHistory> history) {
         StringBuilder sb = new StringBuilder();
 

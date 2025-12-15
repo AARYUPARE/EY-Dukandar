@@ -6,18 +6,25 @@ app = FastAPI()
 
 class Query(BaseModel):
     context: str
-    query: str
+    message: str
+    lastProducts: list = []   # 🔥 REQUIRED
 
 @app.post("/query")
 def query(data: Query):
     print(data)
-    user_query = data.query
-    response = orchestrator.chat(user_query)
+
+    user_query = data.message
+    last_products = data.lastProducts
+
+    response = orchestrator.chat(
+        message=user_query,
+        last_products=last_products
+    )
 
     # Convert any bytes → safe string
     def safe_convert(obj):
         if isinstance(obj, bytes):
-            return obj.hex()        # or base64.b64encode(obj).decode()
+            return obj.hex()
         if isinstance(obj, dict):
             return {k: safe_convert(v) for k, v in obj.items()}
         if isinstance(obj, list):
@@ -29,6 +36,6 @@ def query(data: Query):
     return {
         "reply": response.get("reply"),
         "products": response.get("products"),
+        # optional (but useful)
+        "storeInventory": response.get("storeInventory")
     }
-
-

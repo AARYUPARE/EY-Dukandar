@@ -1,28 +1,49 @@
-# agents/inventory_agent.py
+import requests
 
-from vectorstore.pinecone_client import index
-from vectorstore.embedder import embed
-from db.product_queries import fetch_products_by_ids
-from utils.text_cleaner import clean_text
+BACKEND_BASE_URL = "http://localhost:8080"
 
-class InventoryAgent:
-    def __init__(self, recommendation_agent, llm=None):
-        self.reco = recommendation_agent
-        self.llm = llm
+def handle(sales_output):
 
-    def handle(self, query):
-        vec = embed(clean_text(query))
-        res = index.query(vector=vec, top_k=10, include_metadata=True)
+    product_name = sales_output.get("product_name")
+    size = sales_output.get("size")
 
-        matches = res.get("matches", [])
-        ids = [m["id"] for m in matches]
+    if not product_name:
+        return {"error": "No product name provided"}
 
-        inventory = fetch_products_by_ids(ids)
+    try:
+        # 1) Search product in backend
+        product_response = requests.get(
+            f"{BACKEND_BASE_URL}/api/products/search",
+            params={"name": product_name}
+        )
 
-        reco = self.reco.handle(query)
+        if product_response.status_code != 200:
+            return {"error": "Product service error"}
+
+        products = product_response.json()
+        if not products:
+            return {"inventory": []}
+
+        product = products[0]
+        product_id = product.get("id")
+
+        # 2) Check inventory for this product
+        inventory_response = requests.get(
+            f"{BACKEND_BASE_URL}/api/inventory/check",
+            params={"productId": product_id, "size": size}
+        )
+
+        if inventory_response.status_code != 200:
+            return {"error": "Inventory service error"}
+
+        inventory_data = inventory_response.json()
 
         return {
-            "inventory": inventory,
-            "similar": reco["similar"],
-            "complementary": reco["complementary"]
+            "inventory": inventory_data,
+            "product": product,
+            "category": product.get("category"),
+            "subCategory": product.get("subCategory", [])
         }
+
+    except Exception as e:
+        return {"error": str(e)}

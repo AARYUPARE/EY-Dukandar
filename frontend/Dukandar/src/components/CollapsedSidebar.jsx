@@ -1,10 +1,11 @@
 import "../styles/CollapsedSidebar.css";
-import { IoHomeOutline } from "react-icons/io5";
-import { MdDashboard } from "react-icons/md";
-import { BsTable } from "react-icons/bs";
-import { TbGridDots } from "react-icons/tb";
-import { CgProfile } from "react-icons/cg";
-import { RiExpandLeftRightFill } from "react-icons/ri";
+import {
+  TbHome2,
+  TbUserCircle,
+  TbReceipt2,
+  TbShoppingCart,
+  TbLayoutSidebarRightExpand
+} from "react-icons/tb";
 import { sideBarAction } from "../store/store";
 import { useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -17,7 +18,6 @@ const CollapsedSidebar = () => {
     dispatch(sideBarAction.expand());
   };
 
-  // same helper logic as full sidebar: exact for home, prefix for others
   const isActive = (path, exact = false) => {
     const current = location.pathname.replace(/\/+$/, "");
     const target = path.replace(/\/+$/, "");
@@ -27,10 +27,18 @@ const CollapsedSidebar = () => {
 
   return (
     <div className="collapsed-sidebar">
-      <div className="expand-button" onClick={handleExpand} title="Expand sidebar" role="button" tabIndex={0}>
-        <RiExpandLeftRightFill />
+      {/* Expand Button */}
+      <div
+        className="expand-button"
+        onClick={handleExpand}
+        title="Expand sidebar"
+        role="button"
+        tabIndex={0}
+      >
+        <TbLayoutSidebarRightExpand />
       </div>
 
+      {/* Navigation */}
       <ul className="collapsed-nav">
         <li>
           <Link
@@ -39,7 +47,7 @@ const CollapsedSidebar = () => {
             title="Home"
             aria-label="Home"
           >
-            <IoHomeOutline />
+            <TbHome2 />
           </Link>
         </li>
 
@@ -50,7 +58,7 @@ const CollapsedSidebar = () => {
             title="Profile"
             aria-label="Profile"
           >
-            <CgProfile />
+            <TbUserCircle />
           </Link>
         </li>
 
@@ -61,15 +69,31 @@ const CollapsedSidebar = () => {
             title="Orders"
             aria-label="Orders"
           >
-            <BsTable />
+            <TbReceipt2 />
           </Link>
         </li>
 
-        
+        <li>
+          <Link
+            to="/chat/cart"
+            className={`collapsed-link ${isActive("/chat/cart") ? "active" : ""}`}
+            title="Cart"
+            aria-label="Cart"
+          >
+            <TbShoppingCart />
+          </Link>
+        </li>
       </ul>
 
+      {/* Footer */}
       <div className="collapsed-footer">
-        <img src="https://github.com/mdo.png" width="28" height="28" className="avatar" alt="profile" />
+        <img
+          src="https://github.com/mdo.png"
+          width="28"
+          height="28"
+          className="avatar"
+          alt="profile"
+        />
       </div>
     </div>
   );

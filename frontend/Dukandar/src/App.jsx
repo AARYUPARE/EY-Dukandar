@@ -16,6 +16,8 @@ import Sales from './components/Sales';
 import OffersContainer from './components/OfferContainer';
 import Profile from './components/Profile';
 import Orders from './components/Orders';
+import CreateAccount from './components/CreateAccount';
+import Cart from './components/Cart';
 
 const appRouter = createBrowserRouter([
   {
@@ -25,6 +27,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/login",
     element: <Login />
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccount />
   },
   {
     path: "/chat",
@@ -44,6 +50,10 @@ const appRouter = createBrowserRouter([
       {
         path: "orders",
         element:<Orders/>
+      },
+      {
+        path: "cart",
+        element: <Cart />
       }
     ]
 
