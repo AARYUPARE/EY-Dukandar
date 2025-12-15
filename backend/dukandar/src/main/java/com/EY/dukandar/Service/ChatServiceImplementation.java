@@ -149,8 +149,6 @@ public class ChatServiceImplementation implements ChatService {
         response.setProducts(products);
         response.setStores(stores);
 
-        System.out.println(response);
-
         return response;
     }
 

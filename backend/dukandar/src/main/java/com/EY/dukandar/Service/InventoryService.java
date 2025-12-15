@@ -19,11 +19,7 @@ public interface InventoryService {
 
     void deleteInventory(Long id);
 
-    Inventory reduceStock(Long storeId, Long productId, int qty);
-
-    Inventory increaseStock(Long storeId, Long productId, int qty);
-
-    Inventory reserveStock(Long storeId, Long productId, int qty);
+    Inventory reduceStock(Long storeId, Long productId, String size, int qty);
 
     List<Inventory> checkInventory(Long productId, String size);
 

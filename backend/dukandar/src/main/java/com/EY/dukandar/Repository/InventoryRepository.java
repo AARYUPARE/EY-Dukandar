@@ -18,21 +18,19 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     List<Inventory> findByProductIdAndSize(Long productId, String size);
 
-    /**
-     * Atomically reduce stock (prevents oversell). Returns number of rows updated (0 or 1).
-     * Requires calling method to be transactional.
-     */
-    @Query("UPDATE Inventory i SET i.stockQuantity = i.stockQuantity - :qty WHERE i.storeId = :storeId AND i.productId = :productId AND i.stockQuantity >= :qty")
-    int reduceStockAtomic(@Param("storeId") Long storeId,
-                          @Param("productId") Long productId,
-                          @Param("qty") int qty);
-
-    /**
-     * Atomically increase stock (e.g., new shipment). Returns number of rows updated.
-     */
     @Modifying
-    @Query("UPDATE Inventory i SET i.stockQuantity = i.stockQuantity + :qty WHERE i.storeId = :storeId AND i.productId = :productId")
-    int increaseStockAtomic(@Param("storeId") Long storeId,
-                            @Param("productId") Long productId,
-                            @Param("qty") int qty);
+    @Query("""
+    UPDATE Inventory i
+    SET i.stockQuantity = i.stockQuantity - :orderedQty
+    WHERE i.storeId = :storeId
+      AND i.productId = :productId
+      AND i.size = :size
+      AND i.stockQuantity >= :orderedQty
+    """)
+        int reduceStock(Long storeId,
+                        Long productId,
+                        String size,
+                        int orderedQty);
+
+
 }

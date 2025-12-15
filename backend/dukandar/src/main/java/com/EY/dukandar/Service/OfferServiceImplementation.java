@@ -50,17 +50,7 @@ public class OfferServiceImplementation implements OfferService {
     }
 
     @Override
-    public List<Offer> getAllOffers() {
-        return offerRepository.findAll();
-    }
-
-    @Override
-    public List<Offer> getActiveOffers() {
-        return offerRepository.findByActiveTrue();
-    }
-
-    @Override
-    public List<Offer> getEligibleOffers(int loyaltyPoints) {
-        return offerRepository.findByMinPointsRequiredLessThanEqual(loyaltyPoints);
+    public List<Offer> searchAllOffers(int loyaltyPoints) {
+        return offerRepository.findByActiveTrueAndMinPointsRequiredLessThanEqual(loyaltyPoints);
     }
 }

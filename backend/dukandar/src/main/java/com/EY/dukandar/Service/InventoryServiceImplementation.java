@@ -68,10 +68,10 @@ public class InventoryServiceImplementation implements InventoryService {
     }
 
     @Override
-    public Inventory reduceStock(Long storeId, Long productId, int qty) {
+    public Inventory reduceStock(Long storeId, Long productId, String size, int qty) {
         if (qty <= 0) return null;
 
-        int updated = inventoryRepository.reduceStockAtomic(storeId, productId, qty);
+        int updated = inventoryRepository.reduceStock(storeId, productId, size, qty);
         if (updated <= 0) {
             return null;
         }
@@ -82,39 +82,6 @@ public class InventoryServiceImplementation implements InventoryService {
             return inv;
         }
         return null;
-    }
-
-    @Override
-    public Inventory increaseStock(Long storeId, Long productId, int qty) {
-        if (qty <= 0) return null;
-
-        int updated = inventoryRepository.increaseStockAtomic(storeId, productId, qty);
-        if (updated <= 0) {
-            Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
-            if (inv == null) {
-                Inventory newInv = new Inventory();
-                newInv.setProductId(productId);
-                newInv.setStoreId(storeId);
-                newInv.setStockQuantity(qty);
-                newInv.setAvailable(qty > 0);
-                return inventoryRepository.save(newInv);
-            } else {
-                inv.setAvailable(inv.getStockQuantity() > 0);
-                return inventoryRepository.save(inv);
-            }
-        }
-
-        Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
-        if (inv != null) {
-            inv.setAvailable(inv.getStockQuantity() > 0);
-            return inv;
-        }
-        return null;
-    }
-
-    @Override
-    public Inventory reserveStock(Long storeId, Long productId, int qty) {
-        return reduceStock(storeId, productId, qty);
     }
 
     @Override

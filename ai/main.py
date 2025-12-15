@@ -1,6 +1,4 @@
-# main.py
 
-# LangChain
 from langchain_core.runnables import RunnableSequence
 from langchain_core.prompts import PromptTemplate
 
@@ -11,14 +9,9 @@ from langchain_core.runnables import RunnableSequence
 from dotenv import load_dotenv
 import os
 
-# Load environment variables
 load_dotenv()
 
-# Initialize Groq LLaMA 3 model (free API key from https://console.groq.com/keys)
 
-# ---------------------------------------------------------
-# 1. LLM SETUP (Fix: ensure a Runnable LLM is available)
-# ---------------------------------------------------------
 try:
     llm = ChatGroq(
         model="llama-3.1-8b-instant",

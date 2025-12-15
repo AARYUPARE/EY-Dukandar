@@ -8,7 +8,5 @@ public interface OfferService {
     Offer updateOffer(Long id, Offer offer);
     void deleteOffer(Long id);
     Offer getOfferById(Long id);
-    List<Offer> getAllOffers();
-    List<Offer> getActiveOffers();
-    List<Offer> getEligibleOffers(int loyaltyPoints);
+    List<Offer> searchAllOffers(int loyaltyPoints);
 }

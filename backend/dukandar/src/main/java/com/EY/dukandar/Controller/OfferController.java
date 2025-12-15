@@ -25,8 +25,8 @@ public class OfferController {
     }
 
     @GetMapping
-    public List<Offer> getAllOffers() {
-        return offerService.getAllOffers();
+    public List<Offer> searchOffers(int loyaltyPoints) {
+        return offerService.searchAllOffers(loyaltyPoints);
     }
 
     @PutMapping("/{id}")
