@@ -4,6 +4,7 @@ import com.EY.dukandar.LangChain.LangChainClient;
 import com.EY.dukandar.Model.*;
 import com.EY.dukandar.Repository.ChatHistoryRepository;
 import com.EY.dukandar.Repository.ChatSessionRepository;
+import com.EY.dukandar.Repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,16 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ChatServiceImplementation implements ChatService {
 
     @Autowired
     private ChatHistoryRepository chatHistoryRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ChatSessionRepository chatSessionRepository;
@@ -40,7 +45,7 @@ public class ChatServiceImplementation implements ChatService {
             throw new IllegalArgumentException("UserId cannot be null");
         }
 
-        // Load history
+        // 1️⃣ Load chat history
         List<ChatHistory> history =
                 chatHistoryRepository.findBySessionIdOrderByTimestampAsc(
                         request.getSessionId()
@@ -48,10 +53,11 @@ public class ChatServiceImplementation implements ChatService {
 
         String context = buildContext(history);
 
-        // 🔥 Load last product list from session
+        // 2️⃣ Load session
         ChatSession session =
                 getOrCreateChatSession(request.getUserId(), request.getSessionId());
 
+        // 3️⃣ Load last products from snapshot (AS Product)
         List<Product> lastProducts = Collections.emptyList();
 
         if (session.getLastProductSnapshot() != null) {
@@ -65,24 +71,55 @@ public class ChatServiceImplementation implements ChatService {
             }
         }
 
-        // 🔥 Send context + message + lastProducts to Python agent
+        // 🔥 4️⃣ CONVERT Products → Map before sending to AI
+        List<Map<String, Object>> lastProductMaps = Collections.emptyList();
+
+        try {
+            lastProductMaps = objectMapper.convertValue(
+                    lastProducts,
+                    new TypeReference<List<Map<String, Object>>>() {}
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 5️⃣ Call Python Agent
         Map<String, Object> agentResult =
                 langChainClient.sendToAgent(
                         context,
                         request.getMessage(),
-                        lastProducts
+                        lastProductMaps,
+                        getUser(session.getId())  // 🔥 PASS FULL USER
                 );
 
+        // 6️⃣ Extract reply
         String reply = (String) agentResult.getOrDefault(
                 "reply", "Sorry, I couldn't understand that."
         );
 
-        List<Product> products =
-                (List<Product>) agentResult.getOrDefault(
-                        "products", Collections.emptyList()
-                );
+        // 🔥 7️⃣ Convert AI products → Product entity
+        List<Product> products = Collections.emptyList();
 
-        // Save chat history
+        try {
+            products = objectMapper.convertValue(
+                    agentResult.getOrDefault("products", Collections.emptyList()),
+                    new TypeReference<List<Product>>() {}
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Store> stores = Collections.emptyList();
+
+        try {
+            stores = objectMapper.convertValue(
+                    agentResult.getOrDefault("stores", Collections.emptyList()),
+                    new TypeReference<List<Store>>() {}
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 8️⃣ Save chat history
         ChatHistory entry = new ChatHistory();
         entry.setUserId(request.getUserId());
         entry.setSessionId(request.getSessionId());
@@ -91,7 +128,7 @@ public class ChatServiceImplementation implements ChatService {
         entry.setTimestamp(LocalDateTime.now());
         chatHistoryRepository.save(entry);
 
-        // 🔥 Update session
+        // 9️⃣ Update session
         session.setLastActiveAt(LocalDateTime.now());
 
         if (products != null && !products.isEmpty()) {
@@ -105,11 +142,14 @@ public class ChatServiceImplementation implements ChatService {
 
         chatSessionRepository.save(session);
 
-        // Response
+        // 🔟 Response
         ChatResponse response = new ChatResponse();
         response.setSessionId(request.getSessionId());
         response.setReply(reply);
         response.setProducts(products);
+        response.setStores(stores);
+
+        System.out.println(response);
 
         return response;
     }
@@ -149,6 +189,11 @@ public class ChatServiceImplementation implements ChatService {
             session.setLastActiveAt(LocalDateTime.now());
             chatSessionRepository.save(session);
         }
+    }
+
+    public User getUser(Long id) {
+        Optional<User> userOpt = userRepository.findById(id);
+        return userOpt.orElse(null);
     }
 
     private String buildContext(List<ChatHistory> history) {

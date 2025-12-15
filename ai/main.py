@@ -68,7 +68,7 @@ agents = {
 # ---------------------------------------------------------
 # 4. ORCHESTRATOR
 # ---------------------------------------------------------
-from orchestrator.sales_agent_orchestrator import SalesAgentOrchestrator
+from orchestrator.sales_agent import SalesAgentOrchestrator
 
 orchestrator = SalesAgentOrchestrator(agents=agents, llm=llm)
 

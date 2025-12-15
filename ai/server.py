@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional, Dict, Any
 from main import orchestrator
 
 app = FastAPI()
@@ -7,21 +8,21 @@ app = FastAPI()
 class Query(BaseModel):
     context: str
     message: str
-    lastProducts: list = []   # 🔥 REQUIRED
+    lastProducts: list = []
+    user: Optional[Dict[str, Any]] = None   # ✅ USER COMES HERE
 
 @app.post("/query")
 def query(data: Query):
-    print(data)
-
-    user_query = data.message
-    last_products = data.lastProducts
+    print("📨 Incoming request:", data)
 
     response = orchestrator.chat(
-        message=user_query,
-        last_products=last_products
+        message=data.message,
+        last_products=data.lastProducts,
+        user=data.user
     )
 
-    # Convert any bytes → safe string
+    print("🤖 Agent response (raw):", response)
+
     def safe_convert(obj):
         if isinstance(obj, bytes):
             return obj.hex()
@@ -36,6 +37,5 @@ def query(data: Query):
     return {
         "reply": response.get("reply"),
         "products": response.get("products"),
-        # optional (but useful)
-        "storeInventory": response.get("storeInventory")
+        "stores": response.get("storeInventory")
     }

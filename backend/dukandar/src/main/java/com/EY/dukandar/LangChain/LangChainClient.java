@@ -1,5 +1,6 @@
 package com.EY.dukandar.LangChain;
 
+import com.EY.dukandar.Model.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,18 +12,22 @@ import java.util.Map;
 public class LangChainClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String AGENT_URL = "http://localhost:8000/query";
+    private static final String AGENT_URL = "http://localhost:8000/query";
 
     public Map<String, Object> sendToAgent(
             String context,
             String message,
-            List<?> lastProducts
+            List<Map<String, Object>> lastProducts,
+            User user
     ) {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("context", context);
         payload.put("message", message);
         payload.put("lastProducts", lastProducts);
+        payload.put("user", user); // 🔥 FULL USER
+
+
 
         return restTemplate.postForObject(
                 AGENT_URL,

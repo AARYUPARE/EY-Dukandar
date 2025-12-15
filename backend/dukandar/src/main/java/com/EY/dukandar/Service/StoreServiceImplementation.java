@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StoreServiceImplementation implements StoreService {
@@ -60,10 +61,17 @@ public class StoreServiceImplementation implements StoreService {
         return storeRepository.save(store);
     }
 
-
     @Override
     public void deleteStore(Long id) {
         storeRepository.deleteById(id);
     }
-}
 
+    // 🔥 NEW METHOD (NON-BREAKING)
+    @Override
+    public List<Store> getStoresWithCoordinates() {
+        return storeRepository.findAll()
+                .stream()
+                .filter(s -> s.getLatitude() != null && s.getLongitude() != null)
+                .collect(Collectors.toList());
+    }
+}

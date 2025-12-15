@@ -1,12 +1,16 @@
 package com.EY.dukandar.Service;
 
 import com.EY.dukandar.Model.Inventory;
+import com.EY.dukandar.Model.Store;
 import com.EY.dukandar.Repository.InventoryRepository;
+import com.EY.dukandar.Repository.StoreRepository;
+import com.EY.dukandar.Util.CoordinateResolver;
+import com.EY.dukandar.Util.DistanceCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -14,6 +18,12 @@ public class InventoryServiceImplementation implements InventoryService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    // 🔥 NEW (required for nearby-store lookup)
+    @Autowired
+    private StoreRepository storeRepository;
+
+    // ================= EXISTING METHODS (UNCHANGED) =================
 
     @Override
     public Inventory addInventory(Inventory inventory) {
@@ -51,25 +61,21 @@ public class InventoryServiceImplementation implements InventoryService {
     }
 
     public List<Inventory> checkInventory(Long productId, String size) {
-        if(size == null || size.isEmpty()) {
+        if (size == null || size.isEmpty()) {
             return inventoryRepository.findByProductId(productId);
         }
         return inventoryRepository.findByProductIdAndSize(productId, size);
     }
 
-
-    /** BUY OR RESERVE → Reduce stock atomically */
     @Override
     public Inventory reduceStock(Long storeId, Long productId, int qty) {
         if (qty <= 0) return null;
 
         int updated = inventoryRepository.reduceStockAtomic(storeId, productId, qty);
         if (updated <= 0) {
-            // Either inventory not found or insufficient stock
             return null;
         }
 
-        // fetch and return updated inventory
         Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
         if (inv != null) {
             inv.setAvailable(inv.getStockQuantity() > 0);
@@ -78,17 +84,14 @@ public class InventoryServiceImplementation implements InventoryService {
         return null;
     }
 
-    /** Add stock (e.g., new shipment) */
     @Override
     public Inventory increaseStock(Long storeId, Long productId, int qty) {
         if (qty <= 0) return null;
 
         int updated = inventoryRepository.increaseStockAtomic(storeId, productId, qty);
         if (updated <= 0) {
-            // inventory row might not exist — try to create one
             Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
             if (inv == null) {
-                // create new inventory row
                 Inventory newInv = new Inventory();
                 newInv.setProductId(productId);
                 newInv.setStoreId(storeId);
@@ -96,13 +99,11 @@ public class InventoryServiceImplementation implements InventoryService {
                 newInv.setAvailable(qty > 0);
                 return inventoryRepository.save(newInv);
             } else {
-                // should not normally happen, but return current
                 inv.setAvailable(inv.getStockQuantity() > 0);
                 return inventoryRepository.save(inv);
             }
         }
 
-        // fetch and return updated inventory
         Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
         if (inv != null) {
             inv.setAvailable(inv.getStockQuantity() > 0);
@@ -111,7 +112,6 @@ public class InventoryServiceImplementation implements InventoryService {
         return null;
     }
 
-    /** TEMPORARY HOLD / RESERVATION (same logic as reduceStock) */
     @Override
     public Inventory reserveStock(Long storeId, Long productId, int qty) {
         return reduceStock(storeId, productId, qty);
@@ -120,5 +120,81 @@ public class InventoryServiceImplementation implements InventoryService {
     @Override
     public void deleteInventory(Long id) {
         inventoryRepository.deleteById(id);
+    }
+
+    // ================= 🔥 NEW METHOD ONLY =================
+
+    /**
+     * Finds nearby stores for a product based on user city and distance
+     * Used by AI endpoint:
+     * /api/inventory/product/{productId}/nearby
+     */
+    public List<Map<String, Object>> findNearbyStoresForProduct(
+            Long productId,
+            String city,
+            double maxDistanceKm
+    ) {
+
+        double[] userCoords = CoordinateResolver.resolve(city);
+        if (userCoords == null) {
+            return Collections.emptyList();
+        }
+
+        double userLat = userCoords[0];
+        double userLon = userCoords[1];
+
+        List<Inventory> inventoryList =
+                inventoryRepository.findByProductId(productId);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Inventory inv : inventoryList) {
+
+            if (!inv.isAvailable() || inv.getStockQuantity() <= 0) {
+                continue;
+            }
+
+            Store store =
+                    storeRepository.findById(inv.getStoreId()).orElse(null);
+
+            if (store == null ||
+                    store.getLatitude() == null ||
+                    store.getLongitude() == null) {
+                continue;
+            }
+
+            double distance = DistanceCalculator.calculate(
+                    userLat,
+                    userLon,
+                    store.getLatitude(),
+                    store.getLongitude()
+            );
+
+            if (distance > maxDistanceKm) {
+                continue;
+            }
+
+            Map<String, Object> storeData = new HashMap<>();
+            storeData.put("id", store.getId());
+            storeData.put("name", store.getName());
+            storeData.put("address", store.getAddress());
+            storeData.put("distanceKm", Math.round(distance * 10.0) / 10.0);
+            storeData.put("stockQuantity", inv.getStockQuantity());
+            storeData.put("size", inv.getSize());
+            storeData.put("imageUrl", store.getImageUrl());
+            storeData.put("phone", store.getPhone());
+
+            result.add(storeData);
+        }
+
+        result.sort(
+                Comparator.comparingDouble(
+                        s -> (double) s.get("distanceKm")
+                )
+        );
+
+        System.out.println(result);
+
+        return result;
     }
 }

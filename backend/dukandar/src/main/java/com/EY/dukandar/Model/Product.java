@@ -28,11 +28,6 @@ public class Product {
     @Column(nullable = false)
     private String category;           // Example: "Shirts", "Winter Wear"
 
-    @ElementCollection
-    @CollectionTable(
-            name = "product_subcategories",
-            joinColumns = @JoinColumn(name = "product_id")
-    )
     @Column(name = "sub_category")
     private List<String> subCategory = new ArrayList<>();
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -88,5 +89,18 @@ public class InventoryController {
     public String delete(@PathVariable Long id) {
         inventoryService.deleteInventory(id);
         return "Inventory deleted.";
+    }
+
+    @GetMapping("/product/{productId}/nearby")
+    public List<Map<String, Object>> getNearbyStoresForProduct(
+            @PathVariable Long productId,
+            @RequestParam String city,
+            @RequestParam(defaultValue = "15") double maxDistanceKm
+    ) {
+        return inventoryService.findNearbyStoresForProduct(
+                productId,
+                city,
+                maxDistanceKm
+        );
     }
 }

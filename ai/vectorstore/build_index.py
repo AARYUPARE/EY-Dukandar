@@ -1,120 +1,80 @@
-# vectorstore/build_index.py
+# pinecone_setup.py
 
-import time
-from pinecone import Pinecone, ServerlessSpec
-from db.product_queries import get_all_products
+from vectorstore.pinecone_client import index
 from vectorstore.embedder import embed
+from db.product_queries import get_all_products
 from utils.text_cleaner import clean_text
 
-# ---------------------------------------------
-# CONFIG
-# ---------------------------------------------
-INDEX_NAME = "dukandar"
-DIMENSION = 384   # your embedding dimension
-CLOUD = "aws"
-REGION = "us-east-1"
-BATCH_SIZE = 50
 
-# ---------------------------------------------
-# CONNECT TO PINECONE
-# ---------------------------------------------
-pc = Pinecone(api_key="pcsk_4kyrnt_L4MKiuVp1fWGFc5V5yaqWhHZgnZzJKoFmr62Q8Ur1UWWANM5Fo4HyuEPNLyMKS3")   # <-- Replace with env var ideally
+def safe_str(value):
+    """Convert None → empty string, else string"""
+    return str(value) if value is not None else ""
 
 
-# ---------------------------------------------
-# SAFE METADATA CLEANER
-# ---------------------------------------------
-def safe_meta(value):
+def safe_list(value):
+    """Convert None → empty list, ensure list[str]"""
     if value is None:
-        return ""
+        return []
     if isinstance(value, list):
-        return ", ".join(str(x) for x in value)
-    return str(value)
+        return [str(v) for v in value if v]
+    return [str(value)]
 
 
-# ---------------------------------------------
-# DELETE OLD INDEX IF EXISTS
-# ---------------------------------------------
-def reset_index():
-    existing = [idx["name"] for idx in pc.list_indexes()]
+def build_index():
+    print("🧹 Attempting to delete existing Pinecone vectors...")
 
-    if INDEX_NAME in existing:
-        print(f"🗑 Deleting old index: {INDEX_NAME}")
-        pc.delete_index(name=INDEX_NAME)
-        time.sleep(3)  # wait until deleted
-
-    print(f"🆕 Creating new index: {INDEX_NAME}")
-    pc.create_index(
-        name=INDEX_NAME,
-        dimension=DIMENSION,
-        metric="cosine",
-        spec=ServerlessSpec(cloud=CLOUD, region=REGION)
-    )
-
-    time.sleep(5)  # give time to initialize
-    print("✅ New index created.")
-
-
-# ---------------------------------------------
-# EMBEDDING PIPELINE
-# ---------------------------------------------
-def embed_product_text(p):
-    text = f"""
-        {p.get('name', '')}
-        {p.get('brand', '')}
-        {p.get('category', '')}
-        {p.get('subCategory', '')}
-        {p.get('description', '')}
-    """
-    text = clean_text(text)
-    return embed(text)
-
-
-# ---------------------------------------------
-# UPSERT ALL PRODUCTS
-# ---------------------------------------------
-def upsert_all():
-    index = pc.Index(INDEX_NAME)
+    try:
+        index.delete(delete_all=True)
+        print("🧹 Existing vectors deleted")
+    except Exception:
+        print("ℹ️ No existing vectors found, skipping delete")
 
     products = get_all_products()
+    print(f"📦 Fetched {len(products)} products from DB")
+
     vectors = []
 
-    print(f"📦 Total products found: {len(products)}")
-
     for p in products:
-        print("➡ Upserting:", p)
+        # ---- normalize subCategory from any backend shape ----
+        sub_categories = (
+            p.get("subCategory")
+            or p.get("sub_category")
+            or p.get("subcategory")
+        )
+        sub_categories = safe_list(sub_categories)
+
+        # ---- text for embedding ----
+        combined_text = f"""
+        {safe_str(p.get('name'))}
+        {safe_str(p.get('category'))}
+        {' '.join(sub_categories)}
+        """
+
+        cleaned = clean_text(combined_text)
+        vector = embed(cleaned)
 
         vectors.append({
-            "id": str(p["id"]),
-            "values": embed_product_text(p),
+            "id": str(p["id"]),   # id must be string
+            "values": vector,
             "metadata": {
-                "name": safe_meta(p.get("name")),
-                "brand": safe_meta(p.get("brand")),
-                "category": safe_meta(p.get("category")),
-                "sub_category": safe_meta(p.get("subCategory")),
-                "price": float(p.get("price", 0)),
-                "image_url": safe_meta(p.get("imageUrl")),
-                "model_url": safe_meta(p.get("modelUrl")),
-                "sku": safe_meta(p.get("sku")),
+                "name": safe_str(p.get("name")),
+                "brand": safe_str(p.get("brand")),
+                "category": safe_str(p.get("category")),
+                "sub_category": sub_categories,      # ✅ list[str]
+                "price": float(p.get("price", 0)),   # ✅ number
+                "image_url": safe_str(p.get("imageUrl") or p.get("image_url")),
+                "model_url": safe_str(p.get("modelUrl") or p.get("model_url")),
+                "sku": safe_str(p.get("sku"))
             }
         })
 
-        # batch
-        if len(vectors) >= BATCH_SIZE:
-            index.upsert(vectors=vectors)
-            vectors = []
-
-    # final batch
     if vectors:
         index.upsert(vectors=vectors)
+        print(f"✅ Indexed {len(vectors)} products into Pinecone successfully!")
+    else:
+        print("⚠️ No products found to index.")
 
-    print("✅ All products upserted successfully!")
 
-
-# ---------------------------------------------
-# MAIN SCRIPT
-# ---------------------------------------------
 if __name__ == "__main__":
-    reset_index()
-    upsert_all()
-    print("🎉 Pinecone index rebuild complete!")
+    print("🚀 Rebuilding Pinecone Vector Index...")
+    build_index()

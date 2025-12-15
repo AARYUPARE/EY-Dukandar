@@ -64,7 +64,7 @@ Return ONLY intents.
     # ---------------------------------------------------------
     # ROUTING LOGIC
     # ---------------------------------------------------------
-    def route(self, user_query: str, last_products=None):
+    def route(self, user_query: str, last_products=None, user=None):
         last_products = last_products or []
 
         intent_raw = self.intent_chain.invoke({"query": user_query})
@@ -103,7 +103,8 @@ Return ONLY intents.
             return self.agents["inventory"].search_in_store(
                 product_index=idx,
                 product_list=last_products,
-                size=size
+                size=size,
+                user=user
             )
 
         responses = {}
@@ -154,9 +155,8 @@ Return ONLY intents.
     # ---------------------------------------------------------
     # FASTAPI ENTRY POINT
     # ---------------------------------------------------------
-    def chat(self, message: str, last_products=None):
-
-        result = self.route(message, last_products)
+    def chat(self, message: str, last_products=None, user=None):
+        result = self.route(message, last_products, user)
 
         # search-in-store response (already final)
         if isinstance(result, dict) and "storeInventory" in result:
