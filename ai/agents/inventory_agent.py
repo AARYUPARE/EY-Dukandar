@@ -51,7 +51,7 @@ class InventoryAgent:
         )
 
         stores = res.json()
-        print("🏬 Nearby stores:", stores)
+        # print("🏬 Nearby stores:", stores)
 
         if not stores:
             return {

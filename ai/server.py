@@ -13,7 +13,7 @@ class Query(BaseModel):
 
 @app.post("/query")
 def query(data: Query):
-    print("📨 Incoming request:", data)
+    # print("📨 Incoming request:", data)
 
     response = orchestrator.chat(
         message=data.message,
@@ -21,7 +21,7 @@ def query(data: Query):
         user=data.user
     )
 
-    print("🤖 Agent response (raw):", response)
+    # print("🤖 Agent response (raw):", response)
 
     def safe_convert(obj):
         if isinstance(obj, bytes):

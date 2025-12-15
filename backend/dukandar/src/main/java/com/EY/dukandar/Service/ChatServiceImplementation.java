@@ -100,6 +100,7 @@ public class ChatServiceImplementation implements ChatService {
         // 🔥 7️⃣ Convert AI products → Product entity
         List<Product> products = Collections.emptyList();
 
+            System.out.println(products);
         try {
             products = objectMapper.convertValue(
                     agentResult.getOrDefault("products", Collections.emptyList()),
@@ -108,6 +109,7 @@ public class ChatServiceImplementation implements ChatService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         List<Store> stores = Collections.emptyList();
 
         try {

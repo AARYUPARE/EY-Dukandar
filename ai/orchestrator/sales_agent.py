@@ -70,9 +70,7 @@ Return ONLY intents.
         intent_raw = self.intent_chain.invoke({"query": user_query})
         intents = [i.strip() for i in intent_raw.content.lower().split(",") if i.strip()]
 
-        print("🧭 Detected intents:", intents)
-
-        # 🔥 SEARCH IN STORE
+        # 🔥 SEARCH IN STORE (UNCHANGED)
         if "search-in-store" in intents and last_products:
             selection_raw = self.selector_chain.invoke({
                 "query": user_query,
@@ -82,16 +80,13 @@ Return ONLY intents.
             raw = selection_raw.content.strip()
             print("🔍 Selector raw output:", raw)
 
-            # Try to extract JSON safely
             try:
-                # If wrapped in markdown ```json
                 if raw.startswith("```"):
                     raw = raw.strip("`")
                     raw = raw.replace("json", "", 1).strip()
 
                 data = json.loads(raw)
             except Exception:
-                # Fallback: no valid JSON
                 return {
                     "reply": "Sorry, I couldn't understand which product you selected.",
                     "products": []
@@ -106,6 +101,24 @@ Return ONLY intents.
                 size=size,
                 user=user
             )
+
+        # -----------------------------------------------------
+        # 🔥 NEW: LOYALTY AGENT (READ-ONLY)
+        # -----------------------------------------------------
+        if "loyalty" in intents:
+            if not user or not user.get("id"):
+                return {
+                    "reply": "Please log in to view your loyalty offers.",
+                    "products": []
+                }
+
+            print("🎁 Routing to Loyalty Agent")
+
+            return self.agents["loyalty"]({
+                "user": user,
+                "user_message": user_query,
+                "action": "check"   # 🔒 NEVER APPLY HERE
+            })
 
         responses = {}
 
@@ -136,7 +149,7 @@ Return ONLY intents.
         return self._merge_responses(responses)
 
     # ---------------------------------------------------------
-    # 🔥 MERGING LOGIC (FROM OLD VERSION)
+    # MERGING LOGIC (UNCHANGED)
     # ---------------------------------------------------------
     def _merge_responses(self, responses):
         merged = {
@@ -145,7 +158,6 @@ Return ONLY intents.
             "complementary": responses.get("complementary", []),
         }
 
-        # If recommendation agent returned full dict
         if "recommendation" in responses:
             merged["similar"] = responses["recommendation"].get("similar", [])
             merged["complementary"] = responses["recommendation"].get("complementary", [])
@@ -158,8 +170,9 @@ Return ONLY intents.
     def chat(self, message: str, last_products=None, user=None):
         result = self.route(message, last_products, user)
 
-        # search-in-store response (already final)
-        if isinstance(result, dict) and "storeInventory" in result:
+        if isinstance(result, dict) and (
+            "storeInventory" in result or "eligibleOffers" in result
+        ):
             return result
 
         products = (
@@ -168,10 +181,7 @@ Return ONLY intents.
             + result.get("complementary", [])
         )
 
-        if products:
-            reply = f"Found {len(products)} matching products."
-        else:
-            reply = "No relevant products found."
+        reply = f"Found {len(products)} matching products." if products else "No relevant products found."
 
         return {
             "reply": reply,

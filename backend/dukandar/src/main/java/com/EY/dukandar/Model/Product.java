@@ -1,5 +1,6 @@
 package com.EY.dukandar.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -34,7 +35,9 @@ public class Product {
     @Column(length = 1000)
     private String description;        // Used for vector DB search or embeddings
 
+    @JsonProperty("image_url")
     private String imageUrl;           // For UI display
+    @JsonProperty("model_url")
     private String modelUrl;           // Optional 3D model
 
     // Default constructor
