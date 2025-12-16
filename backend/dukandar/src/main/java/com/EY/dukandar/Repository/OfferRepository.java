@@ -7,6 +7,6 @@ import java.util.List;
 public interface OfferRepository extends JpaRepository<Offer, Long> {
 
     // Get all offers where user's points are enough
-    List<Offer> findByActiveTrueAndMinPointsRequiredLessThanEqual(int points);
+    List<Offer> findByActiveTrueAndMinPointsRequiredLessThanEqual(int loyaltyPoints);
 
 }

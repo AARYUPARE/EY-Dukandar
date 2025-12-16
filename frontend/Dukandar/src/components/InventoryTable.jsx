@@ -2,14 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import css from "../styles/InventoryTable.module.css";
 import { IoArrowBackCircle } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 export default function InventoryTable() {
+
+  const kioskStore = useSelector(store => store.kioskStore);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "grn", dir: "asc" });
   const [page, setPage] = useState(1);
-  const rowsPerPage = 8;
+  const rowsPerPage = 4;
 
   const navigate = useNavigate();
 
@@ -19,20 +23,63 @@ export default function InventoryTable() {
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
 
-    // fetch("/api/inventory")
-    //   .then((r) => r.json())
-    //   .then((data) => mounted && setItems(Array.isArray(data) ? data : []))
-    //   .catch(() => mounted && setItems([]))
-    //   .finally(() => mounted && setLoading(false));
+    const fetchInventory = async () => {
+      setLoading(true);
 
-    //use axios to fetch the store inventory
-    //set it into items array
-    if(mounted) setLoading(false)
+      try {
+        // 1️⃣ Fetch inventory
+        const inventoryRes = await axios.get(
+          `http://localhost:8080/api/inventory/store/${kioskStore.id}`
+        );
 
-    return () => (mounted = false);
-  }, );
+        const inventory = inventoryRes.data;
+
+        // 2️⃣ Fetch all products in parallel
+        const productRequests = inventory.map((item) =>
+          axios.get(`http://localhost:8080/api/products/${item.productId}`)
+        );
+
+        const productResponses = await Promise.all(productRequests);
+        const products = productResponses.map((p) => p.data);
+
+        // 3️⃣ Merge inventory + product
+        const mergedItems = inventory.map((inv, index) => {
+          const prod = products[index];
+
+          return {
+            grn: prod.sku,
+            title: prod.name,
+            quantity: inv.stockQuantity,
+            price: prod.price,
+            specifications: [
+              prod.category,
+              ...prod.subCategory,
+              `Size: ${inv.size}`,
+              `Brand: ${prod.brand}`,
+            ],
+            productId: prod.id,
+            storeId: inv.storeId,
+            available: inv.available,
+          };
+        });
+
+        if (mounted) setItems(mergedItems);
+      } catch (error) {
+        console.error("Inventory merge failed", error);
+        if (mounted) setItems([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchInventory();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

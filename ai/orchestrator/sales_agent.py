@@ -114,11 +114,14 @@ Return ONLY intents.
 
             print("🎁 Routing to Loyalty Agent")
 
-            return self.agents["loyalty"]({
+            res =  self.agents["loyalty"].handle({
                 "user": user,
                 "user_message": user_query,
                 "action": "check"   # 🔒 NEVER APPLY HERE
             })
+
+            print(res)
+            return res
 
         responses = {}
 

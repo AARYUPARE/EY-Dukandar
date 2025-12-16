@@ -1,62 +1,130 @@
 import { useEffect, useState } from "react";
 import css from "../styles/AddStockForm.module.css";
-import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
+import {
+  IoArrowBackCircle,
+  IoAddCircleOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_BACKEND_URL } from "../store/store";
+import { useSelector } from "react-redux";
 
 export default function AddStockSheet() {
-
   const navigate = useNavigate();
-  const productList = useState([])
+  const kioskStore = useSelector((store) => store.kioskStore);
+
+  const [productList, setProductList] = useState([]);
 
   const [rows, setRows] = useState([
-    { grn: "", title: "", quantity: "" }
+    { sku: "", productId: null, title: "", size: "", quantity: "" },
   ]);
 
+  // =========================
+  // Update Row
+  // =========================
   function updateRow(index, field, value) {
-    const newRows = [...rows];
-    newRows[index][field] = value;
+    setRows((prevRows) => {
+      const newRows = [...prevRows];
+      newRows[index] = { ...newRows[index], [field]: value };
 
-    if (field === "grn") {
-      const found = productList.find((p) => String(p.grn) === String(value));
-      newRows[index].title = found ? found.title : "";
-    }
+      // Auto-fill product name & productId from SKU
+      if (field === "sku") {
+        const found = productList.find(
+          (p) => String(p.sku) === String(value)
+        );
 
-    setRows(newRows);
+        newRows[index].title = found ? found.name : "";
+        newRows[index].productId = found ? found.id : null;
+      }
+
+      return newRows;
+    });
   }
 
+  // =========================
+  // Fetch Products
+  // =========================
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(BASE_BACKEND_URL + "/products");
+        setProductList(Array.isArray(res.data) ? res.data : []);
+      } catch (e) {
+        console.error("Failed to fetch products", e);
+      }
+    };
 
-    //fetch company-product list
-    //fetch the store order list and set to rows so it will show the ordered stock directly
+    fetchProducts();
+  }, []);
 
-  },[])
-
-
+  // =========================
+  // Row Controls
+  // =========================
   function addRow() {
-    setRows([...rows, { grn: "", title: "", quantity: "" }]);
+    setRows((prev) => [
+      ...prev,
+      { sku: "", productId: null, title: "", size: "", quantity: "" },
+    ]);
   }
 
   function removeRow(index) {
     if (rows.length === 1) return;
-    setRows(rows.filter((_, i) => i !== index));
+    setRows((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e) {
+  // =========================
+  // Submit Stock
+  // =========================
+  async function handleSubmit(e) {
     e.preventDefault();
-    // if (onSubmit) onSubmit(rows);
 
-    //we will get rows in this, just add those in the stores inventory
+    const validRows = rows.filter(
+      (r) =>
+        r.sku &&
+        r.productId &&
+        r.size &&
+        Number(r.quantity) > 0
+    );
+
+    if (validRows.length === 0) {
+      alert("Please add at least one valid stock row");
+      return;
+    }
+
+    try {
+      for (const row of validRows) {
+        const url = `${BASE_BACKEND_URL}/${kioskStore.id}/${row.productId}`;
+
+        await axios.post(url, null, {
+          params: {
+            newStock: row.quantity,
+            size: row.size,
+          },
+        });
+      }
+
+      alert("Stock added successfully ✅");
+
+      // Reset form
+      setRows([
+        { sku: "", productId: null, title: "", size: "", quantity: "" },
+      ]);
+    } catch (error) {
+      console.error("Failed to add stock", error);
+      alert("Failed to add stock ❌");
+    }
   }
 
-  const onBack = () =>
-  {
-    navigate("../")
-  }
+  const onBack = () => {
+    navigate("../");
+  };
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className={css.wrapper}>
-
-      {/* --- Back Button --- */}
       <button className={css.backBtn} onClick={onBack}>
         <IoArrowBackCircle size={32} />
       </button>
@@ -65,22 +133,23 @@ export default function AddStockSheet() {
         <h2 className={css.title}>Add Stock (Excel Style)</h2>
 
         <form onSubmit={handleSubmit}>
-
           <div className={css.tableHeader}>
-            <span>GRN</span>
+            <span>SKU</span>
             <span>Item Name</span>
+            <span>Size</span>
             <span>Quantity</span>
             <span>Action</span>
           </div>
 
           {rows.map((row, i) => (
             <div key={i} className={css.tableRow}>
-
               <input
                 className={css.input}
-                placeholder="Enter GRN"
-                value={row.grn}
-                onChange={(e) => updateRow(i, "grn", e.target.value)}
+                placeholder="Enter SKU"
+                value={row.sku}
+                onChange={(e) =>
+                  updateRow(i, "sku", e.target.value)
+                }
               />
 
               <input
@@ -92,20 +161,38 @@ export default function AddStockSheet() {
 
               <input
                 className={css.input}
-                placeholder="Qty"
-                value={row.quantity}
-                onChange={(e) => updateRow(i, "quantity", e.target.value)}
+                placeholder="Size (M / L / XL)"
+                value={row.size}
+                onChange={(e) =>
+                  updateRow(i, "size", e.target.value)
+                }
               />
 
-              <button type="button" className={css.deleteBtn} onClick={() => removeRow(i)}>
+              <input
+                className={css.input}
+                placeholder="Qty"
+                value={row.quantity}
+                onChange={(e) =>
+                  updateRow(i, "quantity", Number(e.target.value))
+                }
+              />
+
+              <button
+                type="button"
+                className={css.deleteBtn}
+                onClick={() => removeRow(i)}
+              >
                 <IoTrashOutline size={22} />
               </button>
-
             </div>
           ))}
 
           <div className={css.actions}>
-            <button type="button" className={css.addRowBtn} onClick={addRow}>
+            <button
+              type="button"
+              className={css.addRowBtn}
+              onClick={addRow}
+            >
               <IoAddCircleOutline size={26} /> Add Row
             </button>
 
@@ -113,7 +200,6 @@ export default function AddStockSheet() {
               Submit Stock
             </button>
           </div>
-
         </form>
       </div>
     </div>

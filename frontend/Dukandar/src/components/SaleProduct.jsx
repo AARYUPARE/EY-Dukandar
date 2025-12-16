@@ -1,71 +1,77 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import css from "../styles/SaleProduct.module.css";
-import { IoArrowBackCircle, IoAddCircleOutline, IoTrashOutline } from "react-icons/io5";
+import {
+  IoArrowBackCircle,
+  IoAddCircleOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { BASE_BACKEND_URL } from "../store/store";
 
 export default function SaleProduct() {
-
-
+  const kioskStore = useSelector((store) => store.kioskStore);
   const navigate = useNavigate();
 
-  const inventoryList = [
-    {
-      grn: "101",
-      title: "Virat Kohli Shirt",
-      stock: 12,
-      extraDetails: {
-        finalPrice: 499,
-        originalPrice: 799,
-        offers: "35% OFF",
-      }
-    },
-    {
-      grn: "205",
-      title: "Gaming Laptop",
-      stock: 5,
-      extraDetails: {
-        finalPrice: 45000,
-        originalPrice: 52000,
-        offers: "13% OFF",
-      }
-    },
-    {
-      grn: "334",
-      title: "Running Shoes",
-      stock: 8,
-      extraDetails: {
-        finalPrice: 2499,
-        originalPrice: 2899,
-        offers: "14% OFF",
-      }
-    },
-    {
-      grn: "412",
-      title: "SSD 256GB",
-      stock: 2,
-      extraDetails: {
-        finalPrice: 1999,
-        originalPrice: 2499,
-        offers: "20% OFF",
-      }
-    },
-    {
-      grn: "599",
-      title: "Wireless Headset",
-      stock: 0,
-      extraDetails: {
-        finalPrice: 1599,
-        originalPrice: 1999,
-        offers: "20% OFF",
-      }
-    }
-  ];
+  // =========================
+  // Product master list
+  // =========================
+  const [productList, setProductList] = useState([]);
 
+  // =========================
+  // Inventory list (for stock check)
+  // =========================
+  const [inventoryList, setInventoryList] = useState([]);
+
+  // =========================
+  // Fetch product list
+  // =========================
   useEffect(() => {
-    //fetch inventory of the store and put it into the inventory list
-  }, [])
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(`${BASE_BACKEND_URL}/products`);
+        setProductList(Array.isArray(res.data) ? res.data : []);
+      } catch (e) {
+        console.error("Failed to fetch products", e);
+      }
+    };
 
+    fetchProducts();
+  }, []);
+
+  // =========================
+  // Fetch inventory
+  // =========================
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const res = await axios.get(
+          `${BASE_BACKEND_URL}/inventory/store/${kioskStore.id}`
+        );
+        setInventoryList(Array.isArray(res.data) ? res.data : []);
+      } catch (e) {
+        console.error("Failed to fetch inventory", e);
+      }
+    };
+
+    if (kioskStore?.id) fetchInventory();
+  }, [kioskStore]);
+
+  const [rows, setRows] = useState([
+    {
+      sku: "",
+      productId: null,
+      title: "",
+      price: "",
+      quantity: "",
+      total: "",
+    },
+  ]);
+
+  // =========================
+  // Empty inventory guard
+  // =========================
   if (!inventoryList || inventoryList.length === 0) {
     return (
       <div className={css.wrapper}>
@@ -83,68 +89,130 @@ export default function SaleProduct() {
     );
   }
 
+  // =========================
+  // Sale rows
+  // =========================
 
-  const [rows, setRows] = useState([
-    { grn: "", title: "", price: "", quantity: "", total: "" }
-  ]);
-
+  // =========================
+  // Update row
+  // =========================
   function updateRow(index, field, value) {
-    const updated = [...rows];
-    updated[index][field] = value; // ALWAYS update input
+    setRows((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
 
-    const found = inventoryList.find((p) => String(p.grn) === String(updated[index].grn));
+      // SKU → product lookup
+      if (field === "sku") {
+        const product = productList.find(
+          (p) => String(p.sku) === String(value)
+        );
 
-    // GRN → Autofill Name & Price
-    if (field === "grn") {
-      if (found) {
-        updated[index].title = found.title;
-        updated[index].price = found.extraDetails.finalPrice;
-      } else {
-        // allow typing even when invalid
-        updated[index].title = "";
-        updated[index].price = "";
+        if (product) {
+          updated[index].title = product.name;
+          updated[index].price = product.price;
+          updated[index].productId = product.id;
+        } else {
+          updated[index].title = "";
+          updated[index].price = "";
+          updated[index].productId = null;
+        }
       }
-    }
 
-    // Quantity → Validate and calculate
-    if (field === "quantity") {
-      if (!found) {
-        alert("Invalid GRN! Enter a valid item first.");
-        updated[index].quantity = "";
-        updated[index].total = "";
-      } else if (Number(value) > found.stock) {
-        alert("Item quantity exceeded present stock!");
-        updated[index].quantity = "";
-        updated[index].total = "";
-      } else {
-        const price = Number(updated[index].price || 0);
-        updated[index].total = price * Number(value || 0);
+      // Quantity → stock validation
+      if (field === "quantity") {
+        const inventoryItem = inventoryList.find(
+          (inv) => inv.productId === updated[index].productId
+        );
+
+        if (!inventoryItem) {
+          alert("Item not available in inventory");
+          updated[index].quantity = "";
+          updated[index].total = "";
+        } else if (Number(value) > inventoryItem.stockQuantity) {
+          alert("Item quantity exceeded present stock!");
+          updated[index].quantity = "";
+          updated[index].total = "";
+        } else {
+          updated[index].total =
+            Number(updated[index].price || 0) * Number(value || 0);
+        }
       }
-    }
 
-    setRows(updated);
+      return updated;
+    });
   }
 
-
+  // =========================
+  // Row controls
+  // =========================
   function addRow() {
-    setRows([...rows, { grn: "", title: "", price: "", quantity: "", total: "" }]);
+    setRows((prev) => [
+      ...prev,
+      {
+        sku: "",
+        productId: null,
+        title: "",
+        price: "",
+        quantity: "",
+        total: "",
+      },
+    ]);
   }
 
   function removeRow(index) {
     if (rows.length === 1) return;
-    setRows(rows.filter((_, i) => i !== index));
+    setRows((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e) {
+  // =========================
+  // Submit sale
+  // =========================
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    //we will get rows, update those in the Data base.
+    const validRows = rows.filter(
+      (r) => r.productId && Number(r.quantity) > 0
+    );
+
+    if (validRows.length === 0) {
+      alert("No valid sale rows found");
+      return;
+    }
+
+    try {
+      for (const row of validRows) {
+        const url = `${BASE_BACKEND_URL}/${kioskStore.id}/${row.productId}/reduce`;
+
+        await axios.post(url, null, {
+          params: {
+            qty: row.quantity,
+          },
+        });
+      }
+
+      alert("Sale completed successfully ✅");
+
+      setRows([
+        {
+          sku: "",
+          productId: null,
+          title: "",
+          price: "",
+          quantity: "",
+          total: "",
+        },
+      ]);
+    } catch (error) {
+      console.error("Sale failed", error);
+      alert("Sale failed ❌");
+    }
   }
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className={css.wrapper}>
-
-      {/* BACK BUTTON */}
       <button className={css.backBtn} onClick={() => navigate("../")}>
         <IoArrowBackCircle size={32} />
       </button>
@@ -153,9 +221,8 @@ export default function SaleProduct() {
         <h2 className={css.title}>Sell Product (Excel Sheet)</h2>
 
         <form onSubmit={handleSubmit}>
-
           <div className={css.tableHeader}>
-            <span>GRN</span>
+            <span>SKU</span>
             <span>Item Name</span>
             <span>Price</span>
             <span>Qty</span>
@@ -165,12 +232,13 @@ export default function SaleProduct() {
 
           {rows.map((row, i) => (
             <div key={i} className={css.tableRow}>
-
               <input
                 className={css.input}
-                placeholder="Enter GRN"
-                value={row.grn}
-                onChange={(e) => updateRow(i, "grn", e.target.value)}
+                placeholder="Enter SKU"
+                value={row.sku}
+                onChange={(e) =>
+                  updateRow(i, "sku", e.target.value)
+                }
               />
 
               <input
@@ -191,7 +259,9 @@ export default function SaleProduct() {
                 className={css.input}
                 placeholder="Qty"
                 value={row.quantity}
-                onChange={(e) => updateRow(i, "quantity", e.target.value)}
+                onChange={(e) =>
+                  updateRow(i, "quantity", Number(e.target.value))
+                }
               />
 
               <input
@@ -201,15 +271,22 @@ export default function SaleProduct() {
                 placeholder="₹ Total"
               />
 
-              <button type="button" className={css.deleteBtn} onClick={() => removeRow(i)}>
+              <button
+                type="button"
+                className={css.deleteBtn}
+                onClick={() => removeRow(i)}
+              >
                 <IoTrashOutline size={22} />
               </button>
-
             </div>
           ))}
 
           <div className={css.actions}>
-            <button type="button" className={css.addRowBtn} onClick={addRow}>
+            <button
+              type="button"
+              className={css.addRowBtn}
+              onClick={addRow}
+            >
               <IoAddCircleOutline size={26} /> Add Row
             </button>
 
@@ -217,7 +294,6 @@ export default function SaleProduct() {
               Sell Now
             </button>
           </div>
-
         </form>
       </div>
     </div>

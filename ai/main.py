@@ -30,6 +30,7 @@ except Exception as e:
 # ---------------------------------------------------------
 from agents.recommendation_agent import RecommendationAgent
 from agents.inventory_agent import InventoryAgent
+from  agents.loyalty_agent import LoyaltyAgent
 
 # Optional stubs (so orchestrator does not crash)
 class DummyAgent:
@@ -38,7 +39,6 @@ class DummyAgent:
 
 payment_agent = DummyAgent()
 fulfillment_agent = DummyAgent()
-loyalty_agent = DummyAgent()
 support_agent = DummyAgent()
 
 
@@ -47,6 +47,8 @@ support_agent = DummyAgent()
 # ---------------------------------------------------------
 reco_agent = RecommendationAgent(llm=llm)
 inv_agent = InventoryAgent(recommendation_agent=reco_agent, llm=llm)
+loyalty_agent = LoyaltyAgent()
+
 
 agents = {
     "recommendation": reco_agent,

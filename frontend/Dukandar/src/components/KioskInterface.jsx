@@ -6,8 +6,12 @@ import Navbar from "./Navbar";
 
 import css from "../styles/KioskInterface.module.css";
 import { Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const KioskInterface = () => {
+
+    
+
     return (
         <div className={css.wrapper}>
             {/* LEFT SIDE - Cards */}

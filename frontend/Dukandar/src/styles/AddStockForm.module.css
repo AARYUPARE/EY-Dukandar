@@ -10,6 +10,7 @@
 .wrapper {
   height: 100vh;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -30,7 +31,7 @@
   border: 1px solid var(--panel-border);
   padding: 30px;
   border-radius: 16px;
-  width: 900px;
+  /* width: 900px; */
   box-shadow: 0 15px 40px rgba(0,0,0,0.45);
 }
 
@@ -41,7 +42,7 @@
 
 .tableHeader, .tableRow {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr 0.6fr;
+  grid-template-columns: 1fr 2fr 1fr 1fr 0.6fr;
   gap: 10px;
   align-items: center;
   margin-bottom: 10px;

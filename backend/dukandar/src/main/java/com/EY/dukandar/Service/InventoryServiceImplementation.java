@@ -26,7 +26,8 @@ public class InventoryServiceImplementation implements InventoryService {
     // ================= EXISTING METHODS (UNCHANGED) =================
 
     @Override
-    public Inventory addInventory(Inventory inventory) {
+    public Inventory addInventory(Inventory inventory)
+    {
         inventory.setAvailable(inventory.getStockQuantity() > 0);
         return inventoryRepository.save(inventory);
     }
@@ -53,9 +54,14 @@ public class InventoryServiceImplementation implements InventoryService {
     public Inventory updateStock(Long storeId, Long productId, int newStock) {
         Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
         if (inv != null) {
-            inv.setStockQuantity(newStock);
-            inv.setAvailable(newStock > 0);
+            int currentStockQuantity = inv.getStockQuantity();
+            inv.setStockQuantity(currentStockQuantity + newStock);
+            inv.setAvailable(currentStockQuantity + newStock > 0);
             return inventoryRepository.save(inv);
+        }
+        else
+        {
+
         }
         return null;
     }
