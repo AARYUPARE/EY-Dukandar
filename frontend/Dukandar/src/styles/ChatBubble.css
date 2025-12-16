@@ -48,6 +48,7 @@
     font-size: 0.95rem;
     margin: 8px 0;
     animation: pop-in 0.2s ease;
+    white-space: pre-line;
 }
 
 /* SMOOTH POP-IN ANIMATION */

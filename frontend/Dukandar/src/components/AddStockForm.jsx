@@ -94,9 +94,9 @@ export default function AddStockSheet() {
 
     try {
       for (const row of validRows) {
-        const url = `${BASE_BACKEND_URL}/${kioskStore.id}/${row.productId}`;
+        const url = `${BASE_BACKEND_URL}/inventory/${kioskStore.id}/${row.productId}`;
 
-        await axios.post(url, null, {
+        await axios.put(url, null, {
           params: {
             newStock: row.quantity,
             size: row.size,

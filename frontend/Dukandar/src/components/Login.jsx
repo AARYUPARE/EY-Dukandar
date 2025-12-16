@@ -51,7 +51,7 @@ const Login = ({ onLogin }) => {
                     <button
                         type="button"
                         className={css.createBtn}
-                        onClick={() => navigate("/create-account")}
+                        onClick={() => navigate("create-account")}
                     >
                         Create Account
                     </button>

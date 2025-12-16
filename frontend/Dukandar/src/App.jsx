@@ -104,9 +104,13 @@ const appRouter = createBrowserRouter([
         element: <Login />
       },
       {
+        path: "create-account",
+        element: <CreateAccount />
+      },
+      {
         path: "chat",
         element: <ChatContainer />
-      }
+      },
     ]
   },
 ])

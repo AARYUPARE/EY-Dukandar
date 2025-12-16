@@ -1,6 +1,8 @@
 import SidebarContianer from "./SidebarContainer"
 import Main from "./Main"
 import CardContainer from "./CardContainer"
+import StoreCardContainer from "./StoreCardContainer"
+import ComponentToggler from "./ComponentToggler"
 import { Outlet } from "react-router-dom"
 import "../styles/ChatInterface.css"
 
@@ -12,7 +14,7 @@ const ChatInterface = () => {
       {/* Place the routed content here: */}
       <Main></Main>
 
-      <CardContainer />
+      <ComponentToggler child1={(props) => <CardContainer {...props}/>} child2={(props) => <StoreCardContainer {...props}/>}></ComponentToggler>
     </div>
 }
 

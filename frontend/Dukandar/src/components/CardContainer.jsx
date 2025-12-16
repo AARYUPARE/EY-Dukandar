@@ -4,14 +4,11 @@ import Card from "./Card";
 import { sideBarAction, showcaseAction } from "../store/store";
 import css from "../styles/CardContainer.module.css";
 
-const CardContainer = () => {
+const CardContainer = ({ showStores }) => {
   const dispatch = useDispatch();
   const products = useSelector((store) => store.products.products);
-
-  // ✅ hooks ALWAYS at top
   const [search, setSearch] = useState("");
 
-  // ✅ side-effect inside useEffect
   useEffect(() => {
     dispatch(sideBarAction.collapse());
   }, [dispatch]);
@@ -24,6 +21,15 @@ const CardContainer = () => {
 
   return (
     <div className={`container-fluid m-0 ${css["main-container"]}`}>
+
+      {/* 🔁 TOGGLE BUTTON */}
+      <button
+        className="btn btn-outline-light mb-3"
+        onClick={showStores}
+      >
+        🏬 View Stores
+      </button>
+
       <input
         className="form-control mb-4"
         type="text"
@@ -47,5 +53,6 @@ const CardContainer = () => {
     </div>
   );
 };
+
 
 export default CardContainer;

@@ -20,12 +20,27 @@ export default function SaleProduct() {
   const [productList, setProductList] = useState([]);
 
   // =========================
-  // Inventory list (for stock check)
+  // Inventory list (size-wise)
   // =========================
   const [inventoryList, setInventoryList] = useState([]);
 
   // =========================
-  // Fetch product list
+  // Sale rows
+  // =========================
+  const [rows, setRows] = useState([
+    {
+      sku: "",
+      productId: null,
+      title: "",
+      price: "",
+      size: "",
+      quantity: "",
+      total: "",
+    },
+  ]);
+
+  // =========================
+  // Fetch products
   // =========================
   useEffect(() => {
     const fetchProducts = async () => {
@@ -58,17 +73,6 @@ export default function SaleProduct() {
     if (kioskStore?.id) fetchInventory();
   }, [kioskStore]);
 
-  const [rows, setRows] = useState([
-    {
-      sku: "",
-      productId: null,
-      title: "",
-      price: "",
-      quantity: "",
-      total: "",
-    },
-  ]);
-
   // =========================
   // Empty inventory guard
   // =========================
@@ -88,10 +92,6 @@ export default function SaleProduct() {
       </div>
     );
   }
-
-  // =========================
-  // Sale rows
-  // =========================
 
   // =========================
   // Update row
@@ -115,26 +115,46 @@ export default function SaleProduct() {
           updated[index].title = "";
           updated[index].price = "";
           updated[index].productId = null;
+          updated[index].size = "";
+          updated[index].quantity = "";
+          updated[index].total = "";
         }
       }
 
-      // Quantity → stock validation
-      if (field === "quantity") {
+      // Size change → reset qty & total
+      if (field === "size") {
+        updated[index].quantity = "";
+        updated[index].total = "";
+      }
+
+      // Quantity / Size → stock validation
+      if (field === "quantity" || field === "size") {
+        if (!updated[index].productId || !updated[index].size) {
+          updated[index].total = "";
+          return updated;
+        }
+
         const inventoryItem = inventoryList.find(
-          (inv) => inv.productId === updated[index].productId
+          (inv) =>
+            inv.productId === updated[index].productId &&
+            String(inv.size) === String(updated[index].size)
         );
 
         if (!inventoryItem) {
-          alert("Item not available in inventory");
+          alert("Selected size is not available in stock!");
           updated[index].quantity = "";
           updated[index].total = "";
-        } else if (Number(value) > inventoryItem.stockQuantity) {
-          alert("Item quantity exceeded present stock!");
+          return updated;
+        }
+
+        if (Number(updated[index].quantity) > inventoryItem.stockQuantity) {
+          alert("Quantity exceeds available stock for selected size!");
           updated[index].quantity = "";
           updated[index].total = "";
         } else {
           updated[index].total =
-            Number(updated[index].price || 0) * Number(value || 0);
+            Number(updated[index].price || 0) *
+            Number(updated[index].quantity || 0);
         }
       }
 
@@ -153,6 +173,7 @@ export default function SaleProduct() {
         productId: null,
         title: "",
         price: "",
+        size: "",
         quantity: "",
         total: "",
       },
@@ -171,7 +192,7 @@ export default function SaleProduct() {
     e.preventDefault();
 
     const validRows = rows.filter(
-      (r) => r.productId && Number(r.quantity) > 0
+      (r) => r.productId && r.size && Number(r.quantity) > 0
     );
 
     if (validRows.length === 0) {
@@ -181,10 +202,11 @@ export default function SaleProduct() {
 
     try {
       for (const row of validRows) {
-        const url = `${BASE_BACKEND_URL}/${kioskStore.id}/${row.productId}/reduce`;
+        const url = `${BASE_BACKEND_URL}/inventory/${kioskStore.id}/${row.productId}/reduce`;
 
         await axios.post(url, null, {
           params: {
+            size: row.size,
             qty: row.quantity,
           },
         });
@@ -198,6 +220,7 @@ export default function SaleProduct() {
           productId: null,
           title: "",
           price: "",
+          size: "",
           quantity: "",
           total: "",
         },
@@ -225,6 +248,7 @@ export default function SaleProduct() {
             <span>SKU</span>
             <span>Item Name</span>
             <span>Price</span>
+            <span>Size</span>
             <span>Qty</span>
             <span>Total</span>
             <span>Action</span>
@@ -236,9 +260,7 @@ export default function SaleProduct() {
                 className={css.input}
                 placeholder="Enter SKU"
                 value={row.sku}
-                onChange={(e) =>
-                  updateRow(i, "sku", e.target.value)
-                }
+                onChange={(e) => updateRow(i, "sku", e.target.value)}
               />
 
               <input
@@ -253,6 +275,13 @@ export default function SaleProduct() {
                 value={row.price}
                 disabled
                 placeholder="₹ Price"
+              />
+
+              <input
+                className={css.input}
+                placeholder="Size (M / L / XL)"
+                value={row.size}
+                onChange={(e) => updateRow(i, "size", e.target.value)}
               />
 
               <input

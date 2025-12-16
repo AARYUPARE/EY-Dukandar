@@ -1,10 +1,13 @@
 import "../styles/Card.css";
-import Tilty from "../utils/Tilty.jsx";   // <-- add this import
+import Tilty from "../utils/Tilty.jsx";
 
-export default function Card({ title, image_url, description, onClick, brand, size}) {
-
-  if(!size) size = "";
-
+export default function StoreCard({
+  name,
+  imageUrl,
+  address,
+  phone,
+  onClick,
+}) {
   return (
     <Tilty
       max={25}
@@ -24,20 +27,20 @@ export default function Card({ title, image_url, description, onClick, brand, si
         id="card-container"
       >
         <img
-          src={image_url}
-          alt={title}
+          src={imageUrl}
+          alt={name}
           className="card-img-top"
           style={{
             height: "200px",
-            objectFit: "contain",
+            objectFit: "cover",
             backgroundColor: "#f8f9fa",
           }}
         />
 
         <div className="card-body">
-          <h5 className="card-title">{title}</h5>
-          <p className="card-text">Brand: {brand}</p>
-          {size ?? <p className="card-text">Size: {size}</p>}
+          <h5 className="card-title">{name}</h5>
+          <p className="card-text">📍 {address}</p>
+          <p className="card-text">📞 {phone}</p>
         </div>
       </div>
     </Tilty>

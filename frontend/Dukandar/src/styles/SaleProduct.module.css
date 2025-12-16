@@ -13,8 +13,10 @@
   display: flex;
   justify-content: center;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
+/* ---------------- BACK BUTTON ---------------- */
 .backBtn {
   position: absolute;
   top: 20px;
@@ -29,16 +31,19 @@
   transform: scale(1.12);
 }
 
+/* ---------------- PANEL ---------------- */
 .panel {
-  /* width: 80%; */
-  /* max-width: 950px; */
+  width: 100%;
+  max-width: 1200px;
   padding: 26px;
   border-radius: 16px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
+/* ---------------- TITLE ---------------- */
 .title {
   font-size: 1.8rem;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
@@ -48,9 +53,25 @@
   font-weight: 700;
 }
 
-.tableHeader {
+/* ---------------- TABLE GRID ---------------- */
+/* Header & Row MUST match exactly */
+.tableHeader,
+.tableRow {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr 1fr 1fr 0.6fr;
+  grid-template-columns:
+    minmax(90px, 1fr)    /* SKU */
+    minmax(160px, 2fr)  /* Item Name */
+    minmax(80px, 1fr)   /* Price */
+    minmax(70px, 0.8fr) /* Size */
+    minmax(60px, 0.7fr) /* Qty */
+    minmax(90px, 1fr)   /* Total */
+    minmax(40px, 0.5fr);/* Action */
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tableHeader {
   padding: 12px;
   color: var(--muted);
   border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -59,14 +80,15 @@
 }
 
 .tableRow {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr 1fr 1fr 0.6fr;
-  gap: 10px;
   padding: 12px 0;
   border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+/* ---------------- INPUTS ---------------- */
 .input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: rgba(255,255,255,0.05);
   color: var(--white);
   border: 1px solid rgba(255,255,255,0.1);
@@ -74,11 +96,22 @@
   padding: 10px;
   font-size: 0.95rem;
 }
+
 .input:focus {
   border-color: var(--accent2);
   box-shadow: 0 0 15px rgba(57,230,255,0.25);
+  outline: none;
 }
 
+/* Prevent auto-filled text from breaking layout */
+.input[disabled] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: not-allowed;
+}
+
+/* ---------------- DELETE BUTTON ---------------- */
 .deleteBtn {
   background: transparent;
   border: none;
@@ -86,29 +119,31 @@
   cursor: pointer;
   padding: 4px;
   transition: 0.2s;
+  justify-self: center;
 }
 .deleteBtn:hover {
   transform: scale(1.2);
 }
 
+/* ---------------- ACTION BUTTONS ---------------- */
 .actions {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+  gap: 12px;
 }
 
 .addRowBtn {
   display: flex;
   align-items: center;
   gap: 6px;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.08);
   background: transparent;
   color: var(--white);
   padding: 8px 14px;
   font-size: 1rem;
   cursor: pointer;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
 }
 .addRowBtn:hover {
   background: rgba(255,255,255,0.08);
@@ -128,7 +163,7 @@
   box-shadow: 0 10px 30px rgba(142,36,255,0.3);
 }
 
-
+/* ---------------- EMPTY STATE ---------------- */
 .emptyMsg {
   color: var(--muted);
   font-size: 1.1rem;

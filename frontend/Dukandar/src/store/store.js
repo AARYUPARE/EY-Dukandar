@@ -21,6 +21,9 @@ const userSlice = createSlice({
     loyaltyPoints: 1,
     imageUrl: "https://i.pravatar.cc/300?img=12",
     pass: "",
+    wishlist: [
+
+    ]
   },
   reducers:
   {
@@ -53,7 +56,7 @@ const kioskStoreSlice = createSlice({
 const sessionSlice = createSlice({
   name: "session",
   initialState: {
-    id: null,
+    id: "",
   },
   reducers: {
     setSessionId(state, action) {
@@ -71,10 +74,12 @@ export const sendMessageAsync = createAsyncThunk(
     let sessionState = getState().session || {};
     let sessionId = sessionState.id;
 
-    if (!sessionId) {
+    if (sessionId == "") {
       sessionId = Date.now().toString();
       dispatch(sessionActions.setSessionId(sessionId));
     }
+
+    console.log(sessionId);
 
     // add user message
     dispatch(
@@ -96,7 +101,8 @@ export const sendMessageAsync = createAsyncThunk(
     let res = {
       session_id: "",
       reply: "",
-      products: []
+      products: [],
+      stores: [],
     };
 
     try {
@@ -117,7 +123,15 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
 
-      dispatch(productsAction.addProducts({ products: res.data.products || [] }));
+      if(Array.isArray(res.data.products)? res.data.products.length != 0:false)
+      {
+        dispatch(productsAction.addProducts({ products: res.data.products || [] }));
+      }
+      
+      if(Array.isArray(res.data.stores)? res.data.stores.length != 0:false)
+      {
+        dispatch(kioskStoreListActions.addKioskStores({ stores: res.data.stores || [] }));
+      }
     }
     catch (error) {
       console.error("Error sending message:", error);
@@ -191,7 +205,31 @@ const productsSlice = createSlice({
       }
 
       state.products.push(...uniqueProducts);
-      console.log(state.products);
+    },
+  },
+});
+
+const kioskStoreListSlice = createSlice({
+  name: "kioskStoreList",
+  initialState: {
+    kioskStores: [
+      
+    ],
+  },
+  reducers: {
+    addKioskStores(state, action) {
+      const seenIds = new Set(state.kioskStores.map(p => p.id));
+
+      const uniqueStores = [];
+
+      for (const store of action.payload.stores) {
+        if (!seenIds.has(store.id)) {
+          seenIds.add(store.id);
+          uniqueStores.push(store);
+        }
+      }
+
+      state.kioskStores.push(...uniqueStores);
     },
   },
 });
@@ -204,7 +242,15 @@ const storeOffersSlice = createSlice(
         
       ],
     },
-    reducers: {}
+    reducers: {
+      setStoreOffers(state, action)
+      {
+        const newOffers = {
+          list: action.payload
+        }
+        return newOffers;
+      }
+    }
   }
 )
 
@@ -237,6 +283,7 @@ export const showcaseAction = showcaseSlice.actions;
 export const storeOffersAction = storeOffersSlice.actions;
 export const sessionActions = sessionSlice.actions;
 export const kioskStoreActions = kioskStoreSlice.actions;
+export const kioskStoreListActions = kioskStoreListSlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -248,6 +295,7 @@ const store = configureStore({
     session: sessionSlice.reducer,
     user: userSlice.reducer,
     kioskStore: kioskStoreSlice.reducer,
+    kioskStoreList: kioskStoreListSlice.reducer,
   },
 });
 
