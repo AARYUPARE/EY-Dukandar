@@ -55,7 +55,12 @@ class InventoryAgent:
 
         if not stores:
             return {
-                "reply": f"'{product['name']}' is not available near {user_city}.",
+                "reply": (
+                    f"Ahh, I checked around {user_city} 😕\n"
+                    f"Looks like {product['name']} isn’t available in nearby stores right now.\n\n"
+                    f"If you want, I can add it to your wishlist 👀✨\n"
+                    f"So you won’t miss it when it comes back — just tell me 👍"
+                ),
                 "products": [product],
                 "storeInventory": []
             }

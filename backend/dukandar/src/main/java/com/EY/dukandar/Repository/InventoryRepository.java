@@ -18,6 +18,14 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     List<Inventory> findByProductIdAndSize(Long productId, String size);
 
+    List<Inventory> findByStoreIdAndSize(Long storeId, String size);
+
+    Inventory findByProductIdAndSizeAndStoreId(
+            Long productId,
+            String size,
+            Long storeId
+    );
+
     @Modifying
     @Query("""
     UPDATE Inventory i
@@ -27,10 +35,24 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
       AND i.size = :size
       AND i.stockQuantity >= :orderedQty
     """)
-        int reduceStock(Long storeId,
-                        Long productId,
-                        String size,
-                        int orderedQty);
+    int reduceStock(Long storeId,
+                    Long productId,
+                    String size,
+                    int orderedQty);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE i.productId = :productId " +
+            "AND (:size IS NULL OR i.size = :size) " +
+            "AND i.storeId = :storeId " +
+            "AND i.stockQuantity > 0")
+    List<Inventory> checkAvailable(Long productId,
+                                   Long storeId,
+                                   String size);
+
+    @Query("SELECT i FROM Inventory i " +
+            "WHERE i.storeId = :storeId " +
+            "AND i.stockQuantity > 0")
+    List<Inventory> findAllAvailableInStore(Long storeId);
 
 
 }

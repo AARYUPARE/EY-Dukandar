@@ -25,7 +25,7 @@ public class OfferController {
     }
 
     @GetMapping("/search")
-    public List<Offer> searchOffers(@RequestParam(required = false) Integer loyaltyPoints) {
+    public List<Offer> searchOffers(@RequestParam int loyaltyPoints) {
         return offerService.searchAllOffers(loyaltyPoints);
     }
 
@@ -39,14 +39,4 @@ public class OfferController {
         offerService.deleteOffer(id);
         return "Offer deleted successfully.";
     }
-
-//    @GetMapping("/active")
-//    public List<Offer> getActiveOffers() {
-//        return offerService.getActiveOffers();
-//    }
-//
-//    @GetMapping("/eligible/{points}")
-//    public List<Offer> getEligibleOffers(@PathVariable int points) {
-//        return offerService.getEligibleOffers(points);
-//    }
 }

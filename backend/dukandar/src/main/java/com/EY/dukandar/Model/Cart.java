@@ -1,7 +1,7 @@
 package com.EY.dukandar.Model;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Entity
@@ -12,17 +12,14 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // One user has one cart
-    @OneToOne
+    // ⭐ ADD THIS — Many carts belong to one user
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // One cart → many cart items
+    // Add relationship with CartItem
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
-
-    public Cart() {
-    }
+    private List<CartItem> items;
 
     public Long getId() {
         return id;
@@ -36,6 +33,7 @@ public class Cart {
         return user;
     }
 
+    // ⭐ This method is required for cart.setUser(user)
     public void setUser(User user) {
         this.user = user;
     }
@@ -48,4 +46,3 @@ public class Cart {
         this.items = items;
     }
 }
-

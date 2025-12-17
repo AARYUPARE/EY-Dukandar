@@ -1,16 +1,14 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const ComponentToggler = ({ child1, child2 }) => {
-  const [childIndex, setChildIndex] = useState(1);
-
-  const showProducts = () => setChildIndex(1);
-  const showStores = () => setChildIndex(2);
+  let state = useSelector(store => store.toggleContainers);
 
   return (
     <>
-      {childIndex === 1
-        ? child1({ showStores })
-        : child2({ showProducts })}
+      {state === 1
+        ? child1
+        : child2}
     </>
   );
 };

@@ -7,15 +7,23 @@ import { Outlet } from "react-router-dom"
 import "../styles/ChatInterface.css"
 
 const ChatInterface = () => {
-    return <div className="container">
-        <SidebarContianer />
+  return <div className="container">
+    <SidebarContianer />
 
-      {/* other fixed UI you want to keep (top bar / right panel etc.) */}
-      {/* Place the routed content here: */}
-      <Main></Main>
+    {/* other fixed UI you want to keep (top bar / right panel etc.) */}
+    {/* Place the routed content here: */}
+    <Main></Main>
 
-      <ComponentToggler child1={(props) => <CardContainer {...props}/>} child2={(props) => <StoreCardContainer {...props}/>}></ComponentToggler>
-    </div>
+    <ComponentToggler
+      child1={
+        <CardContainer  />
+      }
+      child2={
+        <StoreCardContainer />
+      }
+    />
+
+  </div>
 }
 
 export default ChatInterface;

@@ -1,6 +1,7 @@
 package com.EY.dukandar.Service;
 
 import com.EY.dukandar.Model.Inventory;
+import com.EY.dukandar.Model.Product;
 
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,15 @@ public interface InventoryService {
 
     List<Inventory> getInventoryForStore(Long storeId);
 
-    Inventory updateStock(Long storeId, Long productId, int newStock);
+    Inventory updateStock(Long storeId, Long productId, int newStock, String size);
 
     void deleteInventory(Long id);
 
-    Inventory reduceStock(Long storeId, Long productId, String size, int qty);
+    void reduceStock(Long storeId, Long productId, String size, int qty);
 
-    List<Inventory> checkInventory(Long productId, String size);
+    List<Inventory> checkInventory(Long productId, Long storeId, String size);
+
+    List<Inventory> getAvailableProductsInStore(Long storeId);
 
     public List<Map<String, Object>> findNearbyStoresForProduct(
             Long productId,

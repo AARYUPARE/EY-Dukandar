@@ -12,6 +12,10 @@ public class OrderItem {
     private Long id;
 
     private Long productId;
+
+    private String size;        // size variant of item
+    private Long storeId;       // store fulfilling this item
+
     private int quantity;
     private double pricePerUnit;
     private double totalPrice;
@@ -21,14 +25,18 @@ public class OrderItem {
     @JsonBackReference
     private Order order;
 
-
     // Getters & Setters
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
+
+    public String getSize() { return size; }
+    public void setSize(String size) { this.size = size; }
+
+    public Long getStoreId() { return storeId; }
+    public void setStoreId(Long storeId) { this.storeId = storeId; }
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }

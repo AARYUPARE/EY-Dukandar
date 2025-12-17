@@ -5,6 +5,7 @@ import { sendMessageAsync } from "../store/store"
 import { useDispatch, useSelector } from "react-redux"
 import "../styles/ChatContainer.css"
 import { useEffect, useRef } from "react"
+import OverlayText from "./OverlayText"
 
 const ChatContainer = () => {    
     

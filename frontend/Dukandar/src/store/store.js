@@ -4,9 +4,11 @@ import {
   configureStore,
 } from "@reduxjs/toolkit";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const BASE_BACKEND_URL = "http://localhost:8080/api"
 const CHAT_API_URL = BASE_BACKEND_URL + "/chat";
+// const navigate = useNavigate();
 
 const userSlice = createSlice({
   name: "user",
@@ -35,16 +37,17 @@ const userSlice = createSlice({
 
 const kioskStoreSlice = createSlice({
   name: "store",
-  initialState:
-  {
-    id: 1,
-    name: "ABFRL Phoenix Mall Store",
-    address: "Phoenix Marketcity, Viman Nagar, Pune",
-    phone: "9876543210",
-    latitude: 100.00,
-    longitude: 100.00,
-    imageUrl: "https://www.rli.uk.com/wp-content/uploads/2023/01/990283593_20230117093831_8328433219.jpeg",
-  },
+  initialState: 
+    {
+      id: 1,
+      name: "ABFRL Phoenix Mall Store",
+      address: "Phoenix Marketcity, Viman Nagar, Pune",
+      phone: "9876543210",
+      latitude: 100.00,
+      longitude: 100.00,
+      imageUrl: "https://www.rli.uk.com/wp-content/uploads/2023/01/990283593_20230117093831_8328433219.jpeg",
+    },
+  
   reducers:
   {
     setStore(state, action) {
@@ -64,6 +67,128 @@ const sessionSlice = createSlice({
     }
   }
 });
+
+/* =========================
+   KIOSK LOGIN
+========================= */
+export const loginKiosk = createAsyncThunk(
+  "auth/loginKiosk",
+  async ({ email, password }, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const id = getState().kioskStore.id;
+
+      const response = await axios.post(
+        `${BASE_BACKEND_URL}/login`,
+        {
+          email,
+          password,
+          storeType: "kiosk",
+          storeId: id
+        }
+      );
+
+      // console.log(response.data)
+
+      if (response.data.message === "login failed") {
+        return false;
+      }
+
+      const loggingUser = response.data.user;
+      const userWishlist = await axios.get(BASE_BACKEND_URL + `/wishlist/${loggingUser.id}`)
+
+      dispatch(
+        userActions.setUser({
+          id: loggingUser.id,
+          name: loggingUser.name,
+          gender: loggingUser.gender,
+          DOB: loggingUser.dob,
+          email: loggingUser.email,
+          phone: loggingUser.phone,
+          loyaltyPoints: loggingUser.loyaltyPoints,
+          imageUrl: loggingUser.imageUrl,
+          pass: "",
+          wishlist: userWishlist.data
+        })
+      );
+
+      let availProductsFromWishList = [];
+
+      // console.log(response.data.availableWishlist);
+
+      response.data.availableWishlist.forEach(ele => {
+        availProductsFromWishList.push(ele.product);
+      });
+
+      // console.log(availProductsFromWishList);
+
+      
+      if(availProductsFromWishList.length != 0)
+      {
+        dispatch(storeOffersAction.clearStoreOffers());
+        dispatch(overlayActions.setOverlayText("You can see products of your wishlist which are available here"))
+        dispatch(storeOffersAction.setStoreOffers(availProductsFromWishList))
+      }
+
+
+      // dispatch()
+      return true;
+
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Login failed"
+      );
+    }
+  }
+);
+
+
+/* =========================
+   WEB LOGIN
+========================= */
+export const loginWeb = createAsyncThunk(
+  "auth/loginWeb",
+  async ({ email, password }, { dispatch, getState, rejectWithValue }) => {
+    try {
+      // const { email, password } = getState().user;
+
+      const response = await axios.post(BASE_BACKEND_URL + `/login`, {
+        email,
+        password,
+        storeType: "web"
+      });
+
+      if (response.data.message == "login failed") {
+        
+        return false;
+      }
+
+      const loggingUser = response.data.user;
+
+      const userWishlist = await axios.get(BASE_BACKEND_URL + `/wishlist/${loggingUser.id}`)
+      
+
+      const newAction = {
+        id: loggingUser.id,
+        name: loggingUser.name,
+        gender: loggingUser.gender,
+        DOB: loggingUser.dob,
+        email: loggingUser.email,
+        phone: loggingUser.phone,
+        loyaltyPoints: loggingUser.loyaltyPoints,
+        imageUrl: loggingUser.imageUrl,
+        pass: "",
+        wishlist: userWishlist.data
+      }
+
+      dispatch(userActions.setUser(newAction))
+      return true;
+
+
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: "login failed" });
+    }
+  }
+);
 
 export const sendMessageAsync = createAsyncThunk(
   "chat/sendMessage",
@@ -123,13 +248,11 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
 
-      if(Array.isArray(res.data.products)? res.data.products.length != 0:false)
-      {
+      if (Array.isArray(res.data.products) ? res.data.products.length != 0 : false) {
         dispatch(productsAction.addProducts({ products: res.data.products || [] }));
       }
-      
-      if(Array.isArray(res.data.stores)? res.data.stores.length != 0:false)
-      {
+
+      if (Array.isArray(res.data.stores) ? res.data.stores.length != 0 : false) {
         dispatch(kioskStoreListActions.addKioskStores({ stores: res.data.stores || [] }));
       }
     }
@@ -184,11 +307,24 @@ const toggleSideSlice = createSlice({
   },
 });
 
+const toggleCardContainers = createSlice({
+  name: "containertoggle",
+  initialState: 1,
+  reducers: {
+    showProducts() {
+      return 1;
+    },
+    showStores() {
+      return 2;
+    }
+  }
+})
+
 const productsSlice = createSlice({
   name: "products",
   initialState: {
     products: [
-      
+
     ],
   },
   reducers: {
@@ -212,24 +348,16 @@ const productsSlice = createSlice({
 const kioskStoreListSlice = createSlice({
   name: "kioskStoreList",
   initialState: {
-    kioskStores: [
-      
+    stores: [
+
     ],
   },
   reducers: {
     addKioskStores(state, action) {
-      const seenIds = new Set(state.kioskStores.map(p => p.id));
 
-      const uniqueStores = [];
+      // if(!action.payload.stores) return;
 
-      for (const store of action.payload.stores) {
-        if (!seenIds.has(store.id)) {
-          seenIds.add(store.id);
-          uniqueStores.push(store);
-        }
-      }
-
-      state.kioskStores.push(...uniqueStores);
+      state.stores.push(...action.payload.stores);
     },
   },
 });
@@ -239,16 +367,19 @@ const storeOffersSlice = createSlice(
     name: "storeOffers",
     initialState: {
       list: [
-        
+
       ],
     },
     reducers: {
-      setStoreOffers(state, action)
-      {
+      setStoreOffers(state, action) {
         const newOffers = {
           list: action.payload
         }
         return newOffers;
+      },
+      clearStoreOffers()
+      {
+        return { list: [] }
       }
     }
   }
@@ -276,6 +407,22 @@ const showcaseSlice = createSlice(
   }
 )
 
+const overlaySlice = createSlice({
+  name: 'overlay',
+  initialState: "",
+  reducers:
+  {
+    setOverlayText(state, action)
+    {
+      return action.payload;
+    },
+    clearOverlay()
+    {
+      return "";
+    }
+  }
+})
+
 export const chatAction = chatSlice.actions;
 export const sideBarAction = toggleSideSlice.actions;
 export const productsAction = productsSlice.actions;
@@ -284,6 +431,9 @@ export const storeOffersAction = storeOffersSlice.actions;
 export const sessionActions = sessionSlice.actions;
 export const kioskStoreActions = kioskStoreSlice.actions;
 export const kioskStoreListActions = kioskStoreListSlice.actions;
+export const toggleCardContainersActions = toggleCardContainers.actions;
+export const userActions = userSlice.actions;
+export const overlayActions = overlaySlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -296,6 +446,8 @@ const store = configureStore({
     user: userSlice.reducer,
     kioskStore: kioskStoreSlice.reducer,
     kioskStoreList: kioskStoreListSlice.reducer,
+    toggleContainers: toggleCardContainers.reducer,
+    overlayText: overlaySlice.reducer
   },
 });
 

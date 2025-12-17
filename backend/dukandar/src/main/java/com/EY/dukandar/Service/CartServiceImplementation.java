@@ -14,6 +14,7 @@ public class CartServiceImplementation implements CartService {
 
     @Autowired
     private CartRepository cartRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -23,18 +24,18 @@ public class CartServiceImplementation implements CartService {
         return cart != null ? cart : null;
     }
 
-
     @Override
     public Cart createCart(Long userId) {
         Optional<User> userOpt = userRepository.findById(userId);
+
         if (userOpt.isEmpty()) {
-            return null; // Or throw exception if preferred
+            return null; // Or throw exception
         }
 
         User user = userOpt.get();
         Cart cart = new Cart();
         cart.setUser(user);
+
         return cartRepository.save(cart);
     }
 }
-

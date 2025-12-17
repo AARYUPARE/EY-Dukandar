@@ -22,4 +22,3 @@ public class CartController {
         return cartService.createCart(userId);
     }
 }
-

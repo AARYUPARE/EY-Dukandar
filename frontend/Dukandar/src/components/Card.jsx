@@ -37,7 +37,7 @@ export default function Card({ title, image_url, description, onClick, brand, si
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
           <p className="card-text">Brand: {brand}</p>
-          {size ?? <p className="card-text">Size: {size}</p>}
+          {size != "" ? <p className="card-text">Size: {size}</p>: ''}
         </div>
       </div>
     </Tilty>

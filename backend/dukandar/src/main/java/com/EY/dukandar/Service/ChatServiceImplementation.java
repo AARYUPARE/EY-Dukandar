@@ -89,7 +89,7 @@ public class ChatServiceImplementation implements ChatService {
                         context,
                         request.getMessage(),
                         lastProductMaps,
-                        getUser(session.getId())  // 🔥 PASS FULL USER
+                        getUser(request.getUserId())  // 🔥 PASS FULL USER
                 );
 
         // 6️⃣ Extract reply
@@ -148,7 +148,13 @@ public class ChatServiceImplementation implements ChatService {
         ChatResponse response = new ChatResponse();
         response.setSessionId(request.getSessionId());
         response.setReply(reply);
-        response.setProducts(products);
+        if(products != null && !products.isEmpty())
+        {
+            response.setProducts(products);
+        }
+        else {
+            response.setProducts(lastProducts);
+        }
         response.setStores(stores);
 
         return response;

@@ -1,19 +1,20 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import StoreCard from "./StoreCard";
-import { sideBarAction } from "../store/store";
+import { sideBarAction, toggleCardContainersActions } from "../store/store";
 import css from "../styles/CardContainer.module.css";
 
-const StoreCardContainer = ({ showProducts }) => {
+const StoreCardContainer = () => {
   const dispatch = useDispatch();
   const stores = useSelector((store) => store.kioskStoreList.stores);
+  console.log(stores);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     dispatch(sideBarAction.collapse());
   }, [dispatch]);
 
-  if (!stores || stores.length === 0) return null;
+  // if (!stores || stores.length === 0) return null;
 
   const filtered = stores.filter((store) =>
     store.name.toLowerCase().includes(search.toLowerCase())
@@ -25,7 +26,7 @@ const StoreCardContainer = ({ showProducts }) => {
       {/* 🔁 TOGGLE BUTTON */}
       <button
         className="btn btn-outline-light mb-3"
-        onClick={showProducts}
+        onClick={() => dispatch(toggleCardContainersActions.showProducts())}
       >
         🛍 View Products
       </button>

@@ -1,6 +1,7 @@
 package com.EY.dukandar.Controller;
 
 import com.EY.dukandar.Model.Inventory;
+import com.EY.dukandar.Model.Product;
 import com.EY.dukandar.Service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,33 +36,37 @@ public class InventoryController {
         return inventoryService.getInventoryForStore(storeId);
     }
 
+    @GetMapping("/available")
+    public List<Inventory> getAvailableProducts(@RequestParam Long storeId) {
+        return inventoryService.getAvailableProductsInStore(storeId);
+    }
+
     @GetMapping("/check")
     public List<Inventory> checkInventory(
             @RequestParam Long productId,
-            @RequestParam(required = false) String size
-    ) {
-        return inventoryService.checkInventory(productId, size);
+            @RequestParam Long storeId,
+            @RequestParam String size) {
+
+        return inventoryService.checkInventory(productId, storeId, size);
     }
-
-
 
     @PutMapping("/{storeId}/{productId}")
     public Inventory updateStock(@PathVariable Long storeId,
                                  @PathVariable Long productId,
-                                 @RequestParam int stock) {
-        return inventoryService.updateStock(storeId, productId, stock);
+                                 @RequestParam int newStock,
+                                 @RequestParam String size) {
+
+        return inventoryService.updateStock(storeId, productId, newStock, size);
     }
 
     @PostMapping("/{storeId}/{productId}/reduce")
-    public Inventory reduceStock(@PathVariable Long storeId,
-                                 @PathVariable Long productId,
-                                 @RequestParam String size,
-                                 @RequestParam int qty) {
-        Inventory inv = inventoryService.reduceStock(storeId, productId, size, qty);
-        if (inv == null) {
-            throw new RuntimeException("Insufficient stock or inventory not found");
-        }
-        return inv;
+    public void reduceStock(@PathVariable Long storeId,
+                            @PathVariable Long productId,
+                            @RequestParam String size,
+                            @RequestParam int qty) {
+
+        inventoryService.reduceStock(storeId, productId, size, qty);
+
     }
 
     @DeleteMapping("/{id}")

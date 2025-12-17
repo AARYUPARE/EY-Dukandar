@@ -1,8 +1,10 @@
 package com.EY.dukandar.Service;
 
 import com.EY.dukandar.Model.Inventory;
+import com.EY.dukandar.Model.Product;
 import com.EY.dukandar.Model.Store;
 import com.EY.dukandar.Repository.InventoryRepository;
+import com.EY.dukandar.Repository.ProductRepository;
 import com.EY.dukandar.Repository.StoreRepository;
 import com.EY.dukandar.Util.CoordinateResolver;
 import com.EY.dukandar.Util.DistanceCalculator;
@@ -18,6 +20,9 @@ public class InventoryServiceImplementation implements InventoryService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     // 🔥 NEW (required for nearby-store lookup)
     @Autowired
@@ -51,44 +56,66 @@ public class InventoryServiceImplementation implements InventoryService {
     }
 
     @Override
-    public Inventory updateStock(Long storeId, Long productId, int newStock) {
-        Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
-        if (inv != null) {
-            int currentStockQuantity = inv.getStockQuantity();
-            inv.setStockQuantity(currentStockQuantity + newStock);
-            inv.setAvailable(currentStockQuantity + newStock > 0);
-            return inventoryRepository.save(inv);
-        }
-        else
-        {
-
-        }
-        return null;
-    }
-
-    public List<Inventory> checkInventory(Long productId, String size) {
-        if (size == null || size.isEmpty()) {
-            return inventoryRepository.findByProductId(productId);
-        }
-        return inventoryRepository.findByProductIdAndSize(productId, size);
+    public List<Inventory> getAvailableProductsInStore(Long storeId) {
+        return inventoryRepository.findAllAvailableInStore(storeId);
     }
 
     @Override
-    public Inventory reduceStock(Long storeId, Long productId, String size, int qty) {
-        if (qty <= 0) return null;
+    public Inventory updateStock(Long storeId, Long productId, int newStock, String size) {
 
-        int updated = inventoryRepository.reduceStock(storeId, productId, size, qty);
-        if (updated <= 0) {
-            return null;
-        }
+        Inventory inv = inventoryRepository
+                .findByProductIdAndSizeAndStoreId(productId, size, storeId);
 
-        Inventory inv = inventoryRepository.findByStoreIdAndProductId(storeId, productId);
         if (inv != null) {
-            inv.setAvailable(inv.getStockQuantity() > 0);
-            return inv;
+
+            int updatedStock = inv.getStockQuantity() + newStock;
+            inv.setStockQuantity(updatedStock);
+            inv.setAvailable(updatedStock > 0);
+            return inventoryRepository.save(inv);
         }
-        return null;
+
+        else {
+            Inventory newInv = new Inventory();
+            newInv.setProductId(productId);
+            newInv.setStoreId(storeId);
+            newInv.setSize(size);
+            newInv.setStockQuantity(newStock);
+            newInv.setAvailable(newStock > 0);
+            return inventoryRepository.save(newInv);
+        }
     }
+
+    @Override
+    public List<Inventory> checkInventory(Long productId, Long storeId, String size) {
+
+        return inventoryRepository.checkAvailable(productId, storeId, size);
+    }
+
+    @Override
+    public void reduceStock(Long storeId, Long productId, String size, int qty) {
+
+        // 1️⃣ Find inventory first
+        Inventory inventory = inventoryRepository
+                .findByProductIdAndSizeAndStoreId(productId, size, storeId);
+
+        if (inventory == null) {
+            throw new RuntimeException("Inventory not found");
+        }
+
+        // 2️⃣ Check stock
+        if (inventory.getStockQuantity() < qty) {
+            throw new RuntimeException("Insufficient stock");
+        }
+
+        // 3️⃣ Reduce stock using JPQL atomic update
+        int updatedRows = inventoryRepository.reduceStock(
+                storeId, productId, size, qty);
+
+        if (updatedRows == 0) {
+            throw new RuntimeException("Stock update failed");
+        }
+    }
+
 
     @Override
     public void deleteInventory(Long id) {
@@ -123,7 +150,7 @@ public class InventoryServiceImplementation implements InventoryService {
 
         for (Inventory inv : inventoryList) {
 
-            if (!inv.isAvailable() || inv.getStockQuantity() <= 0) {
+            if (inv.getStockQuantity() <= 0) {
                 continue;
             }
 

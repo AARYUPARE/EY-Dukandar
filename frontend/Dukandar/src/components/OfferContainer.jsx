@@ -3,6 +3,7 @@ import Card from "./Card";
 import { useEffect, useState } from "react";
 import { showcaseAction, storeOffersAction } from "../store/store";
 import { BASE_BACKEND_URL } from "../store/store";
+import OverlayText from "./OverlayText";
 
 import css from "../styles/OfferContainer.module.css";
 import axios from "axios";
@@ -20,7 +21,14 @@ const OffersContainer = () => {
 
         const fetchStoreProducts = async () => {
             try {
-                let res = await axios(BASE_BACKEND_URL + `/inventory/store/${kioskStore.id}`)
+                let res = await axios(BASE_BACKEND_URL + `/inventory/available`,
+                    {
+                        params:
+                        {
+                            storeId: kioskStore.id
+                        }
+                    }
+                )
                 console.log('res: ', res)
 
                 let products = [];
@@ -49,7 +57,9 @@ const OffersContainer = () => {
         (item.title ?? "").toLowerCase().includes(search.toLowerCase())
     );
 
-    return (
+    return (<>
+        <OverlayText />
+
         <div className={`container-fluid m-0 ${css["main-container"]}`}>
             <input
                 className="form-control mb-4"
@@ -62,7 +72,7 @@ const OffersContainer = () => {
             <div className="d-flex align-items-start" id={css["card-list"]}>
                 {filtered.map((item, i) => (
                     <Card
-                        key={item.sku + item.size?? i}
+                        key={(item.sku + item.size)}
                         title={item.name}
                         image_url={item.image_url}
                         description={item.description ?? ""}
@@ -73,6 +83,7 @@ const OffersContainer = () => {
                 ))}
             </div>
         </div>
+        </>
     );
 };
 

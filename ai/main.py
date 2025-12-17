@@ -31,6 +31,8 @@ except Exception as e:
 from agents.recommendation_agent import RecommendationAgent
 from agents.inventory_agent import InventoryAgent
 from  agents.loyalty_agent import LoyaltyAgent
+from agents.support_agent import SupportAgent
+from agents.fulfillment_agent import fulfillment_agent
 
 # Optional stubs (so orchestrator does not crash)
 class DummyAgent:
@@ -38,8 +40,6 @@ class DummyAgent:
         return {"summary": "Not implemented"}
 
 payment_agent = DummyAgent()
-fulfillment_agent = DummyAgent()
-support_agent = DummyAgent()
 
 
 # ---------------------------------------------------------
@@ -48,6 +48,7 @@ support_agent = DummyAgent()
 reco_agent = RecommendationAgent(llm=llm)
 inv_agent = InventoryAgent(recommendation_agent=reco_agent, llm=llm)
 loyalty_agent = LoyaltyAgent()
+support_agent = SupportAgent(base_url="http://localhost:8080")
 
 
 agents = {

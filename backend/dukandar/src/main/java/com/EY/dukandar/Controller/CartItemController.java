@@ -8,28 +8,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cart-item")
+@RequestMapping("/api/cart-items")
 public class CartItemController {
 
     @Autowired
-    private CartItemService itemService;
+    private CartItemService cartItemService;
 
+    /**
+     * Add item to cart (with productId, size, quantity)
+     */
     @PostMapping("/add")
-    public CartItem addItem(@RequestParam Long cartId,
-                            @RequestParam Long productId,
-                            @RequestParam int quantity) {
-        return itemService.addItem(cartId, productId, quantity);
+    public CartItem addItem(
+            @RequestParam Long cartId,
+            @RequestParam Long productId,
+            @RequestParam String size,
+            @RequestParam int quantity
+    ) {
+        return cartItemService.addItem(cartId, productId, size, quantity);
     }
 
+    /**
+     * Get all items of a cart
+     */
     @GetMapping("/{cartId}")
     public List<CartItem> getItems(@PathVariable Long cartId) {
-        return itemService.getItems(cartId);
+        return cartItemService.getItems(cartId);
     }
 
+    /**
+     * Remove a single cart item
+     */
     @DeleteMapping("/{itemId}")
     public String removeItem(@PathVariable Long itemId) {
-        itemService.removeItem(itemId);
-        return "Item removed";
+        cartItemService.removeItem(itemId);
+        return "Item removed successfully!";
+    }
+
+    /**
+     * Clear entire cart
+     */
+    @DeleteMapping("/clear/{cartId}")
+    public String clearCart(@PathVariable Long cartId) {
+        cartItemService.clearCart(cartId);
+        return "Cart cleared successfully!";
     }
 }
-

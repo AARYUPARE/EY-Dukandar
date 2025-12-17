@@ -1,10 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import Card from "./Card";
-import { sideBarAction, showcaseAction } from "../store/store";
+import { sideBarAction, showcaseAction, toggleCardContainersActions } from "../store/store";
 import css from "../styles/CardContainer.module.css";
 
-const CardContainer = ({ showStores }) => {
+
+const CardContainer = () => {
   const dispatch = useDispatch();
   const products = useSelector((store) => store.products.products);
   const [search, setSearch] = useState("");
@@ -25,7 +26,7 @@ const CardContainer = ({ showStores }) => {
       {/* 🔁 TOGGLE BUTTON */}
       <button
         className="btn btn-outline-light mb-3"
-        onClick={showStores}
+        onClick={() => dispatch(toggleCardContainersActions.showStores())}
       >
         🏬 View Stores
       </button>

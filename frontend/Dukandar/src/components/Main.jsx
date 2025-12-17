@@ -4,10 +4,11 @@ import "../styles/Main.css"
 import { Outlet } from "react-router-dom"
 
 const Main = () => {
+
+
     return <div className="main-container">
             <Navbar></Navbar>
-            {/* <ChatContainer></ChatContainer> */}
-            <Outlet></Outlet>
+            <Outlet ></Outlet>
             
         </div>
 }
