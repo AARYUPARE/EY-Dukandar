@@ -248,11 +248,13 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
 
-      if (Array.isArray(res.data.products) ? res.data.products.length != 0 : false) {
-        dispatch(productsAction.addProducts({ products: res.data.products || [] }));
+      if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4: false) {
+        dispatch(productsAction.clearProducts())
       }
+      dispatch(productsAction.addProducts({ products: res.data.products || [] }));
 
       if (Array.isArray(res.data.stores) ? res.data.stores.length != 0 : false) {
+        dispatch(kioskStoreListActions.clearKioskStores());
         dispatch(kioskStoreListActions.addKioskStores({ stores: res.data.stores || [] }));
       }
     }
@@ -342,6 +344,11 @@ const productsSlice = createSlice({
 
       state.products.push(...uniqueProducts);
     },
+
+    clearProducts()
+    {
+      return { products: [] }
+    }
   },
 });
 
@@ -359,6 +366,10 @@ const kioskStoreListSlice = createSlice({
 
       state.stores.push(...action.payload.stores);
     },
+    clearKioskStores()
+    {
+      return {stores:[]}
+    }
   },
 });
 
