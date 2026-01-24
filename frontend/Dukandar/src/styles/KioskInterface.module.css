@@ -22,6 +22,9 @@
 .right {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 
     background: rgba(255,255,255,0.02);
     backdrop-filter: blur(14px);

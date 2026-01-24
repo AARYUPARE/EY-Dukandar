@@ -15,7 +15,7 @@ const KioskInterface = () => {
         <div className={css.wrapper}>
             {/* LEFT SIDE - Cards */}
             <div className={css.left}>
-                <Navbar />
+                {/* <Navbar /> */}
                 <OffersContainer />
             </div>
 

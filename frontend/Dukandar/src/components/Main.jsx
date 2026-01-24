@@ -7,7 +7,7 @@ const Main = () => {
 
 
     return <div className="main-container">
-            <Navbar></Navbar>
+            {/* <Navbar></Navbar> */}
             <Outlet ></Outlet>
             
         </div>
