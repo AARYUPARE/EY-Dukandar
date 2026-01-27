@@ -18,6 +18,7 @@ import Profile from './components/Profile';
 import Orders from './components/Orders';
 import CreateAccount from './components/CreateAccount';
 import Cart from './components/Cart';
+import MapOverlay from './components/MapOverlay';
 
 const appRouter = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ const appRouter = createBrowserRouter([
     path: "/chat",
     element: <>
       <ProductDisplay />
+      <MapOverlay />
       <ChatInterface />
     </>,
     children:[

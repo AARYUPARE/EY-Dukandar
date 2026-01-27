@@ -1,5 +1,5 @@
 import SidebarContianer from "./SidebarContainer"
-import Main from "./Main"
+import Main from "./Main.jsx"
 import CardContainer from "./CardContainer"
 import StoreCardContainer from "./StoreCardContainer"
 import ComponentToggler from "./ComponentToggler"

@@ -7,12 +7,13 @@ import {
   TbLayoutSidebarRightExpand
 } from "react-icons/tb";
 import { sideBarAction } from "../store/store";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
 const CollapsedSidebar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const user = useSelector(store => store.user)
 
   const handleExpand = () => {
     dispatch(sideBarAction.expand());
@@ -88,7 +89,7 @@ const CollapsedSidebar = () => {
       {/* Footer */}
       <div className="collapsed-footer">
         <img
-          src="https://github.com/mdo.png"
+          src={`${user.imageUrl}`}
           width="28"
           height="28"
           className="avatar"

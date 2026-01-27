@@ -37,17 +37,17 @@ const userSlice = createSlice({
 
 const kioskStoreSlice = createSlice({
   name: "store",
-  initialState: 
-    {
-      id: 1,
-      name: "ABFRL Phoenix Mall Store",
-      address: "Phoenix Marketcity, Viman Nagar, Pune",
-      phone: "9876543210",
-      latitude: 100.00,
-      longitude: 100.00,
-      imageUrl: "https://www.rli.uk.com/wp-content/uploads/2023/01/990283593_20230117093831_8328433219.jpeg",
-    },
-  
+  initialState:
+  {
+    id: 1,
+    name: "ABFRL Phoenix Mall Store",
+    address: "Phoenix Marketcity, Viman Nagar, Pune",
+    phone: "9876543210",
+    latitude: 100.00,
+    longitude: 100.00,
+    imageUrl: "https://www.rli.uk.com/wp-content/uploads/2023/01/990283593_20230117093831_8328433219.jpeg",
+  },
+
   reducers:
   {
     setStore(state, action) {
@@ -121,9 +121,8 @@ export const loginKiosk = createAsyncThunk(
 
       // console.log(availProductsFromWishList);
 
-      
-      if(availProductsFromWishList.length != 0)
-      {
+
+      if (availProductsFromWishList.length != 0) {
         dispatch(storeOffersAction.clearStoreOffers());
         dispatch(overlayActions.setOverlayText("You can see products of your wishlist which are available here"))
         dispatch(storeOffersAction.setStoreOffers(availProductsFromWishList))
@@ -158,14 +157,14 @@ export const loginWeb = createAsyncThunk(
       });
 
       if (response.data.message == "login failed") {
-        
+
         return false;
       }
 
       const loggingUser = response.data.user;
 
       const userWishlist = await axios.get(BASE_BACKEND_URL + `/wishlist/${loggingUser.id}`)
-      
+
 
       const newAction = {
         id: loggingUser.id,
@@ -248,7 +247,7 @@ export const sendMessageAsync = createAsyncThunk(
         })
       );
 
-      if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4: false) {
+      if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4 : false) {
         dispatch(productsAction.clearProducts())
       }
       dispatch(productsAction.addProducts({ products: res.data.products || [] }));
@@ -311,7 +310,7 @@ const toggleSideSlice = createSlice({
 
 const toggleCardContainers = createSlice({
   name: "containertoggle",
-  initialState: 1,
+  initialState: 2,
   reducers: {
     showProducts() {
       return 1;
@@ -345,8 +344,7 @@ const productsSlice = createSlice({
       state.products.push(...uniqueProducts);
     },
 
-    clearProducts()
-    {
+    clearProducts() {
       return { products: [] }
     }
   },
@@ -356,7 +354,33 @@ const kioskStoreListSlice = createSlice({
   name: "kioskStoreList",
   initialState: {
     stores: [
-
+      {
+        "id": 1,
+        "name": "ABFRL Phoenix Mall Store",
+        "address": "Phoenix Marketcity Mall, Kurla West, Mumbai",
+        "phone": "+91 9876543210",
+        "latitude": 19.0865,
+        "longitude": 72.8897,
+        "imageUrl": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da"
+      },
+      {
+        "id": 2,
+        "name": "ABFRL R City Mall Store",
+        "address": "R City Mall, Ghatkopar West, Mumbai",
+        "phone": "+91 9822223344",
+        "latitude": 19.0994,
+        "longitude": 72.9167,
+        "imageUrl": "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a"
+      },
+      {
+        "id": 3,
+        "name": "ABFRL Viviana Mall Store",
+        "address": "Viviana Mall, Thane West, Maharashtra",
+        "phone": "+91 9811112233",
+        "latitude": 19.2147,
+        "longitude": 72.9712,
+        "imageUrl": "https://images.unsplash.com/photo-1560393464-5c69a73c5770"
+      }
     ],
   },
   reducers: {
@@ -366,9 +390,8 @@ const kioskStoreListSlice = createSlice({
 
       state.stores.push(...action.payload.stores);
     },
-    clearKioskStores()
-    {
-      return {stores:[]}
+    clearKioskStores() {
+      return { stores: [] }
     }
   },
 });
@@ -388,8 +411,7 @@ const storeOffersSlice = createSlice(
         }
         return newOffers;
       },
-      clearStoreOffers()
-      {
+      clearStoreOffers() {
         return { list: [] }
       }
     }
@@ -423,13 +445,36 @@ const overlaySlice = createSlice({
   initialState: "",
   reducers:
   {
-    setOverlayText(state, action)
-    {
+    setOverlayText(state, action) {
       return action.payload;
     },
-    clearOverlay()
-    {
+    clearOverlay() {
       return "";
+    }
+  }
+})
+
+const mapList = createSlice({
+  name: "mapList",
+  initialState:
+  {
+    stores: [],
+    showRoutes: false
+  },
+  reducers:
+  {
+    setStores(state, action) {
+      state.stores = action.payload;
+    },
+    setShowRoutes(state, action) {
+      state.showRoutes = action.payload;
+    },
+    clearMapList()
+    {
+      return {
+        stores: [],
+        showRoutes: false,
+      }
     }
   }
 })
@@ -445,6 +490,7 @@ export const kioskStoreListActions = kioskStoreListSlice.actions;
 export const toggleCardContainersActions = toggleCardContainers.actions;
 export const userActions = userSlice.actions;
 export const overlayActions = overlaySlice.actions;
+export const mapListAction = mapList.actions;
 
 const store = configureStore({
   reducer: {
@@ -458,7 +504,8 @@ const store = configureStore({
     kioskStore: kioskStoreSlice.reducer,
     kioskStoreList: kioskStoreListSlice.reducer,
     toggleContainers: toggleCardContainers.reducer,
-    overlayText: overlaySlice.reducer
+    overlayText: overlaySlice.reducer,
+    mapList: mapList.reducer,
   },
 });
 

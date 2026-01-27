@@ -7,13 +7,14 @@ import {
   TbReceipt2,
   TbShoppingCart
 } from "react-icons/tb";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { sideBarAction } from "../store/store.js";
 import { Link, useLocation } from "react-router-dom";
 
 const FullSidebar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const user = useSelector(store => store.user)
 
   const handleCollapse = () => {
     dispatch(sideBarAction.collapse());
@@ -85,12 +86,12 @@ const FullSidebar = () => {
       {/* Footer */}
       <div className={css.footer}>
         <img
-          src="https://github.com/mdo.png"
+          src={`${user.imageUrl}`}
           width="36"
           height="36"
           className={css.avatar}
         />
-        <strong className={css.profileName}>mdo</strong>
+        <strong className={css.profileName}>{user.name}</strong>
       </div>
     </div>
   );
