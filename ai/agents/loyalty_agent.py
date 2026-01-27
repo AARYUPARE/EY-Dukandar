@@ -8,6 +8,36 @@ class LoyaltyAgent:
     def __init__(self):
         pass
 
+    # ------------------------------------------------
+    # 🔥 INTERNAL FORMATTER (NEW)
+    # ------------------------------------------------
+    def _format_offers(self, user_points, offers):
+        lines = []
+
+        for idx, offer in enumerate(offers, start=1):
+            lines.append(
+                f"🏷️ OFFER {idx}\n"
+                f"─────────\n"
+                f"{offer.get('offerName', 'Special Offer')}\n"
+                f"✨ {offer.get('description', '')}\n"
+                f"⭐ Requires: {offer.get('minPointsRequired')} points\n"
+                f"💸 Discount: {offer.get('discountPercentage', 0)}%"
+            )
+
+        offers_text = "\n\n".join(lines)
+
+        return (
+            f"🎁 **YOUR LOYALTY STATUS**\n"
+            f"─────────\n"
+            f"⭐ Points: {user_points}\n\n"
+            f"🎉 **Available Offers**\n\n"
+            f"{offers_text}\n\n"
+            f"👉 Say *apply offer 1* to redeem"
+        )
+
+    # ------------------------------------------------
+    # MAIN HANDLER
+    # ------------------------------------------------
     def handle(self, payload: dict):
         """
         payload = {
@@ -42,8 +72,6 @@ class LoyaltyAgent:
         except Exception:
             return {"reply": "Unable to fetch loyalty offers right now."}
 
-        print(offers)
-
         # ----------------------------
         # 2️⃣ Filter eligible offers
         # ----------------------------
@@ -53,7 +81,7 @@ class LoyaltyAgent:
         ]
 
         # ----------------------------
-        # 3️⃣ Apply offer (ONLY if allowed)
+        # 3️⃣ APPLY OFFER
         # ----------------------------
         if action == "apply":
             if not eligible_offers:
@@ -70,19 +98,42 @@ class LoyaltyAgent:
                     }
                 )
 
+                new_points = response.json().get("loyaltyPoints")
+
                 return {
-                    "reply": "Offer applied successfully!",
-                    "updatedPoints": response.json().get("loyaltyPoints"),
+                    "reply": (
+                        f"✅ **Offer Applied Successfully!**\n\n"
+                        f"🏷️ {chosen_offer.get('offerName')}\n"
+                        f"⭐ Remaining Points: {new_points}\n\n"
+                        f"Enjoy your savings 🎉"
+                    ),
+                    "updatedPoints": new_points,
                     "offerApplied": chosen_offer
                 }
+
             except Exception:
                 return {"reply": "Failed to apply the offer."}
 
         # ----------------------------
-        # 4️⃣ READ-ONLY RESPONSE
+        # 4️⃣ READ ONLY RESPONSE (🔥 formatted)
         # ----------------------------
+        if not eligible_offers:
+            return {
+                "reply": (
+                    f"🎁 **YOUR LOYALTY STATUS**\n"
+                    f"─────────\n"
+                    f"⭐ Points: {user_points}\n\n"
+                    f"😕 No offers available yet.\n"
+                    f"Shop more to earn rewards!"
+                ),
+                "userPoints": user_points,
+                "eligibleOffers": []
+            }
+
+        reply_text = self._format_offers(user_points, eligible_offers)
+
         return {
-            "reply": f"You have {user_points} loyalty points.",
+            "reply": reply_text,
             "userPoints": user_points,
             "eligibleOffers": eligible_offers
         }

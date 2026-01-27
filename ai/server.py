@@ -17,10 +17,10 @@ def query(data: Query):
 
     response = orchestrator.chat(
         message=data.message,
-        last_products=data.lastProducts,
         user=data.user
     )
 
+    print(response)
     # print("🤖 Agent response (raw):", response)
 
     def safe_convert(obj):

@@ -1,73 +1,96 @@
 import requests
-from vectorstore.pinecone_client import index
-from vectorstore.embedder import embed
-from db.product_queries import fetch_products_by_ids
-from utils.text_cleaner import clean_text
 
 BACKEND_BASE_URL = "http://localhost:8080"
 
+
 class InventoryAgent:
-    def __init__(self, recommendation_agent, llm=None):
-        self.reco = recommendation_agent
-        self.llm = llm
+    def __init__(self):
+        pass
 
-    def handle(self, query):
-        vec = embed(clean_text(query))
-        res = index.query(vector=vec, top_k=10, include_metadata=True)
-        ids = [m["id"] for m in res.get("matches", [])]
-        inventory = fetch_products_by_ids(ids)
-        reco = self.reco.handle(query)
+    # ------------------------------------------------
+    # 🔥 INTERNAL FORMATTER (NEW)
+    # ------------------------------------------------
+    def _format_store_cards(self, product, stores, city):
+        """
+        Pretty UI formatting only
+        NO business logic here
+        """
 
-        return {
-            "inventory": inventory,
-            "similar": reco["similar"],
-            "complementary": reco["complementary"]
-        }
+        store_lines = []
 
-    def search_in_store(self, product_index, product_list, size=None, user=None):
+        for idx, store in enumerate(stores, start=1):
+            store_lines.append(
+                f"🏬 STORE {idx}\n"
+                f"─────────\n"
+                f"📍 {store.get('address', 'Address not available')}\n"
+                f"📞 {store.get('phone', 'N/A')}"
+            )
 
-        print("📦 InventoryAgent.search_in_store")
-        print("👤 User received:", user)
+        stores_text = "\n\n".join(store_lines)
 
-        if product_index is None or product_index >= len(product_list):
-            return {"reply": "Invalid product selection.", "products": []}
+        return (
+            f"✅ **{product['name']}** is available near you in **{city}** 🎉\n\n"
+            f"{stores_text}\n\n"
+            "👉 Say:\n"
+            "• Reserve at store 1\n"
+            "• Book second store\n"
+            "• Add to wishlist"
+        )
 
-        product = product_list[product_index]
-        product_id = product["id"]
+    # ------------------------------------------------
+    # CHECK AVAILABILITY IN NEAREST STORE
+    # ------------------------------------------------
+    def check_nearest_store(self, product, user, size=None):
+        """
+        product → already selected product
+        user → user object with location
+        """
+
+        if not product or not product.get("id"):
+            return {"reply": "Please select a product first."}
 
         user_city = user.get("location") if isinstance(user, dict) else None
-        print("📍 User city:", user_city)
 
         if not user_city:
             return {
-                "reply": "Please update your location to find nearby stores.",
+                "reply": "Please update your location to check nearby availability.",
                 "products": [product],
                 "storeInventory": []
             }
 
         res = requests.get(
-            f"{BACKEND_BASE_URL}/api/inventory/product/{product_id}/nearby",
-            params={"city": user_city, "maxDistanceKm": 15}
+            f"{BACKEND_BASE_URL}/api/inventory/product/{product['id']}/nearby",
+            params={
+                "city": user_city,
+                "maxDistanceKm": 15,
+                "size": size
+            }
         )
 
         stores = res.json()
-        # print("🏬 Nearby stores:", stores)
 
+        # ------------------------------------------------
+        # ❌ NOT AVAILABLE
+        # ------------------------------------------------
         if not stores:
             return {
                 "reply": (
-                    f"Ahh, I checked around {user_city} 😕\n"
-                    f"Looks like {product['name']} isn’t available in nearby stores right now.\n\n"
-                    f"If you want, I can add it to your wishlist 👀✨\n"
-                    f"So you won’t miss it when it comes back — just tell me 👍"
+                    f"😕 I checked stores around **{user_city}**.\n\n"
+                    f"❌ **{product['name']}** is currently out of stock.\n\n"
+                    "Would you like me to add it to your wishlist? 💖"
                 ),
                 "products": [product],
-                "storeInventory": []
+                "storeInventory": [],
+                "wishlistSuggested": True
             }
 
+        # ------------------------------------------------
+        # ✅ AVAILABLE  (🔥 now nicely formatted)
+        # ------------------------------------------------
+        reply_text = self._format_store_cards(product, stores, user_city)
+
         return {
-            "reply": f"'{product['name']}' is available near you.",
+            "reply": reply_text,
             "products": [product],
             "storeInventory": stores
         }
-

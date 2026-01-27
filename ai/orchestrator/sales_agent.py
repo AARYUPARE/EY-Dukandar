@@ -1,393 +1,260 @@
+import re
 import json
+import os
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
 
+MEMORY_FILE = "user_memory.json"
+
+ALLOWED_INTENTS = {
+    "LOYALTY",
+    "ORDER_HISTORY",
+    "INVENTORY_CHECK",
+    "RECOMMEND",
+    "SELECT",
+    "CHECKOUT",
+    "ONLINE_PAYMENT",
+    "COD"
+}
 
 class SalesAgentOrchestrator:
-    def __init__(self, agents: dict, llm):
-        self.agents = agents
+    def __init__(
+        self,
+        recommendation_agent,
+        inventory_agent,
+        fulfillment_agent,
+        payment_agent,
+        loyalty_agent,
+        llm
+    ):
+        self.reco = recommendation_agent
+        self.inventory = inventory_agent
+        self.fulfillment = fulfillment_agent
+        self.payment = payment_agent
+        self.loyalty = loyalty_agent
         self.llm = llm
 
-        # -------------------------------
-        # INTENT CLASSIFIER
-        # -------------------------------
-        self.intent_prompt = PromptTemplate(
+        self.context = {
+            "shown_products": [],
+            "selected_product": None,
+            "pending_checkout": None,
+            "awaiting_wishlist_confirm": False,
+            "disliked_products": set()
+        }
+
+        self.memory = self.load_memory()
+
+    # ------------------------------------------------
+    # MEMORY
+    # ------------------------------------------------
+    def load_memory(self):
+        if os.path.exists(MEMORY_FILE):
+            with open(MEMORY_FILE, "r") as f:
+                return json.load(f)
+        return {"disliked_products": []}
+
+    def save_memory(self):
+        with open(MEMORY_FILE, "w") as f:
+            json.dump(self.memory, f)
+
+    # ------------------------------------------------
+    # INTENT DETECTION
+    # ------------------------------------------------
+    def detect_intent(self, text: str):
+        prompt = PromptTemplate(
             input_variables=["query"],
             template="""
-        You are a senior retail AI intent classifier.
+You are a STRICT intent classifier.
 
-        Classify the user's intent.
-        Return ONE OR MORE intents (comma-separated).
-        Return ONLY intent names.
+Valid intents:
+LOYALTY, ORDER_HISTORY, INVENTORY_CHECK,
+RECOMMEND, SELECT, CHECKOUT,
+ONLINE_PAYMENT, COD
 
-        ------------------------
-        VALID INTENTS
-        ------------------------
-
-        recommendation
-        - User wants suggestions, alternatives, best items
-
-        inventory
-        - User wants availability, stock, price, size, stores
-
-        search-in-store
-        - User refers to a product already shown
-        - Examples:
-          "1st product", "3rd one", "this", "that", "buy this", "select this"
-
-        fulfillment
-        - User wants to RESERVE or ORDER a product
-        - Includes:
-          reserve, book, hold, order, buy now, place order
-        - Examples:
-          "reserve this"
-          "order the 2nd one"
-          "book the 3rd product"
-        - If product is referenced → ALSO include search-in-store
-
-        loyalty
-        - Points, offers, rewards
-
-        support
-        - Wishlist, account help, store help
-
-        payment
-        - Checkout, pay now
-
-        ------------------------
-        IMPORTANT RULES
-        ------------------------
-
-        1. If user says reserve/order AND refers to a product → include fulfillment + search-in-store
-        2. If user mentions wishlist → include support
-        3. If product reference exists → search-in-store MUST be included
-        4. Return only intent names, comma-separated
-
-        ------------------------
-        User Query:
-        {query}
-
-        Return ONLY intents.
-        """
+Rules:
+• Return ONLY intent names
+• No explanation
+• Multiple intents → comma-separated
+"""
         )
 
-        # -------------------------------
-        # PRODUCT SELECTOR
-        # -------------------------------
-        self.selector_prompt = PromptTemplate(
-            input_variables=["query", "products"],
-            template="""
-        Products:
-        {products}
+        chain = RunnableSequence(prompt, self.llm)
+        result = chain.invoke({"query": text})
 
-        User query:
-        {query}
+        raw = result.content.upper()
+        intents = [i for i in ALLOWED_INTENTS if i in raw]
 
-        Respond ONLY with valid JSON.
-        Do NOT add any text, explanation, or markdown.
+        # 🔥 FALLBACK RULES (FIXED)
+        if not intents:
+            t = text.lower()
+            if any(x in t for x in ["upi", "card", "wallet"]):
+                return ["ONLINE_PAYMENT"]
+            if any(x in t for x in ["cod", "cash on delivery", "cash"]):
+                return ["COD"]
+            if any(x in t for x in ["buy", "order", "checkout"]):
+                return ["CHECKOUT"]
+            if any(x in t for x in ["available", "stock", "store", "where"]):
+                return ["INVENTORY_CHECK"]
+            if any(x in t for x in ["show", "want", "looking"]):
+                return ["RECOMMEND"]
+            return ["UNKNOWN"]
 
-        JSON format:
-        {{
-          "product_index": null,
-          "size": null
-        }}
-        """
-        )
+        return intents
 
-        self.intent_chain = RunnableSequence(self.intent_prompt, self.llm)
-        self.selector_chain = RunnableSequence(self.selector_prompt, self.llm)
+    # ------------------------------------------------
+    # UTILITIES
+    # ------------------------------------------------
+    def extract_index(self, text):
+        match = re.search(r"(\d+)", text)
+        return int(match.group(1)) - 1 if match else None
 
-    # ---------------------------------------------------------
-    # ROUTING LOGIC
-    # ---------------------------------------------------------
-    def route(self, user_query: str, last_products=None, user=None):
-        last_products = last_products or []
-
-        intent_raw = self.intent_chain.invoke({"query": user_query})
-        intents = [i.strip() for i in intent_raw.content.lower().split(",") if i.strip()]
-        print("Detected intents:", intents, "\n")
-
-        # -----------------------------------------------------
-        # 🔥 NEW: SUPPORT AGENT
-        # -----------------------------------------------------
-        if "wishlist" in intents:
-            if not user or not user.get("id"):
-                return {
-                    "reply": "Please log in to get support assistance."
-                }
-
-            print("🛠 Routing to Support Agent")
-
-            return self.agents["support"].handle(
-                query=user_query,
-                user=user
-            )
-
-        # 🔥 SEARCH IN STORE (UNCHANGED)
-        if "search-in-store" in intents and last_products:
-            selection_raw = self.selector_chain.invoke({
-                "query": user_query,
-                "products": last_products
-            })
-
-            raw = selection_raw.content.strip()
-            print("🔍 Selector raw output:", raw)
-
-            try:
-                if raw.startswith("```"):
-                    raw = raw.strip("`")
-                    raw = raw.replace("json", "", 1).strip()
-
-                data = json.loads(raw)
-            except Exception:
-                return {
-                    "reply": "Sorry, I couldn't understand which product you selected.",
-                    "products": []
-                }
-
-            idx = data.get("product_index")
-            size = data.get("size")
-
-            res = self.agents["inventory"].search_in_store(
-                product_index=idx,
-                product_list=last_products,
-                size=size,
-                user=user
-            )
-            # --- NEW FORMATTING LOGIC ---
-            base_reply = res.get("reply", "Here are the stores where you can find this item:")
-            stores = res.get("storeInventory", [])
-
-            if stores:
-                store_lines = []
-                for idx, store in enumerate(stores, start=1):
-                    # Building an attractive card-like format for each store
-                    lines = [
-                        f"🏬 Store {idx}: {store.get('name', 'Retail Store')}",
-                        f"📍 Address: {store.get('address', 'Contact store for location')}",
-                        f"📞 Phone: {store.get('phone', 'N/A')}",
-                    ]
-
-                    # Optional: Add a visual separator or small note
-                    store_lines.append("\n".join(lines))
-
-                stores_text = "\n\n---\n\n".join(store_lines)
-                full_reply = f"{base_reply}\n\n{stores_text}\n\n📍 Would you like reserve product at any of these locations?*"
-            else:
-                full_reply = base_reply
-
-            res["reply"] = full_reply
-            return res
-
-        # -----------------------------------------------------
-        # 🔥 FULFILLMENT INTENT (RESERVE / ORDER)
-        # -----------------------------------------------------
-        if "fulfillment" in intents and "search-in-store" in intents and last_products:
-            selection_raw = self.selector_chain.invoke({
-                "query": user_query,
-                "products": last_products
-            })
-
-            raw = selection_raw.content.strip()
-
-            try:
-                if raw.startswith("```"):
-                    raw = raw.strip("`").replace("json", "", 1).strip()
-                data = json.loads(raw)
-            except Exception:
-                return {
-                    "reply": "I couldn’t figure out which product you want to reserve.",
-                    "products": []
-                }
-
-            product_index = data.get("product_index")
-            size = data.get("size")
-
-            if product_index is None or product_index >= len(last_products):
-                return {"reply": "Invalid product selection."}
-
-            product = last_products[product_index]
-
-            # 🔥 POWERFUL, HUMAN-LIKE REPLY
-            return {
-                "reply": (
-                    f"Nice choice 😄\n\n"
-                    f"I can reserve **{product.get('name')}** for you.\n\n"
-                    f"📍 First, tell me **which store** you want to reserve it from.\n"
-                    f"Just say something like:\n"
-                    f"➡️ *Reserve it at store 1*\n"
-                    f"➡️ *Book this at the second store*\n\n"
-                    f"I’ll take care of everything 💪"
-                ),
-                "pendingFulfillment": {
-                    "intent": "reserve",
-                    "product_id": product.get("id"),
-                    "size": size
-                },
-                "products": [product]
-            }
-
-        # -----------------------------------------------------
-        # 🔥 NEW: LOYALTY AGENT (READ-ONLY)
-        # -----------------------------------------------------
-        if "loyalty" in intents:
-            if not user or not user.get("id"):
-                return {
-                    "reply": "Please log in to view your loyalty offers.",
-                    "products": []
-                }
-
-            print("🎁 Routing to Loyalty Agent")
-
-            res =  self.agents["loyalty"].handle({
-                "user": user,
-                "user_message": user_query,
-                "action": "check"   # 🔒 NEVER APPLY HERE
-            })
-
-            base_reply = res.get("reply", "")
-            offers = res.get("eligibleOffers", [])
-
-            if offers:
-                offer_lines = []
-
-                for idx, offer in enumerate(offers, start=1):
-                    lines = [
-                        f"🎁 Offer {idx}: {offer.get('offerName', 'Special Offer')}",
-                        f"• Description: {offer.get('description', 'N/A')}",
-                        f"• Minimum Points Required: {offer.get('minPointsRequired', 'N/A')}",
-                        f"• Discount: {offer.get('discountPercentage', 0)}%",
-                    ]
-
-                    offer_lines.append("\n".join(lines))
-
-                offers_text = "\n\n".join(offer_lines)
-                full_reply = f"{base_reply}\n\nHere are your eligible offers:\n\n{offers_text}"
-            else:
-                full_reply = base_reply
-
-            res["reply"] = full_reply
-            return res
-
-        responses = {}
-
-        # INVENTORY ONLY
-        if intents == ["inventory"]:
-            responses["inventory"] = self.agents["inventory"].handle(user_query)
-
-        # RECOMMENDATION ONLY
-        elif intents == ["recommendation"]:
-            responses["recommendation"] = self.agents["recommendation"].handle(user_query)
-
-        # BOTH
-        elif "inventory" in intents and "recommendation" in intents:
-            inv = self.agents["inventory"].handle(user_query)
-            rec = self.agents["recommendation"].handle(user_query)
-            responses["inventory"] = inv.get("inventory", [])
-            responses["similar"] = rec.get("similar", [])
-            responses["complementary"] = rec.get("complementary", [])
-
-        # FALLBACK
-        else:
-            q = user_query.lower()
-            if any(k in q for k in ["suggest", "recommend", "best"]):
-                responses["recommendation"] = self.agents["recommendation"].handle(user_query)
-            else:
-                responses["inventory"] = self.agents["inventory"].handle(user_query)
-
-        return self._merge_responses(responses)
-
-    # ---------------------------------------------------------
-    # MERGING LOGIC (UNCHANGED)
-    # ---------------------------------------------------------
-    def _merge_responses(self, responses):
-        merged = {
-            "inventory": responses.get("inventory", []),
-            "similar": responses.get("similar", []),
-            "complementary": responses.get("complementary", []),
-        }
-
-        if "recommendation" in responses:
-            merged["similar"] = responses["recommendation"].get("similar", [])
-            merged["complementary"] = responses["recommendation"].get("complementary", [])
-
-        return merged
-
-    # ---------------------------------------------------------
-    # FASTAPI ENTRY POINT
-    # ---------------------------------------------------------
-    def chat(self, message: str, last_products=None, user=None):
-        result = self.route(message, last_products, user)
-        # print(result);
-
-        if isinstance(result, dict) and (
-            "storeInventory" in result or "eligibleOffers" in result
-        ):
-            return result
-
-        products = (
-            result.get("inventory", [])
-            + result.get("similar", [])
-            + result.get("complementary", [])
-        )
-
-        PRODUCT_EMOJI_MAP = {"shirt": "👕", "tshirt": "👕", "t-shirt": "👕", "pant": "👖", "pants": "👖", "trouser": "👖",
-                             "jeans": "👖", "belt": "👔", "suit": "🕴️", "jacket": "🧥", "hoodie": "🧥", "shoe": "👟",
-                             "shoes": "👟", "sneaker": "👟", "watch": "⌚", "cap": "🧢", }
-
-        def get_product_emoji(product_name: str) -> str:
-            if not product_name:
-                return "🛍️"
-
-            name = product_name.lower()
-
-            for keyword, emoji in PRODUCT_EMOJI_MAP.items():
-                if keyword in name:
-                    return emoji
-
-            return "🛍️"
-
-        unique_products_map = {}
-
+    def match_by_name(self, text, products):
+        t = text.lower()
         for p in products:
-            pid = p.get("id")
-            if pid is not None:
-                unique_products_map[pid] = p
+            if p.get("name", "").lower() in t:
+                return p
+        return None
 
-        products = list(unique_products_map.values())
+    def chat(self, message: str, user=None):
+        return self.handle(user=user, message=message)
 
-        if products:
-            product_lines = []
+    # ------------------------------------------------
+    # PRODUCT FORMATTER
+    # ------------------------------------------------
+    def format_products(self, products):
+        lines = []
+        for i, p in enumerate(products, 1):
+            lines.append(f"👕 OPTION {i}\n{p['name']} — ₹{p['price']}")
+        return "\n\n".join(lines), products
 
-            for idx, p in enumerate(products, start=1):
-                name = p.get("name", "this one")
-                price = p.get("price", "N/A")
-                emoji = get_product_emoji(name)
+    # ------------------------------------------------
+    # MAIN HANDLER
+    # ------------------------------------------------
+    def handle(self, user, message):
+        msg = message.lower()
 
-                product_lines.append(
-                    f"{emoji} OPTION {idx}\n"
-                    f"─────────\n"
-                    f"{name} — ₹{price}"
-                )
+        # ---------- SMART OVERRIDE: DISLIKE ----------
+        if any(x in msg for x in ["don't like", "do not like", "not this"]):
+            disliked = self.context["selected_product"]
+            if disliked:
+                pid = str(disliked.get("id"))
+                self.context["disliked_products"].add(pid)
+                self.memory["disliked_products"].append(pid)
+                self.save_memory()
 
-            products_text = "\n\n".join(product_lines)
+            remaining = [
+                p for p in self.context["shown_products"]
+                if str(p.get("id")) not in self.context["disliked_products"]
+            ]
 
-            reply = (
-                f"heyy, sir 😄\n"
-                f"I checked it properly — you’ve got {len(products)} solid options here.\n\n"
-                f"{products_text}\n\n"
-                f"Just tell me which one you’re feeling —\n"
-                f"like 1st, 2nd, or 3rd etc.\n"
-                f"I’ll handle the rest 😉"
-            )
+            if not remaining:
+                return {"reply": "Got it 👍 I’ll remember that. Want to see something else?"}
+
+            formatted, products = self.format_products(remaining)
+            self.context["shown_products"] = products
+            self.context["selected_product"] = None
+            return {"reply": "No worries 🙂 Here are other options:\n\n" + formatted}
+
+        # ---------- FIX: I like 2nd one ----------
+        if self.context["shown_products"]:
+            # numeric select: 1, 2nd, first, etc.
+            if re.search(r"\b(1st|2nd|3rd|\d+|first|second|third)\b", msg):
+                intents = ["SELECT"]
+
+            # contextual select: "this item", "this one", "show this"
+            elif any(x in msg for x in ["this item", "this one", "show this", "show this item"]):
+                if self.context["selected_product"]:
+                    intents = ["SELECT"]
+                elif len(self.context["shown_products"]) == 1:
+                    intents = ["SELECT"]
+                else:
+                    return {
+                        "reply": "Please specify which one 🙂 (e.g. *first one*, *2nd one*)"
+                    }
+
+            else:
+                intents = self.detect_intent(message)
         else:
-            reply = (
-                "Sorry, sir 😕 I checked, but nothing solid came up this time.\n"
-                "Try changing it a bit — brand, color, or category — we’ll find something 💪"
-            )
+            intents = self.detect_intent(message)
 
-        return {
-            "reply": reply,
-            "products": products
-        }
+        print(f"🕵️ Intents: {intents}")
 
+        response = None
+
+        for intent in intents:
+
+            if intent == "RECOMMEND":
+                response = self.reco.handle(message)
+
+            elif intent == "SELECT" and self.context["shown_products"]:
+                idx = self.extract_index(message)
+                product = (
+                    self.context["shown_products"][idx]
+                    if idx is not None and idx < len(self.context["shown_products"])
+                    else self.match_by_name(message, self.context["shown_products"])
+                )
+                if product:
+                    self.context["selected_product"] = product
+                    response = {
+                        "reply": (
+                            f"✅ {product['name']} selected\n\n"
+                            "You can say:\n"
+                            "• Check availability\n"
+                            "• Buy this"
+                        )
+                    }
+
+            elif intent == "INVENTORY_CHECK":
+                product = self.context["selected_product"]
+                if not product:
+                    response = {"reply": "Please select a product first 🙂"}
+                else:
+                    response = self.inventory.check_nearest_store(product, user)
+
+            elif intent == "CHECKOUT":
+                product = self.context["selected_product"]
+                if not product:
+                    response = {"reply": "Please select a product first 🙂"}
+                else:
+                    self.context["pending_checkout"] = product
+                    response = {
+                        "reply": (
+                            f"🧾 Order Summary\n"
+                            f"Product: {product['name']}\n"
+                            f"Price: ₹{product['price']}\n\n"
+                            "How would you like to pay?\n"
+                            "• UPI\n• Card\n• 💵 Cash on Delivery"
+                        )
+                    }
+
+            elif intent == "ONLINE_PAYMENT" and self.context["pending_checkout"]:
+                product = self.context["pending_checkout"]
+                pay = self.payment.pay(
+                    user=user,
+                    amount=product["price"],
+                    method=message.upper()
+                )
+                if pay.get("status") == "SUCCESS":
+                    response = self.fulfillment.place_order(user)
+                    self.context["pending_checkout"] = None
+                else:
+                    response = {"reply": "❌ Payment failed. Try again."}
+
+            elif intent == "COD" and self.context["pending_checkout"]:
+                response = self.fulfillment.place_order(
+                    user=user,
+                    delivery_type="HOME_DELIVERY"
+                )
+                self.context["pending_checkout"] = None
+
+            elif intent == "ORDER_HISTORY":
+                response = self.fulfillment.order_history(user)
+
+            elif intent == "LOYALTY":
+                response = self.loyalty.handle({
+                    "user": user,
+                    "user_message": message,
+                    "action": "check"
+                })
+
+        return response or {"reply": "I didn’t quite get that 😅"}

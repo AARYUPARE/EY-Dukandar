@@ -4,15 +4,19 @@ from vectorstore.pinecone_client import index
 from vectorstore.embedder import embed
 from db.product_queries import fetch_products_by_ids
 from utils.text_cleaner import clean_text
+
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
+
+import json
+
 
 class RecommendationAgent:
     def __init__(self, llm=None):
         self.llm = llm
 
     # --------------------------------------------------- #
-    # Pinecone Search
+    # Pinecone Search (UNCHANGED)
     # --------------------------------------------------- #
     def pinecone_search(self, query, k=6, filter_metadata=None):
         vector = embed(clean_text(query))
@@ -42,7 +46,7 @@ class RecommendationAgent:
         return fetch_products_by_ids(ids)
 
     # --------------------------------------------------- #
-    # Category Expansion Using LLM
+    # Category Expansion Using LLM (UNCHANGED)
     # --------------------------------------------------- #
     def category_expand_with_llm(self, query, top_n=3):
         if not self.llm:
@@ -51,11 +55,11 @@ class RecommendationAgent:
         prompt = PromptTemplate(
             input_variables=["query", "top_n"],
             template="""
-            You are a smart retail assistant.
-            Generate {top_n} relevant product categories or sub-categories.
-            Query: {query}
-            Return ONLY a comma-separated list.
-            """
+You are a smart retail assistant.
+Generate {top_n} relevant product categories or sub-categories.
+Query: {query}
+Return ONLY a comma-separated list.
+"""
         )
 
         try:
@@ -72,9 +76,105 @@ class RecommendationAgent:
             return []
 
     # --------------------------------------------------- #
-    # Main Handler
+    # 🔥 PRODUCT FORMATTING + LLM EXPLANATION (FIXED)
     # --------------------------------------------------- #
-    def handle(self, query, k_similar=8, k_complement=6):
+    def _format_products(self, products, query):
+
+        PRODUCT_EMOJI_MAP = {
+            "shirt": "👕",
+            "pant": "👖",
+            "trouser": "👖",
+            "jeans": "👖",
+            "suit": "🕴️",
+            "jacket": "🧥",
+            "hoodie": "🧥",
+            "shoe": "👟",
+            "watch": "⌚",
+            "belt": "👔",
+            "cap": "🧢"
+        }
+
+        def emoji(name):
+            name = (name or "").lower()
+            for k, e in PRODUCT_EMOJI_MAP.items():
+                if k in name:
+                    return e
+            return "🛍️"
+
+        explanations = {}
+
+        # -----------------------------
+        # 🔥 LLM REASON GENERATION (ROBUST)
+        # -----------------------------
+        if self.llm and products:
+            try:
+                prompt = f"""
+You are a helpful shopping assistant.
+
+User query:
+{query}
+
+For each product, write ONE short friendly reason (max 15 words).
+
+STRICT RULES:
+- Return ONLY valid JSON
+- No text before or after
+- No markdown
+- No explanation
+
+Format:
+{{"0":"reason","1":"reason"}}
+
+Products:
+{[p.get("name") + " - " + (p.get("description") or "") for p in products]}
+"""
+
+                res = self.llm.invoke(prompt)
+
+                raw = getattr(res, "content", str(res)).strip()
+
+                # 🔥 Remove markdown/codeblocks
+                raw = raw.replace("```json", "").replace("```", "").strip()
+
+                try:
+                    explanations = json.loads(raw)
+                except Exception:
+                    print("⚠️ LLM explanation parse failed. Raw output:\n", raw)
+                    explanations = {}
+
+            except Exception as e:
+                print("❌ LLM explanation error:", e)
+                explanations = {}
+
+        # -----------------------------
+        # FORMAT PRODUCT CARDS
+        # -----------------------------
+        lines = []
+
+        for i, p in enumerate(products):
+            reason = explanations.get(str(i), "Popular choice for your search")
+
+            lines.append(
+                f"{emoji(p.get('name'))} OPTION {i+1}\n"
+                f"─────────\n"
+                f"{p.get('name')} — ₹{p.get('price')}\n"
+                f"✨ {reason}"
+            )
+
+        text = "\n\n".join(lines)
+
+        reply = (
+            "Here are some hand-picked options for you 👇\n\n"
+            f"{text}\n\n"
+            "Tell me which one you like (1st, 2nd, etc.) 😉"
+        )
+
+        return reply
+
+    # --------------------------------------------------- #
+    # Main Handler (LOGIC SAME + formatting added)
+    # --------------------------------------------------- #
+    def handle(self, query, k_similar=8, k_complement=2):
 
         similar = self.pinecone_search(query, k=k_similar)
 
@@ -86,7 +186,9 @@ class RecommendationAgent:
                 self.pinecone_search(cat, k=k_complement)
             )
 
+        # -----------------------------
         # De-duplicate
+        # -----------------------------
         seen = set()
 
         def dedupe(items):
@@ -98,7 +200,17 @@ class RecommendationAgent:
                     out.append(p)
             return out
 
+        similar = dedupe(similar)
+        complementary = dedupe(complementary)
+
+        display_products = (similar + complementary)[:6]
+
+        # 🔥 Formatting happens ONLY here (agent responsibility)
+        reply = self._format_products(display_products, query)
+
         return {
-            "similar": dedupe(similar),
-            "complementary": dedupe(complementary)
+            "reply": reply,
+            "products": display_products,
+            "similar": similar,
+            "complementary": complementary
         }
