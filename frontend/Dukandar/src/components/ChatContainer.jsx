@@ -29,16 +29,22 @@ const ChatContainer = () => {
     }
 
     return <div className="field-container">
-        <div className="chat-field">
-            {chatSlice.messages.map((m) => {
-                return m.sender == "user" ? <ChatBubble message={m} cls="user-message" key={m.id} /> : m.isLoading ? <Loader key={m.id} /> : <ChatBubble message={m} cls="robot-message" key={m.id} />
-            }
-            )}
-            <div ref={bottom}></div>
-        </div>
 
-        <InputBar sendPromt={sendPromt}></InputBar>
+    <div className="chat-title">Dukandar</div>
+
+    <div className="chat-field">
+      {chatSlice.messages.map((m) => {
+        return m.sender == "user"
+          ? <ChatBubble message={m} cls="user" key={m.id} />
+          : m.isLoading
+          ? <Loader key={m.id} />
+          : <ChatBubble message={m} cls="robot" key={m.id} />
+      })}
+      <div ref={bottom}></div>
     </div>
+
+    <InputBar sendPromt={sendPromt} />
+  </div>
 }
 
 export default ChatContainer;

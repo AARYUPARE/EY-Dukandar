@@ -1,64 +1,59 @@
 :root {
-    --accent: #8e24ff;
-    --accent2: #39e6ff;
-    --white: #ffffff;
-    --user-bg: linear-gradient(135deg, #8e24ff 0%, #39e6ff 100%);
-    --bot-bg: rgba(255, 255, 255, 0.08);
-    --bot-border: rgba(255, 255, 255, 0.15);
+    --bg-user: #ccff01;
+    --bg-ai: #000000;
+    --text-user: #000000;
+    --text-ai: #ffffff;
 }
 
+/* MESSAGE WRAPPER */
 .message-container {
     display: flex;
-    flex-direction: column;
     width: 100%;
+    margin: 6px 0;
 }
 
-/* USER MESSAGE (RIGHT SIDE, NEON GLOW) */
-.user-message {
-    align-self: flex-end;
-    max-width: 70%;
-    padding: 12px 18px;
-    border-radius: 14px 14px 4px 14px;
-    color: var(--white);
-    background: var(--user-bg);
-    box-shadow: 
-        0 0 12px rgba(142, 36, 255, 0.4),
-        0 0 24px rgba(57, 230, 255, 0.25);
-    font-size: 0.95rem;
-    margin: 8px 0;
-    animation: pop-in 0.2s ease;
+/* ALIGNMENT */
+.align-right {
+    justify-content: flex-end;
 }
 
-/* BOT MESSAGE (LEFT SIDE, GLASS EFFECT) */
-.robot-message {
-    align-self: flex-start;
-    max-width: 70%;
-    padding: 12px 18px;
-    border-radius: 14px 14px 14px 4px;
+.align-left {
+    justify-content: flex-start;
+}
 
-    background: var(--bot-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--bot-border);
-    color: var(--white);
-
-    box-shadow: 
-        0 0 10px rgba(255, 255, 255, 0.05),
-        inset 0 0 8px rgba(255, 255, 255, 0.03);
-
+/* BASE CHAT BUBBLE */
+.chat-bubble {
+    max-width: 68%;
+    padding: 14px 18px;
     font-size: 0.95rem;
-    margin: 8px 0;
-    animation: pop-in 0.2s ease;
+    line-height: 1.6;
+    border-radius: 14px;
     white-space: pre-line;
+    animation: fade-in 0.2s ease;
 }
 
-/* SMOOTH POP-IN ANIMATION */
-@keyframes pop-in {
-    0% { 
-        transform: scale(0.9); 
-        opacity: 0; 
+/* USER MESSAGE (RIGHT) */
+.chat-bubble.user {
+    background: var(--bg-user);
+    color: var(--text-user);
+    border-bottom-right-radius: 6px;
+}
+
+/* ROBOT MESSAGE (LEFT) */
+.chat-bubble.robot {
+    background: var(--bg-ai);
+    color: var(--text-ai);
+    border-bottom-left-radius: 6px;
+}
+
+/* ENTRY ANIMATION */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
     }
-    100% { 
-        transform: scale(1); 
-        opacity: 1; 
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

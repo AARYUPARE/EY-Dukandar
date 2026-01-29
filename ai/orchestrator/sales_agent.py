@@ -115,7 +115,7 @@ Rules:
                 return p
         return None
 
-    def chat(self, message: str, user=None):
+    def chat(self, message: str, last_products = None,user=None):
         return self.handle(user=user, message=message)
 
     # ------------------------------------------------

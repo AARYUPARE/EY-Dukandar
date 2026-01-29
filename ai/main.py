@@ -46,8 +46,8 @@ orchestrator = SalesAgentOrchestrator(
     inventory_agent=agents["inventory"],
     fulfillment_agent=agents["fulfillment"],
     payment_agent=agents["payment"],
-    loyalty_agent=agents["loyalty"],   # 🔥 ADD THIS
-    llm = llm
+    loyalty_agent=agents["loyalty"],
+    llm=llm                      # 🔥 THIS WAS MISSING
 )
 
 # -----------------------------------------
@@ -64,6 +64,8 @@ def repl():
             break
 
         out = orchestrator.chat(q)
+
+        print(out)
 
         # print("\n--- Response ---")
 

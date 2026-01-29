@@ -14,7 +14,7 @@
 
     background: radial-gradient(circle at top left, #13001a 0%, #05050d 100%);
     overflow: hidden;
-    position: relative;
+    /* position: relative; */
 }
 
 /* Glowing orbs */
@@ -31,13 +31,13 @@
 .wrapper::before {
     top: -50px;
     left: -40px;
-    background: var(--purple);
+    background: #0a0e19;
 }
 
 .wrapper::after {
     bottom: -60px;
     right: -40px;
-    background: var(--cyan);
+    background: #0a0e19;
 }
 
 /* Login card */
@@ -45,12 +45,12 @@
     width: 350px;
     padding: 32px 28px;
 
-    background: rgba(255, 255, 255, 0.06);
+    background: #0a0e19a3;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 18px;
 
     backdrop-filter: blur(20px) saturate(150%);
-    box-shadow: 0 0 28px rgba(142, 36, 255, 0.25);
+    /* box-shadow: 0 0 28px rgba(142, 36, 255, 0.25); */
 
     display: flex;
     flex-direction: column;

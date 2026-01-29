@@ -4,10 +4,8 @@ from vectorstore.pinecone_client import index
 from vectorstore.embedder import embed
 from db.product_queries import fetch_products_by_ids
 from utils.text_cleaner import clean_text
-
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableSequence
-
 import json
 
 
@@ -55,11 +53,11 @@ class RecommendationAgent:
         prompt = PromptTemplate(
             input_variables=["query", "top_n"],
             template="""
-You are a smart retail assistant.
-Generate {top_n} relevant product categories or sub-categories.
-Query: {query}
-Return ONLY a comma-separated list.
-"""
+            You are a smart retail assistant.
+            Generate {top_n} relevant product categories or sub-categories.
+            Query: {query}
+            Return ONLY a comma-separated list.
+            """
         )
 
         try:
@@ -76,22 +74,13 @@ Return ONLY a comma-separated list.
             return []
 
     # --------------------------------------------------- #
-    # 🔥 PRODUCT FORMATTING + LLM EXPLANATION (FIXED)
+    # 🔥 PRODUCT FORMATTING (NEW)
     # --------------------------------------------------- #
     def _format_products(self, products, query):
-
         PRODUCT_EMOJI_MAP = {
-            "shirt": "👕",
-            "pant": "👖",
-            "trouser": "👖",
-            "jeans": "👖",
-            "suit": "🕴️",
-            "jacket": "🧥",
-            "hoodie": "🧥",
-            "shoe": "👟",
-            "watch": "⌚",
-            "belt": "👔",
-            "cap": "🧢"
+            "shirt": "👕", "pant": "👖", "trouser": "👖", "jeans": "👖",
+            "suit": "🕴️", "jacket": "🧥", "hoodie": "🧥",
+            "shoe": "👟", "watch": "⌚", "belt": "👔", "cap": "🧢"
         }
 
         def emoji(name):
@@ -101,11 +90,9 @@ Return ONLY a comma-separated list.
                     return e
             return "🛍️"
 
+        # ---------- LLM explanations ----------
         explanations = {}
 
-        # -----------------------------
-        # 🔥 LLM REASON GENERATION (ROBUST)
-        # -----------------------------
         if self.llm and products:
             try:
                 prompt = f"""
@@ -114,46 +101,26 @@ You are a helpful shopping assistant.
 User query:
 {query}
 
-For each product, write ONE short friendly reason (max 15 words).
+For each product, give TWO OR THREE short reason (max 20 words)
+why it matches the user.
 
-STRICT RULES:
-- Return ONLY valid JSON
-- No text before or after
-- No markdown
-- No explanation
-
-Format:
+Return ONLY JSON like:
 {{"0":"reason","1":"reason"}}
 
 Products:
-{[p.get("name") + " - " + (p.get("description") or "") for p in products]}
+{[p.get("name") + " - " + p.get("description", "") for p in products]}
 """
-
                 res = self.llm.invoke(prompt)
+                explanations = json.loads(res.content)
 
-                raw = getattr(res, "content", str(res)).strip()
-
-                # 🔥 Remove markdown/codeblocks
-                raw = raw.replace("```json", "").replace("```", "").strip()
-
-                try:
-                    explanations = json.loads(raw)
-                except Exception:
-                    print("⚠️ LLM explanation parse failed. Raw output:\n", raw)
-                    explanations = {}
-
-            except Exception as e:
-                print("❌ LLM explanation error:", e)
+            except Exception:
                 explanations = {}
 
-        # -----------------------------
-        # FORMAT PRODUCT CARDS
-        # -----------------------------
+        # ---------- format cards ----------
         lines = []
 
         for i, p in enumerate(products):
             reason = explanations.get(str(i), "Popular choice for your search")
-
             lines.append(
                 f"{emoji(p.get('name'))} OPTION {i+1}\n"
                 f"─────────\n"
@@ -186,9 +153,7 @@ Products:
                 self.pinecone_search(cat, k=k_complement)
             )
 
-        # -----------------------------
         # De-duplicate
-        # -----------------------------
         seen = set()
 
         def dedupe(items):
@@ -203,9 +168,9 @@ Products:
         similar = dedupe(similar)
         complementary = dedupe(complementary)
 
+        # 🔥 combine for display
         display_products = (similar + complementary)[:6]
 
-        # 🔥 Formatting happens ONLY here (agent responsibility)
         reply = self._format_products(display_products, query)
 
         return {

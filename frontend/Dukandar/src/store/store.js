@@ -246,14 +246,11 @@ export const sendMessageAsync = createAsyncThunk(
           isLoading: false,
         })
       );
-
-      if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4 : false) {
-        dispatch(productsAction.clearProducts())
-      }
-      dispatch(productsAction.addProducts({ products: res.data.products || [] }));
+      // if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4 : false) {
+        dispatch(productsAction.addProducts(res.data.products))
+      // }
 
       if (Array.isArray(res.data.stores) ? res.data.stores.length != 0 : false) {
-        dispatch(kioskStoreListActions.clearKioskStores());
         dispatch(kioskStoreListActions.addKioskStores({ stores: res.data.stores || [] }));
       }
     }
@@ -310,7 +307,7 @@ const toggleSideSlice = createSlice({
 
 const toggleCardContainers = createSlice({
   name: "containertoggle",
-  initialState: 2,
+  initialState: 1,
   reducers: {
     showProducts() {
       return 1;
@@ -325,7 +322,22 @@ const productsSlice = createSlice({
   name: "products",
   initialState: {
     products: [
-
+      // {
+      //   id: 123,
+      //   name: "T-Shirt",
+      //   description: "This, is very good t-shirt",
+      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+      //   brand: "Dukandar",
+      //   size: "M"
+      // },
+      // {
+      //   id: 123,
+      //   name: "T-Shirt",
+      //   description: "This, is very good t-shirt",
+      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+      //   brand: "Dukandar",
+      //   size: "M"
+      // }
     ],
   },
   reducers: {
@@ -334,7 +346,7 @@ const productsSlice = createSlice({
 
       const uniqueProducts = [];
 
-      for (const product of action.payload.products) {
+      for (const product of action.payload) {
         if (!seenIds.has(product.id)) {
           seenIds.add(product.id);
           uniqueProducts.push(product);
@@ -354,33 +366,33 @@ const kioskStoreListSlice = createSlice({
   name: "kioskStoreList",
   initialState: {
     stores: [
-      {
-        "id": 1,
-        "name": "ABFRL Phoenix Mall Store",
-        "address": "Phoenix Marketcity Mall, Kurla West, Mumbai",
-        "phone": "+91 9876543210",
-        "latitude": 19.0865,
-        "longitude": 72.8897,
-        "imageUrl": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da"
-      },
-      {
-        "id": 2,
-        "name": "ABFRL R City Mall Store",
-        "address": "R City Mall, Ghatkopar West, Mumbai",
-        "phone": "+91 9822223344",
-        "latitude": 19.0994,
-        "longitude": 72.9167,
-        "imageUrl": "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a"
-      },
-      {
-        "id": 3,
-        "name": "ABFRL Viviana Mall Store",
-        "address": "Viviana Mall, Thane West, Maharashtra",
-        "phone": "+91 9811112233",
-        "latitude": 19.2147,
-        "longitude": 72.9712,
-        "imageUrl": "https://images.unsplash.com/photo-1560393464-5c69a73c5770"
-      }
+      // {
+      //   "id": 1,
+      //   "name": "ABFRL Phoenix Mall Store",
+      //   "address": "Phoenix Marketcity Mall, Kurla West, Mumbai",
+      //   "phone": "+91 9876543210",
+      //   "latitude": 19.0865,
+      //   "longitude": 72.8897,
+      //   "imageUrl": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da"
+      // },
+      // {
+      //   "id": 2,
+      //   "name": "ABFRL R City Mall Store",
+      //   "address": "R City Mall, Ghatkopar West, Mumbai",
+      //   "phone": "+91 9822223344",
+      //   "latitude": 19.0994,
+      //   "longitude": 72.9167,
+      //   "imageUrl": "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a"
+      // },
+      // {
+      //   "id": 3,
+      //   "name": "ABFRL Viviana Mall Store",
+      //   "address": "Viviana Mall, Thane West, Maharashtra",
+      //   "phone": "+91 9811112233",
+      //   "latitude": 19.2147,
+      //   "longitude": 72.9712,
+      //   "imageUrl": "https://images.unsplash.com/photo-1560393464-5c69a73c5770"
+      // }
     ],
   },
   reducers: {
@@ -401,7 +413,22 @@ const storeOffersSlice = createSlice(
     name: "storeOffers",
     initialState: {
       list: [
-
+        {
+        id: 123,
+        name: "T-Shirt",
+        description: "This, is very good t-shirt",
+        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+        brand: "Dukandar",
+        size: "M"
+      },
+      {
+        id: 123,
+        name: "T-Shirt",
+        description: "This, is very good t-shirt",
+        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+        brand: "Dukandar",
+        size: "M"
+      }
       ],
     },
     reducers: {

@@ -30,15 +30,21 @@ const FullSidebar = () => {
   return (
     <div className={css.sidebar} id={css.sidebarWrapper}>
       {/* Brand */}
-      <div className={css.brandRow}>
-        <div className={css.logoContainer}>
-          <TbHexagonLetterD />
-        </div>
+<div className={css.brandRow}>
+  <div className={css.logoContainer}>
+    <TbHexagonLetterD />
+  </div>
 
-        <div className={css.collapseIcon} onClick={handleCollapse}>
-          <TbLayoutSidebarLeftCollapseFilled />
-        </div>
-      </div>
+  {/* BRAND NAME */}
+  <div className={css.brandName}>
+    Dukandar
+  </div>
+
+  <div className={css.collapseIcon} onClick={handleCollapse}>
+    <TbLayoutSidebarLeftCollapseFilled />
+  </div>
+</div>
+
 
       {/* Navigation */}
       <ul className={css.navList}>

@@ -31,8 +31,8 @@ export default function StoreCard({
           alt={name}
           className="card-img-top"
           style={{
-            height: "200px",
-            objectFit: "cover",
+            height: "170px",
+            objectFit: "contain",
             backgroundColor: "#f8f9fa",
           }}
         />

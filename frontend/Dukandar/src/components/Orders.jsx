@@ -9,41 +9,143 @@ import css from "../styles/Orders.module.css";
 const sampleOrders = [
   {
     id: "ORD-1001",
-    placedAt: "2025-12-08T09:12:00Z",
-    deliveryAt: "2025-12-12T12:00:00Z",
-    status: "Shipped",
-    items: [
-      { grn: "GRN101", title: "Virat Kohli Shirt", qty: 1, price: 499 },
-      { grn: "GRN599", title: "Headset", qty: 1, price: 799 }
-    ]
+    placedAt: "2025-12-01T09:10:00Z",
+    deliveryAt: "2025-12-03T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN101", title: "Sports Shoes", qty: 1, price: 2999 }]
   },
   {
     id: "ORD-1002",
-    placedAt: "2025-12-07T13:22:00Z",
-    deliveryAt: "2025-12-09T17:00:00Z",
-    status: "Delivered",
-    items: [
-      { grn: "GRN205", title: "Laptop", qty: 1, price: 45000 }
-    ]
+    placedAt: "2025-12-02T10:20:00Z",
+    deliveryAt: "2025-12-06T15:00:00Z",
+    status: "Shipped",
+    items: [{ grn: "GRN102", title: "Gaming Mouse", qty: 2, price: 899 }]
   },
   {
     id: "ORD-1003",
-    placedAt: "2025-12-01T10:00:00Z",
-    deliveryAt: "2025-12-06T14:00:00Z",
-    status: "Delivered",
-    items: [
-      { grn: "GRN334", title: "Shoes", qty: 2, price: 2499 },
-      { grn: "GRN412", title: "SSD 256GB", qty: 1, price: 1999 }
-    ]
+    placedAt: "2025-12-03T08:30:00Z",
+    deliveryAt: "2025-12-07T16:00:00Z",
+    status: "Packed",
+    items: [{ grn: "GRN103", title: "Mechanical Keyboard", qty: 1, price: 3499 }]
   },
   {
     id: "ORD-1004",
-    placedAt: "2025-11-30T08:00:00Z",
-    deliveryAt: "2025-12-04T10:00:00Z",
+    placedAt: "2025-12-04T11:15:00Z",
+    deliveryAt: "2025-12-08T18:00:00Z",
+    status: "Placed",
+    items: [{ grn: "GRN104", title: "Backpack", qty: 1, price: 1299 }]
+  },
+  {
+    id: "ORD-1005",
+    placedAt: "2025-12-05T13:40:00Z",
+    deliveryAt: "2025-12-10T12:00:00Z",
     status: "Cancelled",
-    items: [
-      { grn: "GRN599", title: "Headset", qty: 1, price: 799 }
-    ]
+    items: [{ grn: "GRN105", title: "Bluetooth Speaker", qty: 1, price: 1999 }]
+  },
+  {
+    id: "ORD-1006",
+    placedAt: "2025-12-06T14:00:00Z",
+    deliveryAt: "2025-12-09T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN106", title: "SSD 512GB", qty: 1, price: 4599 }]
+  },
+  {
+    id: "ORD-1007",
+    placedAt: "2025-12-07T09:50:00Z",
+    deliveryAt: "2025-12-11T12:00:00Z",
+    status: "Shipped",
+    items: [{ grn: "GRN107", title: "Laptop Stand", qty: 1, price: 999 }]
+  },
+  {
+    id: "ORD-1008",
+    placedAt: "2025-12-08T07:25:00Z",
+    deliveryAt: "2025-12-13T12:00:00Z",
+    status: "Placed",
+    items: [{ grn: "GRN108", title: "USB Hub", qty: 3, price: 399 }]
+  },
+  {
+    id: "ORD-1009",
+    placedAt: "2025-12-09T12:10:00Z",
+    deliveryAt: "2025-12-14T12:00:00Z",
+    status: "Packed",
+    items: [{ grn: "GRN109", title: "Power Bank", qty: 2, price: 1099 }]
+  },
+  {
+    id: "ORD-1010",
+    placedAt: "2025-12-10T15:30:00Z",
+    deliveryAt: "2025-12-16T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN110", title: "Smart Watch", qty: 1, price: 5999 }]
+  },
+  {
+    id: "ORD-1011",
+    placedAt: "2025-12-11T16:00:00Z",
+    deliveryAt: "2025-12-17T12:00:00Z",
+    status: "Shipped",
+    items: [{ grn: "GRN111", title: "T-Shirt Pack", qty: 3, price: 499 }]
+  },
+  {
+    id: "ORD-1012",
+    placedAt: "2025-12-12T10:45:00Z",
+    deliveryAt: "2025-12-18T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN112", title: "Desk Lamp", qty: 1, price: 899 }]
+  },
+  {
+    id: "ORD-1013",
+    placedAt: "2025-12-13T09:15:00Z",
+    deliveryAt: "2025-12-19T12:00:00Z",
+    status: "Placed",
+    items: [{ grn: "GRN113", title: "Notebook Set", qty: 5, price: 199 }]
+  },
+  {
+    id: "ORD-1014",
+    placedAt: "2025-12-14T12:35:00Z",
+    deliveryAt: "2025-12-20T12:00:00Z",
+    status: "Packed",
+    items: [{ grn: "GRN114", title: "Headphones", qty: 1, price: 2499 }]
+  },
+  {
+    id: "ORD-1015",
+    placedAt: "2025-12-15T18:00:00Z",
+    deliveryAt: "2025-12-22T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN115", title: "Office Chair", qty: 1, price: 7999 }]
+  },
+  {
+    id: "ORD-1016",
+    placedAt: "2025-12-16T11:20:00Z",
+    deliveryAt: "2025-12-23T12:00:00Z",
+    status: "Cancelled",
+    items: [{ grn: "GRN116", title: "Tablet Cover", qty: 1, price: 599 }]
+  },
+  {
+    id: "ORD-1017",
+    placedAt: "2025-12-17T08:10:00Z",
+    deliveryAt: "2025-12-24T12:00:00Z",
+    status: "Shipped",
+    items: [{ grn: "GRN117", title: "Monitor 24inch", qty: 1, price: 10499 }]
+  },
+  {
+    id: "ORD-1018",
+    placedAt: "2025-12-18T14:50:00Z",
+    deliveryAt: "2025-12-25T12:00:00Z",
+    status: "Packed",
+    items: [{ grn: "GRN118", title: "Webcam", qty: 1, price: 1799 }]
+  },
+  {
+    id: "ORD-1019",
+    placedAt: "2025-12-19T17:40:00Z",
+    deliveryAt: "2025-12-26T12:00:00Z",
+    status: "Placed",
+    items: [{ grn: "GRN119", title: "Router", qty: 1, price: 2299 }]
+  },
+  {
+    id: "ORD-1020",
+    placedAt: "2025-12-20T19:00:00Z",
+    deliveryAt: "2025-12-27T12:00:00Z",
+    status: "Delivered",
+    items: [{ grn: "GRN120", title: "External HDD 1TB", qty: 1, price: 5499 }]
   }
 ];
 
@@ -58,7 +160,7 @@ export default function Orders() {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "placedAt", dir: "desc" });
   const [page, setPage] = useState(1);
-  const rowsPerPage = 6;
+  const rowsPerPage = 8;
 
   const [viewOrder, setViewOrder] = useState(null); // order object
   const [trackOrder, setTrackOrder] = useState(null); // order object
@@ -173,8 +275,8 @@ export default function Orders() {
                       <span className={`${css.status} ${css[o.status?.toLowerCase() ?? ""]}`}>{o.status}</span>
                     </td>
                     <td className={css.actions}>
-                      <button className="btn btn-sm" style={{ background: "linear-gradient(90deg,#8e24ff,#39e6ff)", color: "#001219" }} onClick={() => setViewOrder(o)}>View Order</button>
-                      <button className="btn btn-outline-light btn-sm" style={{ marginLeft: 8 }} onClick={() => setTrackOrder(o)}>Track Order</button>
+                      <button className="btn btn-sm" style={{ background: "#ccff01", color: "#0a0e19", border: "2px solid #0a0e19" }} onClick={() => setViewOrder(o)}>View Order</button>
+                      <button className="btn btn-outline-light btn-sm" style={{ marginLeft: 8, background: "#f6f6f6", color: "#0a0e19", border: "2px solid #0a0e19" }} onClick={() => setTrackOrder(o)}>Track Order</button>
                     </td>
                   </tr>
                 );

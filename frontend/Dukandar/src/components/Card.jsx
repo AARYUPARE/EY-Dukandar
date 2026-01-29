@@ -15,31 +15,19 @@ export default function Card({ title, image_url, description, onClick, brand, si
       perspective={1200}
       className="tilt-wrapper"
     >
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={onClick}
-        onKeyDown={(e) => e.key === "Enter" && onClick()}
-        className="card mb-3"
-        id="card-container"
-      >
-        <img
-          src={image_url}
-          alt={title}
-          className="card-img-top"
-          style={{
-            height: "200px",
-            objectFit: "contain",
-            backgroundColor: "#f8f9fa",
-          }}
-        />
+      {/* <!-- inspo: Camden @ https://x.com/Designownow_/status/1921052041520041991 --> */}
 
-        <div className="card-body">
-          <h5 className="card-title">{title}</h5>
-          <p className="card-text">Brand: {brand}</p>
-          {size != "" ? <p className="card-text">Size: {size}</p>: ''}
-        </div>
-      </div>
+<div className="card" onClick={onClick}>
+		<div className="icon">
+			<img src={`${image_url}`} alt="" />
+		</div>
+	<div className="content">
+		<div className="bottom">
+			<h4>{title}</h4>
+			<p className="description">{description}</p>
+		</div>
+	</div>
+</div>
     </Tilty>
   );
 }

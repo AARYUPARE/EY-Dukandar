@@ -3,6 +3,7 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { loginWeb, loginKiosk } from "../store/store";
 import { useLocation, useNavigate } from "react-router-dom";
+import AnimatedBackground from "./AnimatedBackground";
 import css from "../styles/Login.module.css";
 
 const Login = () => {
@@ -51,6 +52,8 @@ const Login = () => {
 
 
   return (
+    <>
+    <AnimatedBackground />
     <div className={css.wrapper}>
       <div className={css.card}>
         <h2 className={css.title}>Dukandar Login</h2>
@@ -94,6 +97,7 @@ const Login = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

@@ -12,7 +12,7 @@ export default function Profile() {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "name", dir: "asc" });
   const [page, setPage] = useState(1);
-  const rowsPerPage = 6;
+  const rowsPerPage = 9;
 
   // ==============================
   // FETCH WISHLIST
@@ -89,14 +89,15 @@ export default function Profile() {
   // ==============================
   return (
     <div className={css.root}>
-      <div className="container-fluid p-3">
-        <div className="row g-3">
+      <div className="container-fluid p-3" id={css.container}>
+        <div className="row g-3" id={`${css["main-row"]}`}>
           {/* ================= PROFILE CARD ================= */}
-          <div className="col-12 col-lg-4">
+          <div className="col-12 col-lg-4" id={`${css["left-col"]}`}>
             <div className={css.profileCard}>
               <div className={css.avatarWrap}>
                 <img src={user.imageUrl} alt={user.name} className={css.avatar} />
               </div>
+
               <h4 className={css.name}>{user.name}</h4>
 
               <div className={css.meta}><span>User ID</span><span>{user.id}</span></div>
@@ -106,7 +107,7 @@ export default function Profile() {
           </div>
 
           {/* ================= WISHLIST ================= */}
-          <div className="col-12 col-lg-8">
+          <div className="col-12 col-lg-8" id={`${css["right-col"]}`}> 
             <div className={css.tablePanel}>
               <div className={css.headerRow}>
                 <h5 className={css.title}>Wishlist</h5>
@@ -151,7 +152,8 @@ export default function Profile() {
                           <td className={css.center}>{w.size}</td>
                           <td className={css.center}>
                             <button
-                              className="btn btn-sm btn-outline-danger"
+                              className="btn btn-sm"
+                              id={`${css["remove-button"]}`}
                               onClick={() => handleRemove(w.id)}
                             >
                               Remove
@@ -163,6 +165,7 @@ export default function Profile() {
                   </tbody>
                 </table>
               </div>
+
 
               <div className={css.footerRow}>
                 <span>
@@ -185,7 +188,6 @@ export default function Profile() {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
