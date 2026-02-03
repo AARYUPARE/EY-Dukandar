@@ -103,9 +103,9 @@ export default function Sales() {
   return (
     <div className={css.wrapperContainer}>
     <div className={css.wrapper}>
-      <button className={css.backBtn} onClick={() => navigate("../")}>
+      {/* <button className={css.backBtn} onClick={() => navigate("../")}>
         <IoArrowBackCircle size={34} />
-      </button>
+      </button> */}
 
       <div className={css.headerRow}>
         <h3 className={css.title}>Sales Overview</h3>

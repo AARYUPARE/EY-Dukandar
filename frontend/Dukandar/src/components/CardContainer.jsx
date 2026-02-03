@@ -7,14 +7,14 @@ import css from "../styles/CardContainer.module.css";
 
 const CardContainer = () => {
   const dispatch = useDispatch();
-  const products = useSelector((store) => store.products.products);
+  const {products, canShow} = useSelector((store) => store.products);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     dispatch(sideBarAction.collapse());
   }, [dispatch]);
 
-  if (!products || products.length === 0) return null;
+  if (!products || products.length === 0 || !canShow) return null;
 
   const filtered = products.filter((item) =>
     (item.name ?? "").toLowerCase().includes(search.toLowerCase())

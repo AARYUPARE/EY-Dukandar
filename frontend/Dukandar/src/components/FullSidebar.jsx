@@ -8,7 +8,7 @@ import {
   TbShoppingCart
 } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
-import { sideBarAction } from "../store/store.js";
+import { sideBarAction, productsAction } from "../store/store.js";
 import { Link, useLocation } from "react-router-dom";
 
 const FullSidebar = () => {
@@ -19,6 +19,16 @@ const FullSidebar = () => {
   const handleCollapse = () => {
     dispatch(sideBarAction.collapse());
   };
+
+  const showProducts = () => 
+  {
+    dispatch(productsAction.setCanShow(true))
+  }
+  
+  const hideProducts = () => 
+  {
+    dispatch(productsAction.setCanShow(false))
+  }
 
   const isActive = (path, exact = false) => {
     const current = location.pathname.replace(/\/+$/, "");
@@ -52,6 +62,7 @@ const FullSidebar = () => {
           <Link
             to=""
             className={`${css.navItem} ${isActive("", true) ? css.active : ""}`}
+            onClick={showProducts}
           >
             <TbHome2 className={css.navIcon} />
             Home
@@ -62,6 +73,7 @@ const FullSidebar = () => {
           <Link
             to="profile"
             className={`${css.navItem} ${isActive("profile") ? css.active : ""}`}
+            onClick={hideProducts}
           >
             <TbUserCircle className={css.navIcon} />
             Profile
@@ -72,6 +84,7 @@ const FullSidebar = () => {
           <Link
             to="orders"
             className={`${css.navItem} ${isActive("orders") ? css.active : ""}`}
+            onClick={hideProducts}
           >
             <TbReceipt2 className={css.navIcon} />
             Orders
@@ -82,6 +95,7 @@ const FullSidebar = () => {
           <Link
             to="cart"
             className={`${css.navItem} ${isActive("cart") ? css.active : ""}`}
+            onClick={hideProducts}
           >
             <TbShoppingCart className={css.navIcon} />
             Cart

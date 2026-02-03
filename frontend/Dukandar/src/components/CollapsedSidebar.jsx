@@ -6,7 +6,7 @@ import {
   TbShoppingCart,
   TbLayoutSidebarRightExpand
 } from "react-icons/tb";
-import { sideBarAction } from "../store/store";
+import { sideBarAction, productsAction } from "../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
@@ -18,6 +18,16 @@ const CollapsedSidebar = () => {
   const handleExpand = () => {
     dispatch(sideBarAction.expand());
   };
+
+  const showProducts = () => 
+  {
+    dispatch(productsAction.setCanShow(true))
+  }
+  
+  const hideProducts = () => 
+  {
+    dispatch(productsAction.setCanShow(false))
+  }
 
   const isActive = (path, exact = false) => {
     const current = location.pathname.replace(/\/+$/, "");
@@ -47,6 +57,7 @@ const CollapsedSidebar = () => {
             className={`collapsed-link ${isActive("/chat", true) ? "active" : ""}`}
             title="Home"
             aria-label="Home"
+            onClick={showProducts}
           >
             <TbHome2 />
           </Link>
@@ -58,6 +69,7 @@ const CollapsedSidebar = () => {
             className={`collapsed-link ${isActive("/chat/profile") ? "active" : ""}`}
             title="Profile"
             aria-label="Profile"
+            onClick={hideProducts}
           >
             <TbUserCircle />
           </Link>
@@ -69,6 +81,7 @@ const CollapsedSidebar = () => {
             className={`collapsed-link ${isActive("/chat/orders") ? "active" : ""}`}
             title="Orders"
             aria-label="Orders"
+            onClick={hideProducts}
           >
             <TbReceipt2 />
           </Link>
@@ -80,6 +93,7 @@ const CollapsedSidebar = () => {
             className={`collapsed-link ${isActive("/chat/cart") ? "active" : ""}`}
             title="Cart"
             aria-label="Cart"
+            onClick={hideProducts}
           >
             <TbShoppingCart />
           </Link>

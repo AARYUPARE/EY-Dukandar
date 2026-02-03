@@ -16,11 +16,15 @@ const StoreStaffSidebar = () => {
     return (
         <div className={css.sidebar} id={css.sidebarWrapper}>
 
-            {/* BRAND */}
             <div className={css.brandRow}>
-                <div className={css.logoContainer}>
-                    <TbHexagonLetterD />
-                </div>
+              <div className={css.logoContainer}>
+                <TbHexagonLetterD />
+              </div>
+            
+              {/* BRAND NAME */}
+              <div className={css.brandName}>
+                Dukandar
+              </div>
             </div>
 
             {/* NAVIGATION LIST */}
@@ -41,15 +45,6 @@ const StoreStaffSidebar = () => {
                         className={`${css.navItem} ${isActive("sales") ? css.active : ""}`}
                     >
                         <MdPointOfSale /> Sales
-                    </Link>
-                </li>
-
-                <li>
-                    <Link
-                        to="/store-staff/send-order"
-                        className={`${css.navItem} ${isActive("send-order") ? css.active : ""}`}
-                    >
-                        <MdOutlineLocalShipping /> Order
                     </Link>
                 </li>
 
