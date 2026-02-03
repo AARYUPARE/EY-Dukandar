@@ -1,0 +1,18 @@
+.voice-bubble {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e8f5ff;
+    padding: 10px 14px;
+    border-radius: 14px;
+    max-width: 75%;
+}
+
+.play-btn {
+    border: none;
+    background: #4cafef;
+    color: white;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+}
