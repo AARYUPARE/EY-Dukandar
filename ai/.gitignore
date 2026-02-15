@@ -1,0 +1,59 @@
+# ======================
+# ENV FILES (IMPORTANT)
+# ======================
+.env
+.env.*
+!.env.example
+
+# ======================
+# NODE MODULES
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ======================
+# BUILD FOLDERS
+# ======================
+dist/
+build/
+.next/
+out/
+
+# ======================
+# PYTHON
+# ======================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+.venv/
+venv/
+env/
+
+# ======================
+# IDE FILES
+# ======================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ======================
+# OS FILES
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# COVERAGE / TEST
+# ======================
+coverage/
+.coverage
