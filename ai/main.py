@@ -1,11 +1,13 @@
 from dotenv import load_dotenv
 import os
+import uuid
+
 from langchain_groq import ChatGroq
 
-# -----------------------------------------
-# 1. LOAD ENV & LLM
-# -----------------------------------------
-load_dotenv()
+# -------------------------------
+# 1️⃣ LOAD ENV
+# -------------------------------
+load_dotenv(override=True)
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -13,75 +15,82 @@ llm = ChatGroq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
-# -----------------------------------------
-# 2. IMPORT AGENTS (CLASSES ONLY)
-# -----------------------------------------
-from agents.payment_agent import PaymentAgent
+# -------------------------------
+# 2️⃣ IMPORT YOUR AGENTS
+# -------------------------------
+from orchestrator.sales_agent import SalesAgent
 from agents.recommendation_agent import RecommendationAgent
 from agents.inventory_agent import InventoryAgent
-from agents.loyalty_agent import LoyaltyAgent
-from agents.support_agent import SupportAgent
 from agents.fulfillment_agent import FulfillmentAgent
+from session.session_manager import RedisSessionManager
+from agents.payment_agent import PaymentAgent
+from agents.loyalty_agent import LoyaltyAgent
 
-# -----------------------------------------
-# 3. INSTANTIATE AGENTS (MATCH CONSTRUCTORS)
-# -----------------------------------------
-
-agents = {
-    "recommendation": RecommendationAgent(llm=llm),
-    "inventory": InventoryAgent(),
-    "payment": PaymentAgent(),
-    "fulfillment": FulfillmentAgent(),
-    "loyalty": LoyaltyAgent(),
-    "support": SupportAgent(base_url="http://localhost:8080")
-}
-
-# -----------------------------------------
-# 4. ORCHESTRATOR
-# -----------------------------------------
-from orchestrator.sales_agent import SalesAgentOrchestrator
-
-orchestrator = SalesAgentOrchestrator(
-    recommendation_agent=agents["recommendation"],
-    inventory_agent=agents["inventory"],
-    fulfillment_agent=agents["fulfillment"],
-    payment_agent=agents["payment"],
-    loyalty_agent=agents["loyalty"],
-    llm=llm                      # 🔥 THIS WAS MISSING
+# -------------------------------
+# 3️⃣ INIT SESSION MANAGER
+# -------------------------------
+session_manager = RedisSessionManager(
+    redis_host="localhost",
+    redis_port=6379,
+    db=0
 )
 
-# -----------------------------------------
-# 5. REPL LOOP
-# -----------------------------------------
+# -------------------------------
+# 4️⃣ INIT DOMAIN AGENTS
+# -------------------------------
+recommendation_agent = RecommendationAgent()
+inventory_agent = InventoryAgent()
+fulfillment_agent = FulfillmentAgent()
+payment_agent = PaymentAgent()
+loyalty_agent = LoyaltyAgent(session_manager=session_manager)
+
+# -------------------------------
+# 5️⃣ INIT SALES AGENT (CORE)
+# -------------------------------
+sales_agent = SalesAgent(
+    llm=llm,
+    recommendation_agent=recommendation_agent,
+    fulfillment_agent=fulfillment_agent,
+    inventory_agent=inventory_agent,
+    session_manager=session_manager,
+    payment_agent=payment_agent,
+    loyalty_agent=loyalty_agent
+)
+
+# -------------------------------
+# 6️⃣ REPL LOOP (CLI CHAT)
+# -------------------------------
 def repl():
-    print("\n=== Dukandar AI | Sales Assistant ===")
+    print("\n=== 🛍️ Dukandar AI | Sales Assistant ===")
+
+    # 🔐 One session per user
+    session_id = str(uuid.uuid4())
+    print(f"[Session ID]: {session_id}\n")
 
     while True:
-        q = input("You: ").strip()
+        user_input = input("You: ").strip()
 
-        if q.lower() in {"quit", "exit"}:
+        if user_input.lower() in {"exit", "quit"}:
             print("👋 Bye!")
             break
 
-        out = orchestrator.chat(q)
+        try:
+            response = sales_agent.handle(
+                user=user,
+                session_id=session_id,
+                user_message=user_input
+            )
+        except Exception as e:
+            print("❌ Error:", e)
+            continue
 
-        print(out)
+        print("\nAssistant:")
+        print(response)
+        print("-" * 50)
 
-        # print("\n--- Response ---")
 
-        # if isinstance(out, str):
-        #     print(out)
-        #     continue
-
-        # if isinstance(out, dict) and out.get("products"):
-        #     print("\nProducts:")
-        #     for p in out["products"][:10]:
-        #         print(f" - {p['name']} | ₹{p['price']}")
-
-        # print("\n---------------\n")
-
-# -----------------------------------------
-# RUN
-# -----------------------------------------
+# -------------------------------
+# 7️⃣ RUN
+# -------------------------------
 if __name__ == "__main__":
     repl()

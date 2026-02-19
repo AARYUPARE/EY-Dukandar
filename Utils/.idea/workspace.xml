@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="af12c041-1e17-4a53-b737-d2471d1e5f5a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../ai/.env" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/fulfillment_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/fulfillment_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/translator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/utils/translator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/ChatResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/ChatResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/InventoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/InventoryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ChatServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ChatServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Card.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Card.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatBubble.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatBubble.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatContainer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatContainer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/OfferContainer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/OfferContainer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Orders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Orders.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Sales.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Sales.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/VoiceBubble.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/VoiceBubble.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/AnimatedBackground.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/AnimatedBackground.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Cart.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Cart.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/KioskInterface.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/KioskInterface.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/OfferContainer.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/OfferContainer.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Sales.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Sales.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/StoreStaffSidebar.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/StoreStaffSidebar.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/VoiceBubble.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/VoiceBubble.module.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="39ElfBiRTwkZ5RPuCVNyI1afkf8" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="Utils" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-0978a7220b69-9867c7d4c0a4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.28294.336" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="af12c041-1e17-4a53-b737-d2471d1e5f5a" name="Changes" comment="" />
+      <created>1770269214500</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1770269214500</updated>
+    </task>
+    <servers />
+  </component>
+</project>

@@ -5,8 +5,35 @@ APPLY_OFFER_API = "http://localhost:8080/api/offers/apply"
 
 
 class LoyaltyAgent:
-    def __init__(self):
-        pass
+    def __init__(self, session_manager):
+        self.session_manager = session_manager
+
+    def resolve_offer(self, message: str, shown_offers: list):
+        """
+        Resolves offer from user message using:
+        - index (1, 2nd, second, last)
+        - keywords
+        """
+
+        msg = message.lower()
+
+        # 1️⃣ index parsing
+        numbers = [str(i) for i in range(1, len(shown_offers) + 1)]
+
+        for i, num in enumerate(numbers):
+            if num in msg:
+                return shown_offers[i]
+
+        if "last" in msg and shown_offers:
+            return shown_offers[-1]
+
+        # 2️⃣ keyword match
+        for offer in shown_offers:
+            name = offer.get("offerName", "").lower()
+            if any(word in msg for word in name.split()):
+                return offer
+
+        return None
 
     # ------------------------------------------------
     # 🔥 INTERNAL FORMATTER (NEW)
@@ -27,43 +54,39 @@ class LoyaltyAgent:
         offers_text = "\n\n".join(lines)
 
         return (
-            f"🎁 **YOUR LOYALTY STATUS**\n"
+            f"🎁 YOUR LOYALTY STATUS\n"
             f"─────────\n"
             f"⭐ Points: {user_points}\n\n"
-            f"🎉 **Available Offers**\n\n"
+            f"🎉 Available Offers\n\n"
             f"{offers_text}\n\n"
-            f"👉 Say *apply offer 1* to redeem"
+            f"👉 Say apply offer 1 to redeem"
         )
 
-    # ------------------------------------------------
-    # MAIN HANDLER
-    # ------------------------------------------------
-    def handle(self, payload: dict):
+    def build_checkout_summary(self, session):
+
+        lines = []
+        items = session["cart"]["items"]
+        total = self.calculate_cart_total(items)
+
+        lines.append("🧾 Order Summary")
+        for i, item in enumerate(items, 1):
+            lines.append(f"{i}. {item['name']} — ₹{item['price']}")
+
+        lines.append(f"\n🧮 Total: ₹{total}")
+        lines.append("\n💳 How would you like to pay?")
+        lines.append("UPI | Card | Net Banking | Cash on Delivery")
+
+        return "\n".join(lines)
+
+    def show_offers(self, user, session):
+
         """
-        payload = {
-            user: {...},
-            user_message: str,
-            action: "check" | "apply"
-        }
+           Fetch offers directly from Spring controller
+           then apply eligibility + bundle logic
         """
 
-        print("🔥 REAL LoyaltyAgent.handle CALLED")
-
-        user = payload.get("user")
-        user_message = payload.get("user_message", "")
-        action = payload.get("action", "check")
-
-        if not user:
-            return {
-                "reply": "Please log in to view loyalty offers."
-            }
-
-        user_id = user.get("id")
         user_points = user.get("loyaltyPoints", 0)
 
-        # ----------------------------
-        # 1️⃣ Fetch all offers
-        # ----------------------------
         try:
             offers = requests.get(
                 OFFERS_API,
@@ -72,68 +95,102 @@ class LoyaltyAgent:
         except Exception:
             return {"reply": "Unable to fetch loyalty offers right now."}
 
-        # ----------------------------
-        # 2️⃣ Filter eligible offers
-        # ----------------------------
-        eligible_offers = [
-            offer for offer in offers
-            if user_points >= offer.get("minPointsRequired", 0)
-        ]
+        cart_items = session["cart"]["items"]
+        cart_total = sum(i["price"] * i["quantity"] for i in cart_items)
 
-        # ----------------------------
-        # 3️⃣ APPLY OFFER
-        # ----------------------------
-        if action == "apply":
-            if not eligible_offers:
-                return {"reply": "No eligible offers to apply."}
+        valid_offers = []
+        suggestions = []
 
-            chosen_offer = eligible_offers[0]
+        for offer in offers:
+            min_points = offer.get("minPointsRequired", 0)
+            min_price = offer.get("minCartPrice", 0)
 
-            try:
-                response = requests.post(
-                    APPLY_OFFER_API,
-                    json={
-                        "userId": user_id,
-                        "offerId": chosen_offer["id"]
-                    }
-                )
+            has_points = user_points >= min_points
+            has_price = cart_total >= min_price
 
-                new_points = response.json().get("loyaltyPoints")
+            # ----------------------------------
+            # CASE 1 → fully eligible
+            # ----------------------------------
+            if has_points and has_price:
+                valid_offers.append(offer)
+                continue
 
-                return {
-                    "reply": (
-                        f"✅ **Offer Applied Successfully!**\n\n"
-                        f"🏷️ {chosen_offer.get('offerName')}\n"
-                        f"⭐ Remaining Points: {new_points}\n\n"
-                        f"Enjoy your savings 🎉"
-                    ),
-                    "updatedPoints": new_points,
-                    "offerApplied": chosen_offer
-                }
+            # ----------------------------------
+            # CASE 2 → price missing only
+            # ----------------------------------
+            if has_points and not has_price:
+                gap = min_price - cart_total
 
-            except Exception:
-                return {"reply": "Failed to apply the offer."}
+                if 200 <= gap <= 300:
+                    bundle = self.bundle(session["focus"]["current_product"])
+                    suggestions.append((offer, gap, bundle))
+                continue
 
-        # ----------------------------
-        # 4️⃣ READ ONLY RESPONSE (🔥 formatted)
-        # ----------------------------
-        if not eligible_offers:
+            # ----------------------------------
+            # CASE 3 → points missing
+            # ----------------------------------
+            if not has_points:
+                gap_points = min_points - user_points
+                bundle = self.bundle(session["focus"]["current_product"])
+                suggestions.append((offer, f"{gap_points} more points", bundle))
+
+        # ----------------------------------
+        # FORMAT RESPONSE
+        # ----------------------------------
+
+        if valid_offers:
+            session["pending_action"] = "SELECT_OFFER"
+            session["shown_offers"] = valid_offers
+
             return {
-                "reply": (
-                    f"🎁 **YOUR LOYALTY STATUS**\n"
-                    f"─────────\n"
-                    f"⭐ Points: {user_points}\n\n"
-                    f"😕 No offers available yet.\n"
-                    f"Shop more to earn rewards!"
-                ),
-                "userPoints": user_points,
-                "eligibleOffers": []
+                "reply": self._format_offers(user_points, valid_offers),
+                "eligibleOffers": valid_offers
             }
 
-        reply_text = self._format_offers(user_points, eligible_offers)
+        if suggestions:
+            offer, gap, bundle = suggestions[0]
+
+            text = (
+                f"🎁 Almost there!\n\n"
+                f"🏷️ {offer.get('offerName')}\n"
+                f"✨ {offer.get('description')}\n\n"
+                f"👉 Add items worth ₹{gap} more to unlock this offer"
+            )
+
+            if bundle:
+                text += f"\n\n🔥 Recommended combo item: {bundle['items'][0]['name']}"
+
+            return {"reply": text}
+
+        return {"reply": "😕 No offers available yet. Shop more to earn rewards!"}
+
+    def apply_offer_from_message(self, session_id, message):
+        session = self.session_manager.get(session_id)
+
+        shown = session.get("shown_offers", [])
+
+        if not shown:
+            return {"reply": "No offers available to apply."}
+
+        offer = self.resolve_offer(message, shown)
+
+        if not offer:
+            return {"reply": "Please choose a valid offer number."}
+
+        # ----------------------------------
+        # attach to cart
+        # ----------------------------------
+        session["cart"]["offer"] = {
+            "id": offer["id"],
+            "name": offer["offerName"],
+            "type": "PERCENT",
+            "value": offer.get("discountPercentage")
+        }
+
+        self.session_manager._save(session_id, session)
+
+        check_out_summary = self.build_checkout_summary(session=session)
 
         return {
-            "reply": reply_text,
-            "userPoints": user_points,
-            "eligibleOffers": eligible_offers
+            "reply": f"✅ \"{offer['offerName']}\" applied successfully! 🎉 \n\n" + check_out_summary
         }

@@ -1,181 +1,296 @@
-# agents/recommendation_agent.py
+# =====================================================
+# 0️⃣ UTILITIES
+# =====================================================
+def make_json_safe(obj):
+    if isinstance(obj, bytes):
+        try:
+            return obj.decode("utf-8")
+        except UnicodeDecodeError:
+            return repr(obj)
+    if isinstance(obj, dict):
+        return {k: make_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [make_json_safe(v) for v in obj]
+    return obj
+
 
 from vectorstore.pinecone_client import index
 from vectorstore.embedder import embed
 from db.product_queries import fetch_products_by_ids
 from utils.text_cleaner import clean_text
-from langchain_core.prompts import PromptTemplate
-from langchain_core.runnables import RunnableSequence
-import json
 
 
 class RecommendationAgent:
-    def __init__(self, llm=None):
-        self.llm = llm
 
-    # --------------------------------------------------- #
-    # Pinecone Search (UNCHANGED)
-    # --------------------------------------------------- #
-    def pinecone_search(self, query, k=6, filter_metadata=None):
-        vector = embed(clean_text(query))
-
-        try:
-            if filter_metadata:
-                res = index.query(
-                    vector=vector,
-                    top_k=k,
-                    include_metadata=True,
-                    filter=filter_metadata
-                )
-            else:
-                res = index.query(
-                    vector=vector,
-                    top_k=k,
-                    include_metadata=True
-                )
-
-            matches = res.get("matches", [])
-
-        except Exception as e:
-            print("❌ Pinecone error:", e)
-            return []
-
-        ids = [m.get("id") for m in matches]
-        return fetch_products_by_ids(ids)
-
-    # --------------------------------------------------- #
-    # Category Expansion Using LLM (UNCHANGED)
-    # --------------------------------------------------- #
-    def category_expand_with_llm(self, query, top_n=3):
-        if not self.llm:
-            return []
-
-        prompt = PromptTemplate(
-            input_variables=["query", "top_n"],
-            template="""
-            You are a smart retail assistant.
-            Generate {top_n} relevant product categories or sub-categories.
-            Query: {query}
-            Return ONLY a comma-separated list.
-            """
-        )
-
-        try:
-            chain = prompt | self.llm
-            out = chain.invoke({"query": query, "top_n": top_n})
-
-            text = getattr(out, "content", None) or str(out)
-            categories = [c.strip() for c in text.split(",") if c.strip()]
-
-            return categories[:top_n]
-
-        except Exception as e:
-            print("❌ LLM Category Expansion error:", e)
-            return []
-
-    # --------------------------------------------------- #
-    # 🔥 PRODUCT FORMATTING (NEW)
-    # --------------------------------------------------- #
-    def _format_products(self, products, query):
-        PRODUCT_EMOJI_MAP = {
-            "shirt": "👕", "pant": "👖", "trouser": "👖", "jeans": "👖",
-            "suit": "🕴️", "jacket": "🧥", "hoodie": "🧥",
-            "shoe": "👟", "watch": "⌚", "belt": "👔", "cap": "🧢"
+    def __init__(self):
+        # Category → complementary categories
+        self.COMPLEMENTARY_MAP = {
+            "shirt": ["belt", "trouser", "jeans"],
+            "tshirt": ["jeans", "shorts"],
+            "jeans": ["belt", "tshirt"],
+            "trouser": ["belt", "shirt"],
+            "shoes": ["socks", "shoe_care"],
+            "sneakers": ["socks", "shoe_care"],
         }
 
-        def emoji(name):
-            name = (name or "").lower()
-            for k, e in PRODUCT_EMOJI_MAP.items():
-                if k in name:
-                    return e
-            return "🛍️"
+    # =====================================================
+    # INTERNAL VECTOR SEARCH
+    # =====================================================
+    def _search(self, query: str, k=6, filters=None):
+        vector = embed(clean_text(query))
 
-        # ---------- LLM explanations ----------
-        explanations = {}
-
-        if self.llm and products:
-            try:
-                prompt = f"""
-You are a helpful shopping assistant.
-
-User query:
-{query}
-
-For each product, give TWO OR THREE short reason (max 20 words)
-why it matches the user.
-
-Return ONLY JSON like:
-{{"0":"reason","1":"reason"}}
-
-Products:
-{[p.get("name") + " - " + p.get("description", "") for p in products]}
-"""
-                res = self.llm.invoke(prompt)
-                explanations = json.loads(res.content)
-
-            except Exception:
-                explanations = {}
-
-        # ---------- format cards ----------
-        lines = []
-
-        for i, p in enumerate(products):
-            reason = explanations.get(str(i), "Popular choice for your search")
-            lines.append(
-                f"{emoji(p.get('name'))} OPTION {i+1}\n"
-                f"─────────\n"
-                f"{p.get('name')} — ₹{p.get('price')}\n"
-                f"✨ {reason}"
-            )
-
-        text = "\n\n".join(lines)
-
-        reply = (
-            "Here are some hand-picked options for you 👇\n\n"
-            f"{text}\n\n"
-            "Tell me which one you like (1st, 2nd, etc.) 😉"
+        res = index.query(
+            vector=vector,
+            top_k=k,
+            include_metadata=True,
+            filter=filters or {}
         )
 
-        return reply
+        ids = [str(m["id"]) for m in res.get("matches", [])]
+        products = fetch_products_by_ids(ids)
+        return make_json_safe(products)
 
-    # --------------------------------------------------- #
-    # Main Handler (LOGIC SAME + formatting added)
-    # --------------------------------------------------- #
-    def handle(self, query, k_similar=8, k_complement=2):
+    # =====================================================
+    # QUALITY SCORING HELPERS
+    # =====================================================
+    def get_fabric_score(self, fabric: str) -> int:
+        if not fabric:
+            return 0
 
-        similar = self.pinecone_search(query, k=k_similar)
+        fabric = fabric.lower()
 
-        complementary = []
-        categories = self.category_expand_with_llm(query, top_n=3)
+        if "linen" in fabric:
+            return 6
+        if "cotton" in fabric and "blend" in fabric:
+            return 4
+        if "pure cotton" in fabric or "100%" in fabric:
+            return 3
+        if "cotton" in fabric:
+            return 2
+        if "poly" in fabric:
+            return 1
 
-        for cat in categories:
-            complementary.extend(
-                self.pinecone_search(cat, k=k_complement)
-            )
+        return 0
 
-        # De-duplicate
-        seen = set()
+    def get_finish_score(self, finish: str) -> int:
+        if not finish:
+            return 0
 
-        def dedupe(items):
-            out = []
-            for p in items:
-                pid = str(p.get("id"))
-                if pid not in seen:
-                    seen.add(pid)
-                    out.append(p)
-            return out
+        finish = finish.lower()
 
-        similar = dedupe(similar)
-        complementary = dedupe(complementary)
+        if "premium" in finish:
+            return 5
+        if "wrinkle" in finish:
+            return 4
+        if "pre" in finish:
+            return 3
+        if "enzyme" in finish:
+            return 2
+        if "regular" in finish:
+            return 1
 
-        # 🔥 combine for display
-        display_products = (similar + complementary)[:6]
+        return 0
 
-        reply = self._format_products(display_products, query)
+    def quality_score(self, product: dict) -> int:
+        fabric_score = self.get_fabric_score(
+            product.get("fabric", "")
+        )
+        finish_score = self.get_finish_score(
+            product.get("finish", "")
+        )
+
+        # Fabric > Finish
+        return fabric_score * 2 + finish_score
+
+    # =====================================================
+    # 1️⃣ DISCOVERY (SalesAgent → intent == DISCOVERY)
+    # =====================================================
+    def find_products(
+            self,
+            product_type=None,
+            occasion=None,
+            budget=None,
+            size=None
+    ):
+        query_parts = []
+
+        if product_type:
+            query_parts.append(product_type)
+        if occasion:
+            query_parts.append(occasion)
+        if size:
+            query_parts.append(f"size {size}")
+
+        query = " ".join(query_parts)
+
+        filters = {}
+        if budget:
+            filters["price"] = {"$lte": budget}
+
+        return self._search(
+            query=query,
+            k=6,
+            filters=filters
+        )
+
+    # =====================================================
+    # 2️⃣ QUALITY UPGRADE (SalesAgent → after product select)
+    # =====================================================
+    def get_quality_upgrade(self, selected_product: dict,
+                            budget=None, occasion=None):
+        category = selected_product.get("category")
+        price = selected_product.get("price")
+
+        print("UPGRADE")
+
+        if not category or not price:
+            return None
+
+        max_price = price + 500
+        if budget:
+            max_price = min(max_price, budget)
+
+        # 🎯 Occasion-aware query
+        query_parts = ["premium", category]
+        if occasion:
+            query_parts.append(occasion)
+
+        candidates = self._search(
+            query=" ".join(query_parts),
+            k=6,
+            filters={
+                "category": category,
+                "price": {"$gt": price, "$lte": max_price}
+            }
+        )
+
+        base_score = self.quality_score(selected_product)
+
+        upgrades = [
+            p for p in candidates
+            if self.quality_score(p) > base_score
+        ]
+
+        if not upgrades:
+            return None
+
+        upgrades.sort(key=lambda x: x["price"])
+
+        upgrade = upgrades[0]
+        price_diff = upgrade["price"] - price
+
+        return upgrade, price_diff
+
+    # =====================================================
+    # 3️⃣ CROSS-SELL (SalesAgent → after ADD_TO_CART)
+    # =====================================================
+    def cross_sell(self, base_product: dict):
+
+        category = base_product.get("category")
+        if not category:
+            return []
+
+        complements = self.COMPLEMENTARY_MAP.get(category.lower(), [])
+        if not complements:
+            return []
+
+        products = self._search(
+            query=f"{category} accessories",
+            k=5,
+            filters={"category": {"$in": complements}}
+        )
+
+        if not products:
+            return []
+
+        # Sort by quality score
+        products.sort(
+            key=lambda x: self.quality_score(x),
+            reverse=True
+        )
+
+        return products[:2]
+
+    # =====================================================
+    # 4️⃣ BUNDLE (BUSINESS RULES)
+    # =====================================================
+    def bundle(self, base_product: dict, occasion=None):
+
+        if not base_product:
+            return None
+
+        category = base_product.get("category")
+        base_price = base_product.get("price", 0)
+
+        if not category or not base_price:
+            return None
+
+        complements = self.COMPLEMENTARY_MAP.get(category.lower(), [])
+        if not complements:
+            return None
+
+        # Build smart query
+        query_parts = [category]
+
+        if occasion:
+            query_parts.append(occasion)
+
+        if base_product.get("fabric"):
+            query_parts.append(base_product["fabric"])
+
+        query = " ".join(query_parts)
+
+        # Search complementary products
+        candidates = self._search(
+            query=query,
+            k=6,
+            filters={"category": {"$in": complements}}
+        )
+
+        if not candidates:
+            return None
+
+        # Price compatibility filter (economic logic)
+        candidates = [
+            p for p in candidates
+            if p.get("price")
+               and 0.1 * base_price <= p["price"] <= 0.6 * base_price
+        ]
+
+        if not candidates:
+            return None
+
+        # Rank by quality score
+        candidates.sort(
+            key=lambda x: self.quality_score(x),
+            reverse=True
+        )
+
+        selected = candidates[0]
+
+        bundle_total = base_price + selected["price"]
+
+        # Dynamic discount strategy
+        if bundle_total > 5000:
+            discount = {
+                "type": "PERCENT",
+                "value": 15,
+                "label": "Premium Combo Offer"
+            }
+        elif bundle_total > 3000:
+            discount = {
+                "type": "PERCENT",
+                "value": 10,
+                "label": "Smart Saver Combo"
+            }
+        else:
+            discount = {
+                "type": "FLAT",
+                "value": 100,
+                "label": "Starter Combo Deal"
+            }
 
         return {
-            "reply": reply,
-            "products": display_products,
-            "similar": similar,
-            "complementary": complementary
+            "items": [selected],
+            "discount": discount
         }
