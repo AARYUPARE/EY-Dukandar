@@ -29,6 +29,7 @@ public interface InventoryService {
     public List<Map<String, Object>> findNearbyStoresForProduct(
             Long productId,
             String city,
+            String size,
             double maxDistanceKm
     );
 }

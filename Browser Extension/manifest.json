@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Dukandar Companion",
+  "version": "1.0",
+  "description": "Dukandar Sales Companion Overlay",
+  "permissions": ["tabs", "storage"],
+  "host_permissions": [
+    "*://*.abfrl.in/*",
+    "*://localhost:*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+       "*://*.abfrl.in/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}

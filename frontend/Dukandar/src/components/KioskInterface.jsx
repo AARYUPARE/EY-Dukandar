@@ -5,24 +5,29 @@ import OffersContainer from "./OfferContainer";
 import Navbar from "./Navbar";
 
 import css from "../styles/KioskInterface.module.css";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import PaymentOverlay from "./PaymentOverlay";
 
 const KioskInterface = () => {
 
-    
+    const location = useLocation();
+
+    const isScanningPage = location.pathname.includes("scanning-pos") || location.pathname.includes("reserve-auth");
 
     return (
         <div className={css.wrapper}>
+            <PaymentOverlay />
             {/* LEFT SIDE - Cards */}
-            <div className={css.left}>
-                {/* <Navbar /> */}
-                <OffersContainer />
-            </div>
+            {!isScanningPage && (
+                <div className={css.left}>
+                    <OffersContainer />
+                </div>
+            )}
 
             {/* RIGHT SIDE - Chat */}
-            <div className={css.right}>
+            {!isScanningPage ? <div className={`${css["right"]}`}>
                 <Outlet />
-            </div>
+            </div> : <Outlet />}
         </div>
     );
 };

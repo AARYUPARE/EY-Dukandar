@@ -66,6 +66,7 @@ class RedisSessionManager:
 
             # 🔑 SINGLE SOURCE OF TRUTH
             "pending_action": None,
+            "payment_pending": False,
 
             # RESERVATION
             "reservation": {

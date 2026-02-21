@@ -12,7 +12,8 @@ body {
   transform-style: preserve-3d;
   perspective: 800px;
   position: fixed;
-  right: 50vw;
+  right: 50%;
+  margin: auto;
   opacity: .6;
 }
 

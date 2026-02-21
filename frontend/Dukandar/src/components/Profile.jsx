@@ -24,7 +24,7 @@ export default function Profile() {
       .get(`${BASE_BACKEND_URL}/wishlist/user/${user.id}`)
       .then(res => setWishlist(res.data))
       .catch(err => console.error("Wishlist fetch error:", err));
-  }, [user]);
+  });
 
   // ==============================
   // REMOVE ITEM

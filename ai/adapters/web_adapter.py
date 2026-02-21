@@ -7,28 +7,64 @@ class WebAdapter:
         self.llm = llm
 
         # ---------- PROMPTS ----------
-        self.cart_continuity_prompt = PromptTemplate.from_template("""
-        You are a friendly online shopping assistant.
+        self.cart_continuity_prompt = PromptTemplate(
+            input_variables=["cart_items"],
+            template="""
+        You are an omnichannel shopping assistant.
 
-        Greet the user warmly.
-        Tell them they already added items to their cart.
-        List the items with attractive emojis.
-        End by asking whether they want to continue checkout or browse more.
+        VERY IMPORTANT RULES:
+        - Keep the message format EXACTLY the same
+        - Do NOT rephrase, shorten, or add anything
+        - Do not invent any new products
+        - Do NOT change emojis or line breaks
+        - Only replace product names dynamically
+        - Each product MUST be on a new line
+        - Use a suitable product emoji (👕 for shirts, 👖 for jeans, 👟 for shoes, 👜 for bags) at start of each product
+        - Output ONLY the final message, nothing else
 
-        Cart items:
+        FORMAT (DO NOT CHANGE):
+
+        Welcome back 👋
+        I see you already added a few items to your cart 🛒.
+        🙂 Good news! These items are ready for you:
+        {{PRODUCT_LINES}}
+        Would you like to continue to checkout, or would you like to explore more options?
+
+        Products:
         {cart_items}
-        """)
+        """
+        )
 
-        self.browsing_continuity_prompt = PromptTemplate.from_template("""
-        You are a friendly online shopping assistant.
+        self.browsing_continuity_prompt = PromptTemplate(
+            input_variables=["products"],
+            template="""
+        You are an omnichannel shopping assistant.
 
-        Greet the user.
-        Mention that they were browsing these products earlier.
-        Ask if they want to continue browsing similar options or need help.
+        VERY IMPORTANT RULES:
+        - Keep the message format EXACTLY the same
+        - Do NOT rephrase, shorten, or add anything
+        - Do not invent any new products
+        - Do NOT change emojis or line breaks
+        - Only replace product names dynamically
+        - Each product MUST be on a new line
+        - Use a suitable product emoji (👕 for shirts, 👖 for jeans, 👟 for shoes, 👜 for bags, 👗 for dresses, 🧥 for jackets) at start of each product
+        - Output ONLY the final message, nothing else
+
+        FORMAT (DO NOT CHANGE):
+
+        🔄 Welcome back!
+
+        ✨ Your browsing journey is synced across all your devices.
+
+        Here’s what you were exploring earlier:
+        {{PRODUCT_LINES}}
+
+        Would you like to continue exploring these styles, or try something new?
 
         Products:
         {products}
-        """)
+        """
+        )
 
     # ---------------------------
     # ENTRY POINT (CALL ON LOGIN)
@@ -36,14 +72,17 @@ class WebAdapter:
     def on_user_login(self, session_id, user=None):
         session = self.session.get(session_id)
 
-        print("Hellow Web")
+        if not session:
+            session = {}
+
+        print("Hello Web")
 
         # 1️⃣ CART CONTINUITY
-        if session["cart"]["items"]:
+        if session.get("cart", {}).get("items"):
             return self._render_cart_continuity(session)
 
         # 2️⃣ BROWSING CONTINUITY
-        if session["focus"]["shown_products"]:
+        if session.get("focus", {}).get("shown_products"):
             return self._render_browsing_continuity(session)
 
         # 3️⃣ FALLBACK
@@ -53,10 +92,7 @@ class WebAdapter:
     # RENDERERS
     # ---------------------------
     def _render_cart_continuity(self, session):
-        cart_items = [
-            f"{item['name']} (₹{item['price']})"
-            for item in session["cart"]["items"]
-        ]
+        cart_items = session["cart"]["items"]
 
         response = (self.cart_continuity_prompt | self.llm).invoke({
             "cart_items": json.dumps(cart_items)
@@ -65,9 +101,7 @@ class WebAdapter:
         return response.content.strip()
 
     def _render_browsing_continuity(self, session):
-        products = [
-            p["name"] for p in session["focus"]["shown_products"]
-        ]
+        products = session["focus"]["shown_products"]
 
         response = (self.browsing_continuity_prompt | self.llm).invoke({
             "products": json.dumps(products)

@@ -1,4 +1,5 @@
 import os
+import time
 
 import requests
 from langchain_core.prompts import PromptTemplate
@@ -136,12 +137,12 @@ class SalesAgent:
     OFFER
     User asks about deals.
     Trigger words:
-    - "offer", "offers, "discount"
+    - "offer", "offers, "discount", "apply offer"
 
     PAYMENT
     User mentions payment method during checkout.
     Trigger words:
-    - "UPI", "Card", "Net Banking", "Cash on Delivery", "pay with", "pay using", "COD"
+    - "UPI", "Card", "Net Banking", "Cash on Delivery", "pay with", "pay using", "COD", "pay"
 
     NONE
     Use ONLY if message is totally unrelated or meaningless.
@@ -211,19 +212,9 @@ class SalesAgent:
     1. The user's search query
     2. A list of recommended products with their prices
 
-    Your tasks:
+    Your tasks(mandatory):
     Step 1: Sort the products by price (lowest to highest).
-    Step 2: Select the middle-priced product from the list.
-            - If there are 3 products, pick the 2nd.
-            - If there are 4 products, pick the 2nd or 3rd.
-    Step 4: Generate ONE upsell-style sentence ONLY for the selected product:
-            - If only an occasion is mentioned in the query, tailor the sentence to that occasion.
-
-            - If an occasion is not mentioned in the query, use only ONE generic angle from the list below to create a natural, helpful upsell message:
-            • trending or popular or newly arrived
-            • customer preference
-            • comfort or fabric benefit
-            • Styling versatility
+    Step 2: After sorting, ALWAYS select product with second highest price and Do NOT choose any other product
 
     Rules:
     - Do NOT mention other products
@@ -234,6 +225,8 @@ class SalesAgent:
     - keep it short and natural, like a real store assistant so user will get impress
     - keep it in simple language that a typical customer would understand don't use haivy words
     - keep it to ONE to TWO sentence only
+    - Mention the selected product name naturally in the upsell sentence
+    - Do NOT use vague references like "this shirt" or "this product"
     - You may start the sentence with 👕 this emoji.
 
     Output format:
@@ -243,7 +236,7 @@ class SalesAgent:
 
     Format:
     {{
-    "upsell_text": "one sentence upsell message"
+    "upsell_text": "one sentence upsell message including product name"
     }}
 
     User query:
@@ -253,7 +246,7 @@ class SalesAgent:
     {products}
 
     example upsell sentences:
-    - “👕 This shirt is pure cotton. For daily wear, many customers prefer cotton-stretch—easier movement.”
+    - “👕 Urban Edge Casual Shirt is pure cotton. For daily wear, many customers prefer cotton-stretch—easier movement.”
     - "👕 The pure cotton shirt is a good choice for breathable     everyday wear.
     Many customers also consider the cotton-stretch option for easier movement during long hours."
     - "👕 The pure cotton shirt is a classic everyday option.
@@ -523,11 +516,6 @@ class SalesAgent:
     - Ask whether to reserve at this store or at a different store
     - Ask the user to reply with store name or option number
 
-    If the product is not available:
-    - Apologize briefly
-    - Say it is unavailable
-    - Offer to add it to the wishlist
-
     Product:
     {product}
 
@@ -675,7 +663,7 @@ class SalesAgent:
 
         lines.append(f"\n🧮 Total: ₹{total}")
         lines.append("\n💳 How would you like to pay?")
-        lines.append("UPI | Card | Net Banking | Cash on Delivery")
+        lines.append("🔗 UPI | 💳 Card | 🏦 Net Banking | 🛵 Cash on Delivery")
 
         return "\n".join(lines)
 
@@ -868,6 +856,7 @@ class SalesAgent:
             "third": 2, "3rd": 2,
             "fourth": 3, "4th": 3,
             "fifth": 4, "5th": 4,
+            "sixth": 5, "6th": 5,
         }
 
         for word, idx in ordinal_map.items():
@@ -976,10 +965,10 @@ class SalesAgent:
         # 1️⃣ INTENT ROUTING (SINGLE ENTRY)
         # -------------------------
         session_summary = {
-            "has_current_product": session["focus"]["current_product"] is not None,
-            "shown_products_count": len(session["focus"]["shown_products"]),
-            "cart_count": len(session["cart"]["items"]),
-            "pending_action": session["pending_action"],
+            "has_current_product": session.get("focus", {}).get("current_product") is not None,
+            "shown_products_count": len(session.get("focus", {}).get("shown_products", [])),
+            "cart_count": len(session.get("cart", {}).get("items", [])),
+            "pending_action": session.get("pending_action"),
             "last_system_action": session.get("last_system_action", {}).get("type")
         }
 
@@ -1388,12 +1377,13 @@ class SalesAgent:
                 self.session._save(session_id, session)
 
                 return {
-                    "reply":(
-                    "Sure 🙂 Tell me a bit more so I can find the best options.\n\n"
-                    "You can reply like:\n"
-                    "• Office shirts, size L, budget 2000\n"
-                    "• Casual shirt M under 1500\n"
-                    "• Festive kurta XL"
+                    "reply": (
+                        "Sure 🙂 Tell me a bit more so I can find the best options for you!\n\n"
+                        "You can reply like:\n"
+                        "👔 Office shirts, size L, budget ₹2000\n"
+                        "👕 Casual shirt, size M, under ₹1500\n"
+                        "🌸 Festive kurta, size XL, ₹1500\n\n"
+                        "Just give me a this few details and I’ll pick out the perfect choices for you in your budget! ✨"
                     )
                 }
 
@@ -1446,8 +1436,7 @@ class SalesAgent:
             products = self.reco.find_products(
                 product_type=disc["product_type"],
                 occasion=disc["occasion"],
-                budget=disc["budget"],
-                size=disc["size"]
+                budget=disc["budget"]
             )
 
             if not products:
@@ -1489,11 +1478,11 @@ class SalesAgent:
             # -------------------------------
             return {
                 "reply" : f"""
-                {formatted}
-
                 ✨ Quick tip ✨
                 __________________
                 {upsell_text}
+                
+                {formatted}
 
                 Just tell me the number (like 1st or 2nd) or say this one 🙂
                 """,
@@ -1521,6 +1510,7 @@ class SalesAgent:
                 return {
                     "reply" : f"Sure 👍 if you want to reserve {session['focus']['current_product']} Would you like me to reserve it for you at {store['name']}?"
                     }
+
             store_description = (self.select_store_prompt | self.llm).invoke({
                 "store": json.dumps(store)
             }).content.strip()
@@ -1555,7 +1545,6 @@ class SalesAgent:
             # 🔥 ask RecommendationAgent for quality upgrade
             upgrade_result = self.reco.get_quality_upgrade(
                 selected_product=selected_product,
-                budget=session["discovery"]["budget"],
                 occasion=session["discovery"]["occasion"]
             )
 
@@ -1720,20 +1709,22 @@ class SalesAgent:
 
             self.session._save(session_id, session)
 
+            if not stores:
+                return {
+                    "reply": f"🏬 {product["name"]} is not available in any nearest store for reservation would you like to add it into wishlist 💖? 🙂"
+                }
+
             # Natural language via LLM
             response = (self.availability_prompt | self.llm).invoke({
                 "product": json.dumps(product),
                 "availability": json.dumps(availability)
             })
 
-            if not stores:
-                return {"reply": response.content.strip()}
-
             formatted = (self.store_formatter_prompt | self.llm).invoke({
                 "stores": json.dumps(stores)
             }).content.strip()
 
-            result = formatted + "\n\n" + response.content.strip()
+            result = response.content.strip() + "\n\n" + formatted
             return {
                 "reply":result,
                 "stores": stores,
@@ -1744,13 +1735,13 @@ class SalesAgent:
         # -------------------------
         if intent == "RESERVE" and session["pending_action"] == "wishlist_confirm":
             return {
-                "reply":"product is not available in any nearest store for reservation would you like to add it to wishlist? 🙂"
+                "reply":"product is not available in any nearest store for reservation would you like to add it into wishlist 💖? 🙂"
                 }
 
         # -------------------------
         # RESERVE HANDLER (ENTRY)
         # -------------------------
-        if intent == "RESERVE" and session.get("pending_action") not in ("RESERVE_SELECT_STORE",):
+        if intent == "RESERVE" and session.get("pending_action") not in ("RESERVE_SELECT_STORE", "wishlist_confirm"):
             product = self.resolve_product(
                 user_message,
                 session["focus"]["shown_products"],
@@ -1760,7 +1751,7 @@ class SalesAgent:
             if not product:
                 return {"reply":"Please select a product first 🙂"}
 
-            availability = self.inventory.check(product)
+            availability = self.inventory.check(product, user)
             stores = availability.get("available_stores", [])
 
             # ✅ Reservation context = single product
@@ -1778,20 +1769,22 @@ class SalesAgent:
 
             self.session._save(session_id, session)
 
+            if not stores:
+                return {
+                    "reply":f"🏬 {product["name"]} is not available in any nearest store for reservation would you like to add it into wishlist 💖? 🙂"
+                }
+
             # Natural language via LLM
             response = (self.availability_prompt | self.llm).invoke({
                 "product": json.dumps(product),
                 "availability": json.dumps(availability)
             })
 
-            if not stores:
-                return {"reply": response.content.strip()}
-
             formatted = (self.store_formatter_prompt | self.llm).invoke({
                 "stores": json.dumps(stores)
-            }).strip()
+            }).content.strip()
 
-            result = formatted + "\n\n" + response.content.strip()
+            result = response.content.strip() + "\n\n" + formatted
             return {"reply": result}
 
         # -------------------------
@@ -1800,8 +1793,6 @@ class SalesAgent:
         if intent == "CHECKOUT":
             if not session["cart"]["items"]:
                 return {"reply":"Your cart is empty 🙂 Please add something first."}
-
-
 
             offers = self.loyalty_agent.show_offers(user=user, session=session)
 
@@ -1829,47 +1820,31 @@ class SalesAgent:
 
             if not method:
                 return {
-                    "reply": ("Please choose a valid payment method\n" "How would you like to pay?\n"
-                        "• UPI\n"
-                        "• Card\n"
-                        "• Net Banking\n"
-                        "• Cash on Delivery")
+                    "reply": ("Please choose a valid payment method 💳💰\n" "How would you like to pay?\n"
+                              "• 🔗 UPI\n"
+                              "• 💳 Card\n"
+                              "• 🏦 Net Banking\n"
+                              "• 🛵 Cash on Delivery")
                 }
 
             session["checkout"]["payment_method"] = method
             session["pending_action"] = "PAYMENT_PROCESS"
             self.session._save(session_id, session)
 
+            amount = self.calculate_cart_total(session["cart"]["items"])
+
             # 🔹 Call Payment Agent
-            payment_result = self.payment_agent.charge(
-                amount=self.calculate_cart_total(session["cart"]["items"]),
-                method=method,
-                session_id=session_id
+            payment_result = self.payment_agent.pay(
+                amount = amount,
             )
-
-            if not payment_result["success"]:
-                session["pending_action"] = "PAYMENT_SELECTION"
-                self.session._save(session_id, session)
-                return {"reply":"Payment failed ❌ Please try another method."}
-
-            # Payment successful → continue
-            session["checkout"]["order_confirmed"] = True
-            self.session._save(session_id, session)
-
-            # 🔹 Immediately call fulfillment
-            result = self.fulfillment.finalize(session)
-
-            if not result["success"]:
-                return {"reply":"Something went wrong while placing your order ❌"}
 
             self.session.clear_cart(user, session_id)
 
             return {
                 "reply" : (
                 f"🎉 Order placed successfully!\n"
-                f"🧾 Order ID: {result['order_id']}\n"
-                f"📦 Items: {result['items_count']}\n"
-                f"💰 Total: ₹{result['total']}\n\n"
+                f"🧾 Order ID: 101\n"
+                f"💰 Total: ₹{amount}\n\n"
                 "Thank you for shopping with us 😊"
                 )
             }

@@ -14,7 +14,7 @@ const userSlice = createSlice({
   name: "user",
   initialState:
   {
-    id: 1,
+    id: -1,
     name: "Amit Sharma",
     gender: "M",
     DOB: "1995-06-18",
@@ -113,6 +113,16 @@ export const loginKiosk = createAsyncThunk(
 
       let availProductsFromWishList = [];
 
+      dispatch(
+        chatAction.addMessage({
+          id: "init",
+          sender: "bot",
+          text: response.data.agentResponse,
+          isLoading: false,
+          inputState: "text",
+          lang: "en"
+        }));
+
       // console.log(response.data.availableWishlist);
 
       response.data.availableWishlist.forEach(ele => {
@@ -157,7 +167,6 @@ export const loginWeb = createAsyncThunk(
       });
 
       if (response.data.message == "login failed") {
-
         return false;
       }
 
@@ -179,6 +188,16 @@ export const loginWeb = createAsyncThunk(
         wishlist: userWishlist.data
       }
 
+      dispatch(
+        chatAction.addMessage({
+          id: "init",
+          sender: "bot",
+          text: response.data.agentResponse,
+          isLoading: false,
+          inputState: "text",
+          lang: "en"
+        }));
+
       dispatch(userActions.setUser(newAction))
       return true;
 
@@ -191,15 +210,19 @@ export const loginWeb = createAsyncThunk(
 
 export const sendMessageAsync = createAsyncThunk(
   "chat/sendMessage",
-  async ({ prompt }, { dispatch, getState }) => {
+  async (payload, { dispatch, getState }) => {
     const time = Date.now().toString();
     const loaderId = time + "-loader";
+
+    const { prompt, inputState } = payload
+
+    console.log("Input State: " + inputState)
 
     let sessionState = getState().session || {};
     let sessionId = sessionState.id;
 
     if (sessionId == "") {
-      sessionId = Date.now().toString();
+      sessionId = `${getState().user.id}`;
       dispatch(sessionActions.setSessionId(sessionId));
     }
 
@@ -211,6 +234,8 @@ export const sendMessageAsync = createAsyncThunk(
         id: time,
         sender: "user",
         text: prompt,
+        inputState,
+        lang: "en"
       })
     );
 
@@ -220,13 +245,16 @@ export const sendMessageAsync = createAsyncThunk(
         sender: "bot",
         text: "typing...",
         isLoading: true,
+        inputState,
+        lang: "en"
       })
     );
+
     let res = {
-      session_id: "",
       reply: "",
       products: [],
       stores: [],
+      lang: "en"
     };
 
     try {
@@ -244,14 +272,26 @@ export const sendMessageAsync = createAsyncThunk(
           id: loaderId,
           text: res.data.reply ?? "No reply, from Agent",
           isLoading: false,
+          lang: res.data.user_lang
         })
       );
-      // if (Array.isArray(res.data.products) ? res.data.products.length != 0 && res.data.products.length > 4 : false) {
+
+      dispatch(
+        chatAction.updateMessage({
+          id: loaderId,
+          text: res.data.reply ?? "No reply, from Agent",
+          isLoading: false,
+          lang: res.data.user_lang
+        })
+      );
+      if (Array.isArray(res.data.products) && res.data.products.length != 0) {
         dispatch(productsAction.addProducts(res.data.products))
-      // }
+        dispatch(toggleCardContainersActions.showProducts());
+      }
 
       if (Array.isArray(res.data.stores) ? res.data.stores.length != 0 : false) {
         dispatch(kioskStoreListActions.addKioskStores({ stores: res.data.stores || [] }));
+        dispatch(toggleCardContainersActions.showStores());
       }
     }
     catch (error) {
@@ -279,11 +319,10 @@ const chatSlice = createSlice({
     },
 
     updateMessage(state, action) {
-      const msg = state.messages.find((m) => m.id === action.payload.id);
+      const msg = state.messages.find(m => m.id === action.payload.id);
 
       if (msg) {
-        msg.text = action.payload.text;
-        msg.isLoading = false;
+        Object.assign(msg, action.payload);
       }
     },
   },
@@ -323,22 +362,22 @@ const productsSlice = createSlice({
   initialState: {
     canShow: true,
     products: [
-      {
-        id: 123,
-        name: "T-Shirt",
-        description: "This, is very good t-shirt",
-        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-        brand: "Dukandar",
-        size: "M"
-      },
-      {
-        id: 123,
-        name: "T-Shirt",
-        description: "This, is very good t-shirt",
-        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-        brand: "Dukandar",
-        size: "M"
-      }
+      // {
+      //   id: 123,
+      //   name: "T-Shirt",
+      //   description: "This, is very good t-shirt",
+      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+      //   brand: "Dukandar",
+      //   size: "M"
+      // },
+      // {
+      //   id: 124,
+      //   name: "T-Shirt",
+      //   description: "This, is very good t-shirt",
+      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+      //   brand: "Dukandar",
+      //   size: "M"
+      // }
     ],
   },
   reducers: {
@@ -361,8 +400,7 @@ const productsSlice = createSlice({
       return { products: [] }
     },
 
-    setCanShow(state, action)
-    {
+    setCanShow(state, action) {
       state.canShow = action.payload
     }
   },
@@ -403,11 +441,16 @@ const kioskStoreListSlice = createSlice({
   },
   reducers: {
     addKioskStores(state, action) {
+      const existingIds = new Set(state.stores.map(s => String(s.id)));
 
-      // if(!action.payload.stores) return;
+      const filtered = action.payload.stores.filter(
+        store => !existingIds.has(String(store.id))
+      );
 
-      state.stores.push(...action.payload.stores);
+      // add new stores at TOP
+      state.stores.unshift(...filtered);
     },
+
     clearKioskStores() {
       return { stores: [] }
     }
@@ -419,22 +462,22 @@ const storeOffersSlice = createSlice(
     name: "storeOffers",
     initialState: {
       list: [
-        {
-        id: 123,
-        name: "T-Shirt",
-        description: "This, is very good t-shirt",
-        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-        brand: "Dukandar",
-        size: "M"
-      },
-      {
-        id: 123,
-        name: "T-Shirt",
-        description: "This, is very good t-shirt",
-        image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-        brand: "Dukandar",
-        size: "M"
-      }
+        // {
+        //   id: 123,
+        //   name: "T-Shirt",
+        //   description: "This, is very good t-shirt",
+        //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+        //   brand: "Dukandar",
+        //   size: "M"
+        // },
+        // {
+        //   id: 123,
+        //   name: "T-Shirt",
+        //   description: "This, is very good t-shirt",
+        //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
+        //   brand: "Dukandar",
+        //   size: "M"
+        // }
       ],
     },
     reducers: {
@@ -502,8 +545,7 @@ const mapList = createSlice({
     setShowRoutes(state, action) {
       state.showRoutes = action.payload;
     },
-    clearMapList()
-    {
+    clearMapList() {
       return {
         stores: [],
         showRoutes: false,
@@ -511,6 +553,136 @@ const mapList = createSlice({
     }
   }
 })
+
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: {
+    items: []
+  },
+  reducers: {
+
+    // 🔥 Add item (scan or manual add)
+    addItem: (state, action) => {
+      const item = action.payload;
+
+      const existing = state.items.find(i => i.sku === item.sku);
+
+      if (existing) {
+        existing.qty += 1;   // same item → increment
+      } else {
+        state.items.push({ ...item, qty: 1 });
+      }
+    },
+
+
+    // 🔥 Remove item completely
+    removeItem: (state, action) => {
+      const sku = action.payload;
+
+      state.items = state.items.filter(i => i.sku !== sku);
+    },
+
+
+    // 🔥 Update quantity manually
+    updateQty: (state, action) => {
+      const { sku, qty } = action.payload;
+
+      const item = state.items.find(i => i.sku === sku);
+
+      if (!item) return;
+
+      if (qty <= 0) {
+        state.items = state.items.filter(i => i.sku !== sku);
+      } else {
+        item.qty = qty;
+      }
+    },
+
+
+    // 🔥 Clear cart (after payment)
+    clearCart: (state) => {
+      state.items = [];
+    }
+
+  }
+});
+
+export const makePayment = createAsyncThunk(
+  "payment/makePayment",
+  async ({ upiId }, { dispatch, getState }) => {
+
+    const userId = getState().user.id;
+    console.log("make Payment called:" + upiId)
+
+    const response = await axios.post(
+      "http://localhost:8080/api/payment/dummy",
+      null,
+      {
+        params: { userId, upiId }
+      }
+    );
+
+    console.log(response.data)
+    return response.data;
+  }
+);
+
+const paymentSlice = createSlice({
+  name: "payment",
+  initialState: {
+    wantPay: false,
+    loading: false,
+    status: null,
+    error: null,
+  },
+  reducers: {
+    resetPayment: (state) => {
+      state.status = null;
+      state.error = null;
+    },
+    setLoading(state, action) {
+      state.loading = action.payload;
+    },
+    startPayment(state) {
+      state.status = null;
+      state.error = null;
+      state.wantPay = true;
+    },
+    closePayment(state) {
+      state.wantPay = false;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(makePayment.pending, (state) => {
+        state.loading = true;
+        state.status = null;
+      })
+      .addCase(makePayment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.status = action.payload.paymentStatus;
+      })
+      .addCase(makePayment.rejected, (state) => {
+        state.loading = false;
+        state.status = "failed";
+        state.error = "Something went wrong";
+      });
+  },
+});
+
+let event = {
+  eventType: "",
+  data: {}
+}
+
+export const backendEventHandler = (msg) => {
+  event = JSON.parse(msg.body);
+  console.log("Event:", event);
+
+  if (event.eventType == "PAYMENT") {
+    store.dispatch(paymentActions.startPayment());
+  }
+}
 
 export const chatAction = chatSlice.actions;
 export const sideBarAction = toggleSideSlice.actions;
@@ -524,6 +696,8 @@ export const toggleCardContainersActions = toggleCardContainers.actions;
 export const userActions = userSlice.actions;
 export const overlayActions = overlaySlice.actions;
 export const mapListAction = mapList.actions;
+export const cartActions = cartSlice.actions;
+export const paymentActions = paymentSlice.actions;
 
 const store = configureStore({
   reducer: {
@@ -539,6 +713,8 @@ const store = configureStore({
     toggleContainers: toggleCardContainers.reducer,
     overlayText: overlaySlice.reducer,
     mapList: mapList.reducer,
+    cart: cartSlice.reducer,
+    payment: paymentSlice.reducer,
   },
 });
 

@@ -19,6 +19,14 @@ import Orders from './components/Orders';
 import CreateAccount from './components/CreateAccount';
 import Cart from './components/Cart';
 import MapOverlay from './components/MapOverlay';
+import ScanningPOS from './components/ScanningPOS';
+import AuthPOS from './components/AuthPos';
+import AuthScanner from './components/AuthScanner';
+
+//Web socket imports
+import { connectWS } from '../web_socket/socketListener';
+import { backendEventHandler } from './store/store';
+import { useEffect } from 'react';
 
 const appRouter = createBrowserRouter([
   {
@@ -113,11 +121,23 @@ const appRouter = createBrowserRouter([
         path: "chat",
         element: <ChatContainer />
       },
+      {
+        path: "scanning-pos",
+        element: <ScanningPOS />
+      },
+      {
+        path: "reserve-auth",
+        element: <AuthPOS />
+      }
     ]
   },
 ])
 
 const App = () => {
+
+  useEffect(() => {
+    connectWS(backendEventHandler);
+  }, [])
 
   return (
     <>

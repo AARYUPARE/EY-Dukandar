@@ -7,6 +7,16 @@ public class LoginRequest {
     private String storeType; // "web" or "kiosk"
     private Long storeId;     // required only for kiosk
 
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    private String sessionId;
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 

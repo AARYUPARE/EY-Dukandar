@@ -34,8 +34,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").permitAll()
                         // Public authentication APIs (signup/signin)
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/topic/**", "/app/**").permitAll() // ✅ allow stomp messaging
-                        // Everything else is public
+                        .requestMatchers("/topic/**", "/app/**").permitAll()
+                        .requestMatchers(
+                                "/qr/**",
+                                "/barcode/**",
+                                "/invoice/**",
+                                "/misc/**",
+                                "/api/static/**"
+                        ).permitAll() // Everything else is public
+                        .requestMatchers("/ws/**").permitAll()// ✅ allow stomp messaging
+                        .requestMatchers("/topic/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 // Attach our custom JWT filter

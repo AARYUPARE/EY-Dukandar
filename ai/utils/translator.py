@@ -66,19 +66,20 @@ Rules:
         prompt = self.DETECT_PROMPT.format(text=text)
 
         res = self.llm.invoke(prompt)
+        lang = ""
         lang = res.content.strip().lower()
 
         print("Detected:", lang)
 
         # 2️⃣ If already English → skip
-        if lang == "en":
+        if "en" in lang:
             return "en", text
 
         # 3️⃣ Local safe translation
-        if lang == "hi":
+        if "hi" in lang:
             return "hi", self._local_translate(text, self.tok_hi_en, self.mod_hi_en)
 
-        if lang == "mr":
+        if "mr" in lang:
             return "mr", self._local_translate(text, self.tok_mr_en, self.mod_mr_en)
 
         # fallback

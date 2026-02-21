@@ -27,7 +27,7 @@ public class WishlistServiceImplementation implements WishlistService {
     public Wishlist addToWishlist(Long userId, Long productId, String size) {
 
         Optional<Wishlist> exists =
-                wishlistRepository.findByUserIdAndProductIdAndSize(userId, productId, size);
+                wishlistRepository.findByUserIdAndProduct_IdAndSize(userId, productId, size);
 
         if (exists.isPresent()) {
             throw new RuntimeException("Already added to wishlist");
@@ -81,6 +81,6 @@ public class WishlistServiceImplementation implements WishlistService {
 
     @Override
     public void removeFromWishlist(Long userId, Long productId, String size) {
-        wishlistRepository.deleteByUserIdAndProductIdAndSize(userId, productId, size);
+        wishlistRepository.deleteByUserIdAndProduct_IdAndSize(userId, productId, size);
     }
 }

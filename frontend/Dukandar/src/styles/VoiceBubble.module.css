@@ -1,18 +1,44 @@
 .voice-bubble {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    background: #e8f5ff;
-    padding: 10px 14px;
+    background: transparent;
+    padding: 5px;
     border-radius: 14px;
-    max-width: 75%;
+    max-width: 100%;
 }
 
-.play-btn {
+.play-btn-black {
     border: none;
-    background: #4cafef;
-    color: white;
+    background: transparent;
+    color: rgb(0, 0, 0);
+    font-size: 1.2rem;
     border-radius: 50%;
-    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding: 6px; */
     cursor: pointer;
+}
+
+.play-btn-white {
+    border: none;
+    background: transparent;
+    color: rgb(255, 255, 255);
+    font-size: 1.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* padding: 6px; */
+    cursor: pointer;
+}
+
+.slide-bar
+{
+    flex: 1;
+    height: 4px;
+    background-color: black;
+    min-width: 60%;
 }

@@ -1,38 +1,50 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  cartActions
+} from "../store/store";
+
+import PaymentOverlay from "./PaymentOverlay";
+
 import css from "../styles/Cart.module.css";
 import { IoTrashOutline } from "react-icons/io5";
 
-const sampleCart = [
-  { grn: "101", title: "Virat Kohli Shirt", price: 499, qty: 2 },
-  { grn: "205", title: "Gaming Laptop", price: 45000, qty: 1 },
-  { grn: "334", title: "Running Shoes", price: 2499, qty: 1 },
-];
-
 export default function Cart() {
-  const [rows, setRows] = useState(sampleCart);
+  const dispatch = useDispatch();
 
+  // 🔥 get items from redux instead of local state
+  const rows = useSelector((state) => state.cart.items);
+
+  // 🔥 calculate total
   const grandTotal = useMemo(
     () => rows.reduce((sum, r) => sum + r.price * r.qty, 0),
     [rows]
   );
 
-  function updateQty(index, value) {
-    const updated = [...rows];
-    updated[index].qty = Math.max(1, Number(value || 1));
-    setRows(updated);
+  function handleQtyChange(sku, value) {
+    dispatch(cartActions.updateQty({ sku, qty: Number(value) }));
   }
 
-  function removeRow(index) {
-    setRows(rows.filter((_, i) => i !== index));
+  function handleDelete(sku) {
+    dispatch(cartActions.removeItem(sku));
+  }
+
+  function handleCheckout() {
+    // later → call backend purchase API
+    console.log("Checkout:", rows);
+
+    dispatch(cartActions.clearCart());
   }
 
   return (
+    <>
+    <PaymentOverlay />
     <div className={css.wrapper}>
       <div className={css.panel}>
         <h2 className={css.title}>Your Cart</h2>
 
         <div className={css.tableHeader}>
-          <span>GRN</span>
+          <span>SKU</span>
           <span>Item</span>
           <span>Price</span>
           <span>Qty</span>
@@ -40,9 +52,9 @@ export default function Cart() {
           <span>Action</span>
         </div>
 
-        {rows.map((row, i) => (
-          <div key={i} className={css.tableRow}>
-            <input className={css.input} value={row.grn} disabled />
+        {rows.map((row) => (
+          <div key={row.sku} className={css.tableRow}>
+            <input className={css.input} value={row.sku} disabled />
             <input className={css.input} value={row.title} disabled />
             <input className={css.input} value={`₹${row.price}`} disabled />
 
@@ -51,7 +63,9 @@ export default function Cart() {
               type="number"
               min="1"
               value={row.qty}
-              onChange={(e) => updateQty(i, e.target.value)}
+              onChange={(e) =>
+                handleQtyChange(row.sku, e.target.value)
+              }
             />
 
             <input
@@ -61,9 +75,8 @@ export default function Cart() {
             />
 
             <button
-              type="button"
               className={css.deleteBtn}
-              onClick={() => removeRow(i)}
+              onClick={() => handleDelete(row.sku)}
             >
               <IoTrashOutline size={22} />
             </button>
@@ -72,11 +85,19 @@ export default function Cart() {
 
         <div className={css.footer}>
           <span className={css.totalLabel}>Grand Total</span>
-          <span className={css.totalAmount}>₹{grandTotal.toLocaleString()}</span>
+          <span className={css.totalAmount}>
+            ₹{grandTotal.toLocaleString()}
+          </span>
         </div>
 
-        <button className={css.checkoutBtn}>Proceed to Checkout</button>
+        <button
+          className={css.checkoutBtn}
+          onClick={handleCheckout}
+        >
+          Proceed to Checkout
+        </button>
       </div>
     </div>
+    </>
   );
 }

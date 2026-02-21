@@ -1,0 +1,15 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  gap: 16px;
+  padding: 16px;
+  grid-column: span 2;
+}
+
+.layout > *:first-child {
+  flex: 1;   /* scanner smaller */
+}
+
+.layout > *:last-child {
+  flex: 2;   /* cart bigger */
+}

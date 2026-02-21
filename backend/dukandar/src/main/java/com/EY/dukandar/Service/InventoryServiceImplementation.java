@@ -132,6 +132,7 @@ public class InventoryServiceImplementation implements InventoryService {
     public List<Map<String, Object>> findNearbyStoresForProduct(
             Long productId,
             String city,
+            String size,
             double maxDistanceKm
     ) {
 
@@ -144,7 +145,7 @@ public class InventoryServiceImplementation implements InventoryService {
         double userLon = userCoords[1];
 
         List<Inventory> inventoryList =
-                inventoryRepository.findByProductId(productId);
+                inventoryRepository.findByProductIdAndSize(productId, size);
 
         List<Map<String, Object>> result = new ArrayList<>();
 

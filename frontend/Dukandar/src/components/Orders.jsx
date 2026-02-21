@@ -1,5 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import css from "../styles/Orders.module.css";
+import axios from "axios"
+import {useSelector} from "react-redux"
+import { BASE_BACKEND_URL } from "../store/store";
 
 /*
   Frontend-only order history component.
@@ -156,11 +159,30 @@ function formatDate(iso) {
 }
 
 export default function Orders() {
-  const [orders] = useState(sampleOrders);
+
+  const [orders, setOrders] = useState(sampleOrders);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState({ key: "placedAt", dir: "desc" });
   const [page, setPage] = useState(1);
   const rowsPerPage = 8;
+
+  const user = useSelector(store => store.user)
+
+  useEffect(() => {
+  if (user.id === -1) return;
+
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get(`${BASE_BACKEND_URL}/order/user/${user.id}`);
+      setOrders(res.data);
+      console.log("Orders From Backend:", res.data);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+    }
+  };
+
+  fetchOrders();
+}, [user.id]);
 
   const [viewOrder, setViewOrder] = useState(null); // order object
   const [trackOrder, setTrackOrder] = useState(null); // order object

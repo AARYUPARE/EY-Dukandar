@@ -15,6 +15,21 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+    @PostMapping("/init")
+    public void initPayment(
+            @RequestParam String amount
+    )
+    {
+        paymentService.sendPaymentEvent(amount);
+    }
+
+    @PostMapping("/dummy")
+    public Payment dummyPayment(@RequestParam String userId,
+                                @RequestParam String upiId) {
+
+        return paymentService.dummyPayment(userId, upiId);
+    }
+
     @PostMapping("/create/{orderId}")
     public Payment createPayment(@PathVariable Long orderId, @RequestParam String method) {
         return paymentService.createPayment(orderId, method);

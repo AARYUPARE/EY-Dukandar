@@ -2,6 +2,7 @@ package com.EY.dukandar.Controller;
 
 import com.EY.dukandar.Model.Inventory;
 import com.EY.dukandar.Model.Product;
+import com.EY.dukandar.Repository.InventoryRepository;
 import com.EY.dukandar.Service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -75,15 +76,17 @@ public class InventoryController {
         return "Inventory deleted.";
     }
 
-    @GetMapping("/product/{productId}/nearby")
+    @GetMapping("/product/nearby")
     public List<Map<String, Object>> getNearbyStoresForProduct(
-            @PathVariable Long productId,
+            @RequestParam  Long productId,
             @RequestParam String city,
-            @RequestParam(defaultValue = "15") double maxDistanceKm
+            @RequestParam String size,
+            @RequestParam(defaultValue = "5000") double maxDistanceKm
     ) {
         return inventoryService.findNearbyStoresForProduct(
                 productId,
                 city,
+                size,
                 maxDistanceKm
         );
     }

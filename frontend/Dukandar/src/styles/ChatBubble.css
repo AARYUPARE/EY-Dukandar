@@ -1,8 +1,8 @@
 :root {
     --bg-user: #ccff01;
-    --bg-ai: #000000;
+    --bg-ai: #ffffff;
     --text-user: #000000;
-    --text-ai: #ffffff;
+    --text-ai: #000000;
 }
 
 /* MESSAGE WRAPPER */

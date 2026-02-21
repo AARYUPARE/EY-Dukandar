@@ -15,7 +15,8 @@ class InventoryAgent:
                       ) -> Dict:
         payload = {
             "productId": product_id,
-            "city": user_location
+            "city": user_location,
+            "size": "M"
         }
 
         print(f"payload: {payload}")

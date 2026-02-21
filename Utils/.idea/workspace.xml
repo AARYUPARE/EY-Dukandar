@@ -5,18 +5,96 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="af12c041-1e17-4a53-b737-d2471d1e5f5a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../ai/.env" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/agents/fulfillment_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/fulfillment_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/adapters/pos_adapter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/adapters/web_adapter.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/fulfillment_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/inventory_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/loyalty_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/payment_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/support_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/db/mysql_connection.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/db/product_queries.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/19_1_M_1_20260212203210.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209145521.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209150225.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209151133.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209151942.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209153158.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209153445.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209154500.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209155508.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209160034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209165553.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209184830.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209221110.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209222922.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209223138.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209224103.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260209224942.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260210135347.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260210135846.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260210225951.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260211220212.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/1_1_M_1_20260211220651.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209213756.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209213841.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209213924.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214012.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214109.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214201.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214219.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214437.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209214536.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209215407.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209215458.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260209215618.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260210224049.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/generated_qr/P102_S3_L_U77_20260210224340.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/orchestrator/sales_agent.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../ai/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/utils/translator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/utils/translator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/session/session_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/test_qr.png" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/test_qr.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/generate_qr.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/test_qr.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/text_cleaner.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/utils/translator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/vectorstore/build_index.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/vectorstore/embedder.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/vectorstore/pinecone_client.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/dukandar/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/InventoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/InventoryController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/OrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/PaymentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/PaymentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/DukandarApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/DukandarApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/LangChain/LangChainClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/LangChain/LangChainClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/ChatResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/ChatResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/InventoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/InventoryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/ReservationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/ReservationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/StoreRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/StoreRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/WishlistRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Repository/WishlistRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Security/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ChatServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ChatServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/InventoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/InventoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/InventoryServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/InventoryServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/OrderServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/OrderServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/PaymentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/PaymentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/PaymentServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/PaymentServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ReservationServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/ReservationServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/WishlistServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/WishlistServiceImplementation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/resources/application.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/App.jsx" afterDir="false" />
@@ -24,15 +102,19 @@
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatBubble.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatBubble.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatContainer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatContainer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatInterface.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ChatInterface.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/CreateAccount.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/CreateAccount.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/OfferContainer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/OfferContainer.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Orders.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Orders.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Profile.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Sales.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Sales.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/VoiceBubble.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/VoiceBubble.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/AnimatedBackground.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/AnimatedBackground.module.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Cart.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Cart.module.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/ChatBubble.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/ChatBubble.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/KioskInterface.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/KioskInterface.module.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/OfferContainer.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/OfferContainer.module.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Sales.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/styles/Sales.module.css" afterDir="false" />

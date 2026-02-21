@@ -12,8 +12,11 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
     "@reduxjs/toolkit": "^2.11.0",
+    "@stomp/stompjs": "^7.3.0",
+    "@zxing/browser": "^0.1.5",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
+    "lottie-react": "^2.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icon": "^1.0.0",

@@ -38,7 +38,10 @@ public class Product {
     @JsonProperty("image_url")
     private String imageUrl;           // For UI display
     @JsonProperty("model_url")
-    private String modelUrl;           // Optional 3D model
+    private String modelUrl;          // Optional 3D model
+
+    @Column(nullable = true)
+    private String productLink;
 
     // Default constructor
     public Product() {}
@@ -46,7 +49,7 @@ public class Product {
     // All-args constructor
     public Product(Long id, String name, String sku, double price,
                     String brand, String category, String description,
-                   String imageUrl, String modelUrl) {
+                   String imageUrl, String modelUrl, String productLink) {
 
         this.id = id;
         this.name = name;
@@ -57,6 +60,7 @@ public class Product {
         this.description = description;
         this.imageUrl = imageUrl;
         this.modelUrl = modelUrl;
+        this.productLink = productLink;
     }
 
     // Getters & setters
@@ -87,10 +91,20 @@ public class Product {
     public String getModelUrl() { return modelUrl; }
     public void setModelUrl(String modelUrl) { this.modelUrl = modelUrl; }
 
-    public List<String> getSubCategory() {
+    public List<String> getSubCategory()
+    {
         return subCategory;
     }
-    public void setSubCategory(List<String> subCategory) {
+    public void setSubCategory(List<String> subCategory)
+    {
         this.subCategory = subCategory;
+    }
+
+    public String getOriginalProductLink() {
+        return productLink;
+    }
+
+    public void setOriginalProductLink(String originalProductLink) {
+        this.productLink = originalProductLink;
     }
 }

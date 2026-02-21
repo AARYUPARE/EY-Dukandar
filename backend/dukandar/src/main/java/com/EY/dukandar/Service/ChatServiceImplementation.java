@@ -53,23 +53,23 @@ public class ChatServiceImplementation implements ChatService {
 
         String context = buildContext(history);
 
-        // 2️⃣ Load session
-        ChatSession session =
-                getOrCreateChatSession(request.getUserId(), request.getSessionId());
+//        // 2️⃣ Load session
+//        ChatSession session =
+//                getOrCreateChatSession(request.getUserId(), request.getSessionId());
 
         // 3️⃣ Load last products from snapshot (AS Product)
         List<Product> lastProducts = Collections.emptyList();
 
-        if (session.getLastProductSnapshot() != null) {
-            try {
-                lastProducts = objectMapper.readValue(
-                        session.getLastProductSnapshot(),
-                        new TypeReference<List<Product>>() {}
-                );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//        if (session.getLastProductSnapshot() != null) {
+//            try {
+//                lastProducts = objectMapper.readValue(
+//                        session.getLastProductSnapshot(),
+//                        new TypeReference<List<Product>>() {}
+//                );
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         // 🔥 4️⃣ CONVERT Products → Map before sending to AI
         List<Map<String, Object>> lastProductMaps = Collections.emptyList();
@@ -86,15 +86,18 @@ public class ChatServiceImplementation implements ChatService {
         // 5️⃣ Call Python Agent
         Map<String, Object> agentResult =
                 langChainClient.sendToAgent(
-                        context,
+                        request.getSessionId(),
                         request.getMessage(),
-                        lastProductMaps,
                         getUser(request.getUserId())  // 🔥 PASS FULL USER
                 );
 
         // 6️⃣ Extract reply
         String reply = (String) agentResult.getOrDefault(
                 "reply", "Sorry, I couldn't understand that."
+        );
+
+        String user_lang = (String) agentResult.getOrDefault(
+                "user_lang", "Unable to user language"
         );
 
         // 🔥 7️⃣ Convert AI products → Product entity
@@ -131,18 +134,18 @@ public class ChatServiceImplementation implements ChatService {
         chatHistoryRepository.save(entry);
 
         // 9️⃣ Update session
-        session.setLastActiveAt(LocalDateTime.now());
+//        session.setLastActiveAt(LocalDateTime.now());
+//
+//        if (products != null && !products.isEmpty()) {
+//            try {
+//                String snapshot = objectMapper.writeValueAsString(products);
+//                session.setLastProductSnapshot(snapshot);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
-        if (products != null && !products.isEmpty()) {
-            try {
-                String snapshot = objectMapper.writeValueAsString(products);
-                session.setLastProductSnapshot(snapshot);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        chatSessionRepository.save(session);
+//        chatSessionRepository.save(session);
 
         // 🔟 Response
         ChatResponse response = new ChatResponse();
@@ -156,6 +159,7 @@ public class ChatServiceImplementation implements ChatService {
             response.setProducts(lastProducts);
         }
         response.setStores(stores);
+        response.setUser_lang(user_lang);
 
         return response;
     }

@@ -5,10 +5,12 @@ import StoreCardContainer from "./StoreCardContainer"
 import ComponentToggler from "./ComponentToggler"
 import { Outlet } from "react-router-dom"
 import "../styles/ChatInterface.css"
+import PaymentOverlay from "./PaymentOverlay.jsx"
 
 const ChatInterface = () => {
   return <div className="container">
     <SidebarContianer />
+    <PaymentOverlay />
 
     {/* other fixed UI you want to keep (top bar / right panel etc.) */}
     {/* Place the routed content here: */}

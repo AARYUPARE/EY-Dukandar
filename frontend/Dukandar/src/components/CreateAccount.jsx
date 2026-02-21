@@ -1,6 +1,8 @@
 import { useState } from "react";
 import css from "../styles/CreateAccount.module.css";
 import { CgCalendarDates } from "react-icons/cg";
+import axios from "axios";
+import { BASE_BACKEND_URL } from "../store/store";
 
 const CreateAccount = ({ onCreate }) => {
     const [open, setOpen] = useState(false);
@@ -12,7 +14,8 @@ const CreateAccount = ({ onCreate }) => {
         email: "",
         phone: "",
         password: "",
-        image: null
+        image: "",
+        location: ""
     });
 
     const [preview, setPreview] = useState(null);
@@ -28,12 +31,40 @@ const CreateAccount = ({ onCreate }) => {
         }
     };
 
+    async function createUser(user) {
+        try {
+            const res = await axios.post(BASE_BACKEND_URL + "/users", user)
+
+            if(res)
+            {
+                console.log("User created Successfully: " + res.data);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         // SEND form as FormData later
+
+        console.log(form);
+
+        const user = {
+            name: form.name,
+            location: form.location,
+            gender: form.gender,
+            dob: form.dob,
+            email: form.email,
+            phone: form.phone,
+            loyaltyPoints: 0,
+            imageUrl: form.image,
+            password: form.password
+        }
+
         // name, gender, dob, email, phone, password, image(file)
-        onCreate?.(form);
+        createUser(user);
     };
 
     return (
@@ -113,6 +144,14 @@ const CreateAccount = ({ onCreate }) => {
                         placeholder="Phone"
                         value={form.phone}
                         onChange={(e) => update("phone", e.target.value)}
+                        required
+                    />
+                    
+                    <input
+                        type="text"
+                        placeholder="Location"
+                        value={form.location}
+                        onChange={(e) => update("location", e.target.value)}
                         required
                     />
 

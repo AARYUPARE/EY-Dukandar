@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from main import sales_agent, llm, inventory_agent, session_manager   # 🔥 import llm also
+
+from main import sales_agent, llm, inventory_agent, payment_agent, session_manager   # 🔥 import llm also
 from utils.translator import LLMTranslator   # 🔥 new
 from adapters.pos_adapter import POSAdapter
 from adapters.web_adapter import WebAdapter
@@ -10,7 +11,7 @@ from adapters.web_adapter import WebAdapter
 app = FastAPI()
 
 translator = LLMTranslator(llm)
-pos_adapter = POSAdapter(session_manager, inventory_agent, llm)
+pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm)
 web_adapter = WebAdapter(session_manager, llm)
 
 class Query(BaseModel):
@@ -20,9 +21,28 @@ class Query(BaseModel):
 
 @app.post("/query")
 def query(data: Query):
-    # print("📨 Incoming request:", data)
 
     print("From frontend: " + data.message)
+
+    # 🔥 Get session first
+    session = session_manager.get(data.sessionId) or {}
+
+    # =====================================================
+    # 🔥 1️⃣ POS PAYMENT ROUTING (BEFORE AGENT CALL)
+    # =====================================================
+    if session.get("payment_pending"):
+        print("💳 Routing to POS payment handler")
+
+        reply = pos_adapter.handle_payment(
+            session_id=data.sessionId,
+            payment_method=data.message
+        )
+
+        return {"reply": reply}
+
+    # =====================================================
+    # 2️⃣ NORMAL AI FLOW
+    # =====================================================
 
     lang, english_message = translator.to_english(data.message)
 
@@ -31,9 +51,8 @@ def query(data: Query):
         session_id=data.sessionId,
         user_message=english_message
     )
-    print("After: Conversion: " + english_message)
 
-    # print("🤖 Agent response (raw):", response)
+    print("After: Conversion: " + english_message)
 
     def safe_convert(obj):
         if isinstance(obj, bytes):
@@ -47,7 +66,6 @@ def query(data: Query):
     response = safe_convert(response)
 
     reply = response.get("reply")
-
     reply = translator.from_english(reply, lang)
 
     return {
@@ -86,7 +104,7 @@ def login_event(data: LoginEvent):
                 user=data.user
             )
 
-        print("Login event reply:", reply)
+        #print("Login event reply:", reply)
 
         return {"reply": reply}
 
@@ -95,4 +113,21 @@ def login_event(data: LoginEvent):
         return {
             "reply": "Welcome back! How can I help you today? 😊"
         }
+
+class QRScanEvent(BaseModel):
+    sessionId: str
+    product: Dict[str, Any]
+
+
+@app.post("/qr-scan")
+def qr_scan(data: QRScanEvent):
+
+    print("📱 QR Scan received")
+
+    reply = pos_adapter.handle_qr_scan(
+        session_id=data.sessionId,
+        product=data.product
+    )
+
+    return {"reply": reply}
 

@@ -1,16 +1,16 @@
 package com.EY.dukandar.Controller;
 
-import com.EY.dukandar.Model.LoginRequest;
-import com.EY.dukandar.Model.LoginResponse;
-import com.EY.dukandar.Model.User;
-import com.EY.dukandar.Model.Wishlist;
+import com.EY.dukandar.Model.*;
+import com.EY.dukandar.Repository.StoreRepository;
 import com.EY.dukandar.Repository.UserRepository;
 import com.EY.dukandar.Service.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.EY.dukandar.LangChain.LangChainClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/login")
@@ -21,6 +21,11 @@ public class LoginController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
+
+    @Autowired LangChainClient langChainClient;
 
     @PostMapping
     public LoginResponse login(@RequestBody LoginRequest request) {
@@ -33,8 +38,9 @@ public class LoginController {
                     "login failed",
                     null,
                     "",
-                    request.getStoreId(),
-                    null
+                    null,
+                    null,
+                    ""
             );
         }
 
@@ -42,12 +48,22 @@ public class LoginController {
 
         // WEB LOGIN
         if ("web".equalsIgnoreCase(request.getStoreType())) {
+
+            Map<String, Object> agentResponse =
+                    langChainClient.sendLoginEvent(
+                            user.getId().toString(),
+                            "web",
+                            user,
+                            null
+                    );
+
             return new LoginResponse(
                     "login successful",
                     user,
                     "web",
                     null,
-                    null
+                    null,
+                    agentResponse.get("reply").toString()
             );
         }
 
@@ -61,12 +77,23 @@ public class LoginController {
             List<Wishlist> availableWishlist =
                     wishlistService.getAvailableWishlistInStore(user.getId(), request.getStoreId());
 
+            Store store = storeRepository.findByStoreId(request.getStoreId());
+
+            Map<String, Object> agentResponse =
+                    langChainClient.sendLoginEvent(
+                            user.getId().toString(),
+                            "kiosk",
+                            user,
+                            store
+                    );
+
             return new LoginResponse(
                     "login successful",
                     user,
                     "kiosk",
-                    request.getStoreId(),
-                    availableWishlist
+                    store,
+                    availableWishlist,
+                    agentResponse.get("reply").toString()
             );
         }
 
@@ -75,8 +102,9 @@ public class LoginController {
                     "login failed",
                     null,
                     "",
-                    request.getStoreId(),
-                    null
+                    null,
+                    null,
+                    ""
             );
         }
     }

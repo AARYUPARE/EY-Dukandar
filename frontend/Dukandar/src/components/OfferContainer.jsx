@@ -7,15 +7,20 @@ import OverlayText from "./OverlayText";
 
 import css from "../styles/OfferContainer.module.css";
 import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const OffersContainer = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const location = useLocation();
 
     // Use OFFERS instead of PRODUCTS
     const offers = useSelector((store) => store.offers.list);
     const kioskStore = useSelector(store => store.kioskStore);
 
     const [search, setSearch] = useState("");
+    let isKiosk = location.pathname.includes("/kiosk-interface")
+    console.log("Is Kiosk:" + isKiosk)
 
     useEffect(() => {
 
@@ -60,6 +65,28 @@ const OffersContainer = () => {
     return (<>
         <OverlayText />
 
+        {isKiosk ? 
+            <button
+                onClick={() => navigate("scanning-pos")}
+                className={css.scanBtn}
+            >
+                Start POS Scanning
+            </button>
+            :
+            <></>
+        }
+        
+        {isKiosk ? 
+            <button
+                onClick={() => navigate("reserve-auth")}
+                className={css.scanBtn}
+            >
+                Get Reserved
+            </button>
+            :
+            <></>
+        }
+
         <div className={`container-fluid m-0 ${css["main-container"]}`}>
             <input
                 className="form-control mb-4"
@@ -83,7 +110,7 @@ const OffersContainer = () => {
                 ))}
             </div>
         </div>
-        </>
+    </>
     );
 };
 

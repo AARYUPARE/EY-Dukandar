@@ -16,6 +16,7 @@ const InputBar = ({ sendPromt }) => {
 
     if (recognition) {
         recognition.continuous = false; // auto stop
+        recognition.lang = "mr-IN"
         recognition.interimResults = false;
     }
 
@@ -35,8 +36,7 @@ const InputBar = ({ sendPromt }) => {
             const text = event.results[0][0].transcript;
 
             console.log("🗣️ Converted:", text);
-
-            prompt.current.value = text;
+            handleSend(text, "Voice");
         };
 
         recognition.onend = () => {
@@ -50,9 +50,10 @@ const InputBar = ({ sendPromt }) => {
         };
     };
 
-    const handleOnClick = () => {
-        if (!prompt.current.value) return;
-        sendPromt(prompt.current.value);
+    const handleSend = (message, inputState) => {
+        if (!message) return;
+        console.log("handle Method: " + inputState);
+        sendPromt(message, inputState);
         prompt.current.value = "";
     };
 
@@ -71,14 +72,14 @@ const InputBar = ({ sendPromt }) => {
                     type="text"
                     className="input-field"
                     placeholder="Ask anything…"
-                    onKeyDown={(e) => e.key === "Enter" && handleOnClick()}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend(prompt.current.value, "Text")}
                 />
 
                 <button className="mic-btn" onClick={startListening}>
                     <FaMicrophone />
                 </button>
 
-                <button className="send-btn" onClick={handleOnClick}>
+                <button className="send-btn" onClick={() => handleSend(prompt.current.value, "Text")}>
                     <IoMdSend />
                 </button>
             </div>

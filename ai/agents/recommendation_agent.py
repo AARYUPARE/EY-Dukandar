@@ -109,8 +109,7 @@ class RecommendationAgent:
             self,
             product_type=None,
             occasion=None,
-            budget=None,
-            size=None
+            budget=None
     ):
         query_parts = []
 
@@ -118,8 +117,6 @@ class RecommendationAgent:
             query_parts.append(product_type)
         if occasion:
             query_parts.append(occasion)
-        if size:
-            query_parts.append(f"size {size}")
 
         query = " ".join(query_parts)
 
@@ -136,8 +133,7 @@ class RecommendationAgent:
     # =====================================================
     # 2️⃣ QUALITY UPGRADE (SalesAgent → after product select)
     # =====================================================
-    def get_quality_upgrade(self, selected_product: dict,
-                            budget=None, occasion=None):
+    def get_quality_upgrade(self, selected_product: dict, occasion=None):
         category = selected_product.get("category")
         price = selected_product.get("price")
 
@@ -147,11 +143,9 @@ class RecommendationAgent:
             return None
 
         max_price = price + 500
-        if budget:
-            max_price = min(max_price, budget)
 
         # 🎯 Occasion-aware query
-        query_parts = ["premium", category]
+        query_parts = [category]
         if occasion:
             query_parts.append(occasion)
 
@@ -159,7 +153,6 @@ class RecommendationAgent:
             query=" ".join(query_parts),
             k=6,
             filters={
-                "category": category,
                 "price": {"$gt": price, "$lte": max_price}
             }
         )
@@ -177,6 +170,9 @@ class RecommendationAgent:
         upgrades.sort(key=lambda x: x["price"])
 
         upgrade = upgrades[0]
+
+        print(upgrade)
+
         price_diff = upgrade["price"] - price
 
         return upgrade, price_diff

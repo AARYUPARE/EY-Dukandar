@@ -28,101 +28,126 @@ public class OrderServiceImplementation implements OrderService {
     // ✅ PLACE ORDER (Split cart by store → stock check → reduce stock → create orders)
     // =====================================================================
     @Override
-    public List<Order> placeOrder(Long userId, String deliveryType) {
+    public List<Order> placeOrder(OrderRequest request) {
 
-        Cart cart = cartRepository.findByUserId(userId);
-        if (cart == null || cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
-        }
-
-        // Group items by store
-        Map<Long, List<CartItem>> storeWiseItems = new HashMap<>();
-
-        for (CartItem item : cart.getItems()) {
-            Inventory inv = inventoryRepository
-                    .findByProductIdAndSizeAndStoreId(
-                            item.getProduct().getId(),
-                            item.getSize(),
-                            item.getStoreId()
-                    );
-
-            if (inv == null) {
-                throw new RuntimeException("Inventory not found for cart item.");
-            }
-
-            storeWiseItems.computeIfAbsent(inv.getStoreId(), k -> new ArrayList<>()).add(item);
+        if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+            throw new RuntimeException("No items provided for order");
         }
 
         List<Order> createdOrders = new ArrayList<>();
 
-        //  Process per-store orders
-        for (Map.Entry<Long, List<CartItem>> entry : storeWiseItems.entrySet()) {
+        // Since agent does not send storeId, we group dynamically
+        Map<Long, List<OrderItemAgentRequest>> storeWiseItems = new HashMap<>();
 
-            Long storeId = entry.getKey();
-            List<CartItem> items = entry.getValue();
+        // STEP 1️⃣ — Find inventory + group by store
+        for (OrderItemAgentRequest item : request.getItems()) {
 
-            // 1️⃣ Check stock availability
-            for (CartItem ci : items) {
-                Inventory inv = inventoryRepository.findByProductIdAndSizeAndStoreId(
-                        ci.getProduct().getId(), ci.getSize(), storeId
+            List<Inventory> inventories =
+                    inventoryRepository.findByProductId(item.getProduct_id());
+
+            if (inventories == null || inventories.isEmpty()) {
+                throw new RuntimeException(
+                        "Product not available in inventory: " + item.getProduct_id()
                 );
+            }
 
-                if (inv == null || inv.getStockQuantity() < ci.getQuantity()) {
-                    throw new RuntimeException("Insufficient stock for productId " +
-                            ci.getProduct().getId() +
-                            " from store " + storeId + ", size " + ci.getSize());
+            // Pick first store having stock
+            Inventory selectedInventory = null;
+
+            for (Inventory inv : inventories) {
+                if (inv.getStockQuantity() >= item.getQuantity()) {
+                    selectedInventory = inv;
+                    break;
                 }
             }
 
-            // 2️⃣ Create order & reduce stock
+            if (selectedInventory == null) {
+                throw new RuntimeException(
+                        "Insufficient stock for product: " + item.getProduct_id()
+                );
+            }
+
+            storeWiseItems
+                    .computeIfAbsent(selectedInventory.getStoreId(), k -> new ArrayList<>())
+                    .add(item);
+        }
+
+        // STEP 2️⃣ — Create separate order per store
+        for (Map.Entry<Long, List<OrderItemAgentRequest>> entry : storeWiseItems.entrySet()) {
+
+            Long storeId = entry.getKey();
+            List<OrderItemAgentRequest> items = entry.getValue();
+
             Order order = new Order();
-            order.setUserId(userId);
+            order.setUserId(request.getUserId());
+            order.setDeliveryType(request.getDeliveryType());
             order.setPickupStoreId(storeId);
-            order.setDeliveryType(deliveryType);
             order.setOrderStatus("PLACED");
             order.setOrderDate(LocalDateTime.now());
 
             List<OrderItem> orderItems = new ArrayList<>();
             double totalAmount = 0.0;
 
-            for (CartItem ci : items) {
+            for (OrderItemAgentRequest reqItem : items) {
 
-                Inventory inv = inventoryRepository
-                        .findByProductIdAndSizeAndStoreId(ci.getProduct().getId(), ci.getSize(), storeId);
+                // Fetch inventory again for safe stock reduction
+                List<Inventory> inventories =
+                        inventoryRepository.findByProductId(reqItem.getProduct_id());
 
-                // Reduce stock
-                inventoryService.reduceStock(storeId, inv.getProductId(), inv.getSize(), ci.getQuantity());
+                Inventory inv = inventories.stream()
+                        .filter(i -> i.getStoreId().equals(storeId))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException(
+                                "Inventory not found during order processing"
+                        ));
 
-                Product product = ci.getProduct();
+                if (inv.getStockQuantity() < reqItem.getQuantity()) {
+                    throw new RuntimeException(
+                            "Stock changed. Insufficient stock for product "
+                                    + reqItem.getProduct_id()
+                    );
+                }
 
-                OrderItem oi = new OrderItem();
-                oi.setOrder(order);
-                oi.setProductId(product.getId());
-                oi.setQuantity(ci.getQuantity());
-                oi.setSize(inv.getSize());
-                oi.setPricePerUnit(product.getPrice());
-                oi.setTotalPrice(product.getPrice() * ci.getQuantity());
+                // 🔻 Reduce stock
+                inventoryService.reduceStock(
+                        inv.getStoreId(),
+                        inv.getProductId(),
+                        inv.getSize(),
+                        reqItem.getQuantity()
+                );
 
-                orderItems.add(oi);
-                totalAmount += oi.getTotalPrice();
+                // Fetch actual product (never trust frontend price)
+                Product product = productRepository
+                        .findById(reqItem.getProduct_id())
+                        .orElseThrow(() -> new RuntimeException("Product not found"));
+
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(order);
+                orderItem.setProductId(product.getId());
+                orderItem.setStoreId(inv.getStoreId());
+                orderItem.setSize(inv.getSize());
+                orderItem.setQuantity(reqItem.getQuantity());
+                orderItem.setPricePerUnit(product.getPrice());
+                orderItem.setTotalPrice(product.getPrice() * reqItem.getQuantity());
+
+                orderItems.add(orderItem);
+                totalAmount += orderItem.getTotalPrice();
             }
 
             order.setItems(orderItems);
             order.setTotalAmount(totalAmount);
 
-            // ⭐ Save order
+            // 💾 Save order
             Order savedOrder = orderRepository.save(order);
             createdOrders.add(savedOrder);
 
-            // ⭐⭐⭐ CREATE SHIPPING TRACKING FOR THIS ORDER ⭐⭐⭐
+            // 🚚 Create shipping tracking
             shippingTrackingService.createTracking(savedOrder.getId());
         }
 
-        // 3️⃣ Clear cart after successful orders
-        cartItemRepository.deleteAll(cart.getItems());
-
         return createdOrders;
     }
+
 
 
     // =====================================================================

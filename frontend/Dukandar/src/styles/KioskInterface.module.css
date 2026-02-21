@@ -32,8 +32,12 @@
 }
 
 /* Add smooth scroll inside both panels */
-.left, 
-.right {
+.left {
     overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.right{
+    overflow: hidden;
     scroll-behavior: smooth;
 }

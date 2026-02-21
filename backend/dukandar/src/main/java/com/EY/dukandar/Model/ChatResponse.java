@@ -9,14 +9,16 @@ public class ChatResponse {
     private String reply;         // agent textual message
     private List<Product> products;  // recommended products (optional)
     private List<Store> stores;  // recommended products (optional)
+    private String user_lang;
 
     public ChatResponse() {}
 
-    public ChatResponse(String sessionId, String reply, List<Product> products, List<Store> stores) {
+    public ChatResponse(String sessionId, String reply, List<Product> products, List<Store> stores, String user_lang) {
         this.sessionId = sessionId;
         this.reply = reply;
         this.products = products;
         this.stores = stores;
+        this.user_lang = user_lang;
     }
 
     // Getters & Setters
@@ -45,5 +47,10 @@ public class ChatResponse {
     }
     public void setStores(List<Store> stores) {
         this.stores = stores;
+    }
+
+    public String getUser_lang() {return user_lang;}
+    public void setUser_lang(String user_lang){
+        this.user_lang = user_lang;
     }
 }

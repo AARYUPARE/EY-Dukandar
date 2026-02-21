@@ -25,6 +25,7 @@ export default function Card({ title, image_url, description, onClick, brand, si
 		<div className="bottom">
 			<h4>{title}</h4>
 			<p className="description">{description}</p>
+      {(size != null && size != "") ? <p>Size: {size}</p> : <></>}
 		</div>
 	</div>
 </div>
