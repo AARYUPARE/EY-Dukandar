@@ -131,3 +131,28 @@ def qr_scan(data: QRScanEvent):
 
     return {"reply": reply}
 
+class SuccessEvent(BaseModel):
+    sessionId: str
+
+@app.post("/show_success")
+def show_success(data: SuccessEvent):
+    
+    session = session_manager.get(data.sessionId) or {}
+    
+    if session.get("payment_pending"):
+        
+        reply = pos_adapter.payment_success(
+            session_id=data.sessionId
+        )
+
+        return {"reply": reply}
+    
+    else:
+        reply = payment_agent.payment_success(
+            session_id=data.sessionId
+        )
+
+        return {"reply": reply} 
+        
+    
+

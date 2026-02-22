@@ -42,23 +42,17 @@ class RedisSessionManager:
                 "store_id": None,
                 "product_ids":[]
             },
-
-            "last_system_action": {
-                "type": None,
-                "payload": None
-            },
-
-            "inventory": {
-                "last_checked_product": None,
-                "last_result": None
-            },
-
+            
+            "upsell_product": None,
+            "cross-sell_products":[],
+            
             "checkout": {
                 "started": False,
                 "payment_method": None,
                 "order_confirmed": False,
                 "channel": None,                 # 🔑 important
                 "store_id": None,
+                "amount": None,
                 "items": []
             },
 
@@ -101,11 +95,6 @@ class RedisSessionManager:
                 "bundle_applied": False
             },
 
-            # 🧠 USER SIGNALS
-            "user_signals": {
-                "price_sensitive": None,
-                "declined_upsell_count": 0
-            },
 
             # 🌐 META (OMNICHANNEL)
             "meta": {
@@ -185,52 +174,29 @@ class RedisSessionManager:
         self._save(session_id, session)
 
     # ---------------------------
-    # POST-ADD UPSELL
-    # ---------------------------
-    def set_post_add_upsell(self, session_id, product, cross_sell, bundle):
-        session = self.get(session_id)
-
-        if not cross_sell:
-            session["pending_action"] = "BUNDLE"
-
-        if not bundle:
-            session["pending_action"] = "CROSS_SELL"
-
-        session["last_system_action"] = {
-            "type": "POST_ADD_UPSELL",
-            "payload": {
-                "base_product": product,
-                "cross_sell_products": cross_sell,
-                "bundle_products": bundle
-            }
-        }
-
-        self._save(session_id, session)
-
-    # ---------------------------
-    def clear_post_add_action(self, session_id):
-        session = self.get(session_id)
-
-        session["pending_action"] = None
-        session["last_system_action"] = {
-            "type": None,
-            "payload": None
-        }
-
-        self._save(session_id, session)
-
-    # ---------------------------
     # PENDING ACTION CONTROL
     # ---------------------------
-    def set_pending(self, session_id, action):
+    def clear_cart(self, session_id):
         session = self.get(session_id)
-        session["pending_action"] = action
-        self._save(session_id, session)
 
-    def clear_pending(self, session_id):
-        session = self.get(session_id)
+        session["cart"] = {
+            "items": [],
+            "locked": False,
+            "offer": None
+        }
+
+        session["discovery"] = {
+                "product_type": None,
+                "occasion": None,
+                "budget": None,
+                "size": None,
+                "occasion_applicable": True,
+                "asked_once": False
+            }
+        
         session["pending_action"] = None
-        self._save(session_id, session)
+
+        self.save(session_id, session)
 
     # ---------------------------
     # UTIL

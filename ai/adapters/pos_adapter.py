@@ -219,6 +219,7 @@ class POSAdapter:
         # -------------------------------------------------
         return f"Hi {user['name']}! welcome to {store['name']} How can I assist you with your shopping today? You can ask me to show products, check availability, or help with your cart. Just let me know what you need! 😊"
 
+
     def handle_payment(self, session_id, payment_method):
 
         session = self.session.get(session_id)
@@ -230,31 +231,16 @@ class POSAdapter:
         product = reservation.get("product")
 
         if not product:
+            session["payment_pending"] = False
             return "No reserved product found."
-
-        # 🔥 Simulate successful payment
-        order = {
-            "items": [product],
-            "total": product["price"],
-            "payment_method": payment_method,
-            "status": "PAID"
-        }
-
-        # Clear reservation & payment state
-        session["reservation"] = {}
-        session["payment_pending"] = False
-
-        self.session._save(session_id, session)
 
         payment_result = self.payment_agent.pay(
             amount=product["price"]
         )
 
-        return (
-            f"✅ Payment successful via {payment_method}!\n"
-            "🎉 Your reservation has been confirmed.\n"
-            f"💰 Total: ₹{product["price"]}"
-        )
+        return{
+            
+        }
 
     def handle_qr_scan(self, session_id, product):
 
@@ -282,9 +268,28 @@ class POSAdapter:
 
         lines = []
         lines.append("🧾 **Reserved Item Summary**")
-        lines.append(f"1. {product['name']} — ₹{product['price']}")
+        lines.append(f"{product['name']} — ₹{product['price']}")
         lines.append(f"\n🧮 Total: ₹{total}")
         lines.append("\n💳 How would you like to pay?")
-        lines.append("UPI | Card | Net Banking | Cash")
+        lines.append("🔗 UPI | 💳 Card | 🏦 Net Banking | 💵 Cash")
 
         return "\n".join(lines)
+    
+    def payment_success(self, session_id):
+        
+        session = self.session.get(session_id)
+        
+        reservation = session.get("reservation", {})
+        product = reservation.get("product")
+        
+        # Clear reservation & payment state
+        session["reservation"] = {}
+        session["payment_pending"] = False
+        self.session._save(session_id, session)
+        
+        return (
+            f"✅ Payment successful!\n"
+            "🎉 Your reservation has been confirmed.\n"
+            f"💰 Total: ₹{product["price"]}"
+            f"😊 do you want to buy something else. you can browse here"
+        )

@@ -23,15 +23,7 @@ from utils.text_cleaner import clean_text
 class RecommendationAgent:
 
     def __init__(self):
-        # Category → complementary categories
-        self.COMPLEMENTARY_MAP = {
-            "shirt": ["belt", "trouser", "jeans"],
-            "tshirt": ["jeans", "shorts"],
-            "jeans": ["belt", "tshirt"],
-            "trouser": ["belt", "shirt"],
-            "shoes": ["socks", "shoe_care"],
-            "sneakers": ["socks", "shoe_care"],
-        }
+        pass
 
     # =====================================================
     # INTERNAL VECTOR SEARCH
@@ -53,54 +45,71 @@ class RecommendationAgent:
     # =====================================================
     # QUALITY SCORING HELPERS
     # =====================================================
-    def get_fabric_score(self, fabric: str) -> int:
-        if not fabric:
-            return 0
-
-        fabric = fabric.lower()
-
-        if "linen" in fabric:
-            return 6
-        if "cotton" in fabric and "blend" in fabric:
-            return 4
-        if "pure cotton" in fabric or "100%" in fabric:
-            return 3
-        if "cotton" in fabric:
-            return 2
-        if "poly" in fabric:
-            return 1
-
-        return 0
-
-    def get_finish_score(self, finish: str) -> int:
-        if not finish:
-            return 0
-
-        finish = finish.lower()
-
-        if "premium" in finish:
-            return 5
-        if "wrinkle" in finish:
-            return 4
-        if "pre" in finish:
-            return 3
-        if "enzyme" in finish:
-            return 2
-        if "regular" in finish:
-            return 1
-
-        return 0
-
     def quality_score(self, product: dict) -> int:
-        fabric_score = self.get_fabric_score(
-            product.get("fabric", "")
-        )
-        finish_score = self.get_finish_score(
-            product.get("finish", "")
-        )
 
-        # Fabric > Finish
-        return fabric_score * 2 + finish_score
+        score = 0
+        # -------------------------
+        # 1️⃣ PRICE BASED SCORING
+        # -------------------------
+        price = product.get("price", 0)
+
+        if price >= 4000:
+            score += 5
+        elif price >= 2500:
+            score += 4
+        elif price >= 1500:
+            score += 3
+        elif price >= 800:
+            score += 2
+        else:
+            score += 1
+
+        # -------------------------
+        # 2️⃣ BRAND BASED SCORING
+        # -------------------------
+        premium_brands = {
+            "louis philippe": 3,
+            "van heusen": 2,
+            "allen solly": 2,
+            "peter england": 1
+        }
+
+        brand = product.get("brand", "").lower()
+
+        for b, weight in premium_brands.items():
+            if b in brand:
+                score += weight
+                break
+
+        # -------------------------
+        # 3️⃣ SUBCATEGORY KEYWORDS
+        # -------------------------
+        premium_keywords = [
+            "formal",
+            "slim fit",
+            "premium",
+            "solid",
+            "tailored",
+            "luxury"
+        ]
+
+        subcat = product.get("subCategory", "").lower()
+
+        for keyword in premium_keywords:
+            if keyword in subcat:
+                score += 1
+
+        # -------------------------
+        # 4️⃣ NAME BASED BONUS
+        # -------------------------
+        name = product.get("name", "").lower()
+
+        if "slim fit" in name:
+            score += 1
+        if "solid" in name:
+            score += 1
+
+        return score
 
     # =====================================================
     # 1️⃣ DISCOVERY (SalesAgent → intent == DISCOVERY)
@@ -123,6 +132,9 @@ class RecommendationAgent:
         filters = {}
         if budget:
             filters["price"] = {"$lte": budget}
+            
+        if product_type:
+            filters["category"] = product_type
 
         return self._search(
             query=query,
@@ -133,84 +145,48 @@ class RecommendationAgent:
     # =====================================================
     # 2️⃣ QUALITY UPGRADE (SalesAgent → after product select)
     # =====================================================
-    def get_quality_upgrade(self, selected_product: dict, occasion=None):
+    def up_sell(self, selected_product: dict, occasion=None):
+
         category = selected_product.get("category")
         price = selected_product.get("price")
-
-        print("UPGRADE")
 
         if not category or not price:
             return None
 
         max_price = price + 500
 
-        # 🎯 Occasion-aware query
-        query_parts = [category]
-        if occasion:
-            query_parts.append(occasion)
-
         candidates = self._search(
-            query=" ".join(query_parts),
+            query=category,
             k=6,
             filters={
+                "category": category,
                 "price": {"$gt": price, "$lte": max_price}
             }
         )
 
-        base_score = self.quality_score(selected_product)
-
-        upgrades = [
-            p for p in candidates
-            if self.quality_score(p) > base_score
-        ]
-
-        if not upgrades:
+        if not candidates:
             return None
 
-        upgrades.sort(key=lambda x: x["price"])
+        # Exclude same product
+        candidates = [
+            p for p in candidates
+            if p.get("sku") != selected_product.get("sku")
+        ]
 
-        upgrade = upgrades[0]
+        if not candidates:
+            return None
 
-        print(upgrade)
+        # Choose smallest price jump
+        candidates.sort(key=lambda x: x["price"])
 
-        price_diff = upgrade["price"] - price
-
-        return upgrade, price_diff
-
-    # =====================================================
-    # 3️⃣ CROSS-SELL (SalesAgent → after ADD_TO_CART)
-    # =====================================================
-    def cross_sell(self, base_product: dict):
-
-        category = base_product.get("category")
-        if not category:
-            return []
-
-        complements = self.COMPLEMENTARY_MAP.get(category.lower(), [])
-        if not complements:
-            return []
-
-        products = self._search(
-            query=f"{category} accessories",
-            k=5,
-            filters={"category": {"$in": complements}}
-        )
-
-        if not products:
-            return []
-
-        # Sort by quality score
-        products.sort(
-            key=lambda x: self.quality_score(x),
-            reverse=True
-        )
-
-        return products[:2]
+        upgrade = candidates[0]
+        return upgrade
+    
 
     # =====================================================
-    # 4️⃣ BUNDLE (BUSINESS RULES)
+    # 4️⃣ BUNDLE (DYNAMIC MULTI-ITEM - HACKATHON READY)
     # =====================================================
-    def bundle(self, base_product: dict, occasion=None):
+    def cross_sell(self, base_product: dict, occasion=None):
 
         if not base_product:
             return None
@@ -221,72 +197,161 @@ class RecommendationAgent:
         if not category or not base_price:
             return None
 
-        complements = self.COMPLEMENTARY_MAP.get(category.lower(), [])
-        if not complements:
+        # =====================================================
+        # 🎯 Outfit Blueprint (Group Based)
+        # =====================================================
+        BUNDLE_TARGET = {
+            "shirt": {
+                "bottom": ["pant", "trouser", "jeans"],
+                "accessory": ["belt"],
+                "footwear": ["shoes", "sneakers"]
+            },
+            "tshirt": {
+                "bottom": ["jeans", "shorts"],
+                "footwear": ["sneakers"]
+            },
+            "jeans": {
+                "top": ["shirt", "tshirt"],
+                "accessory": ["belt"],
+                "footwear": ["shoes", "sneakers"]
+            },
+            "trouser": {
+                "top": ["shirt"],
+                "accessory": ["belt"],
+                "footwear": ["shoes"]
+            },
+        }
+
+        targets = BUNDLE_TARGET.get(category.lower())
+        if not targets:
             return None
 
-        # Build smart query
-        query_parts = [category]
+        # =====================================================
+        # 🔎 Flatten Categories For Pinecone Filter
+        # =====================================================
+        flat_categories = []
+        for group in targets.values():
+            flat_categories.extend(group)
+
+        # =====================================================
+        # 🔎 Build Smart Semantic Query
+        # =====================================================
+        query_parts = [
+            base_product.get("name", ""),
+            category,
+            "complete outfit",
+            "matching items"
+        ]
 
         if occasion:
             query_parts.append(occasion)
 
-        if base_product.get("fabric"):
-            query_parts.append(base_product["fabric"])
+        if base_product.get("subCategory"):
+            query_parts.append(base_product["subCategory"])
 
         query = " ".join(query_parts)
 
-        # Search complementary products
+        # =====================================================
+        # 🔎 Search From Pinecone
+        # =====================================================
         candidates = self._search(
             query=query,
-            k=6,
-            filters={"category": {"$in": complements}}
+            k=25,
+            filters={"category": {"$in": flat_categories}}
         )
 
         if not candidates:
             return None
 
-        # Price compatibility filter (economic logic)
-        candidates = [
+        # =====================================================
+        # 💰 Price Compatibility Filter
+        # =====================================================
+        filtered = [
             p for p in candidates
             if p.get("price")
-               and 0.1 * base_price <= p["price"] <= 0.6 * base_price
+            and p.get("sku") != base_product.get("sku")
+            and 0.3 * base_price <= p["price"] <= 1.2 * base_price
         ]
 
-        if not candidates:
+        if not filtered:
             return None
 
-        # Rank by quality score
-        candidates.sort(
-            key=lambda x: self.quality_score(x),
-            reverse=True
-        )
+        # =====================================================
+        # ⭐ Quality Filtering
+        # =====================================================
+        base_quality = self.quality_score(base_product)
 
-        selected = candidates[0]
+        filtered = [
+            p for p in filtered
+            if self.quality_score(p) >= base_quality - 2
+        ]
 
-        bundle_total = base_price + selected["price"]
+        if not filtered:
+            return None
 
-        # Dynamic discount strategy
-        if bundle_total > 5000:
+        # =====================================================
+        # 📦 Group By Target Blueprint Groups
+        # =====================================================
+        from collections import defaultdict
+        grouped = defaultdict(list)
+
+        for p in filtered:
+            for group_name, group_categories in targets.items():
+                if p["category"].lower() in group_categories:
+                    grouped[group_name].append(p)
+
+        # =====================================================
+        # 🧠 Select Best Item Per Group
+        # =====================================================
+        bundle_items = []
+
+        for group_name, items in grouped.items():
+            if not items:
+                continue
+
+            items.sort(
+                key=lambda x: (
+                    self.quality_score(x),
+                    -abs(x["price"] - base_price * 0.6)
+                ),
+                reverse=True
+            )
+
+            bundle_items.append(items[0])
+
+        if not bundle_items:
+            return None
+
+        # =====================================================
+        # 💵 Calculate Bundle Pricing
+        # =====================================================
+        bundle_total = base_price + sum(p["price"] for p in bundle_items)
+
+        # =====================================================
+        # 🎁 Dynamic Discount Based On Value
+        # =====================================================
+        if bundle_total > 8000:
             discount = {
                 "type": "PERCENT",
-                "value": 15,
-                "label": "Premium Combo Offer"
+                "value": 18,
+                "label": "Premium Complete Look Offer"
             }
-        elif bundle_total > 3000:
+        elif bundle_total > 5000:
             discount = {
                 "type": "PERCENT",
-                "value": 10,
-                "label": "Smart Saver Combo"
+                "value": 12,
+                "label": "Smart Combo Deal"
             }
         else:
             discount = {
-                "type": "FLAT",
-                "value": 100,
-                "label": "Starter Combo Deal"
+                "type": "PERCENT",
+                "value": 8,
+                "label": "Style Saver Combo"
             }
 
         return {
-            "items": [selected],
+            "base_product": base_product,
+            "items": bundle_items,
+            "bundle_total": bundle_total,
             "discount": discount
         }

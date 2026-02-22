@@ -402,47 +402,6 @@ class SalesAgent:
         )
 
         # =====================================================
-        # 6️⃣ CROSS‑SELL PROMPT
-        # =====================================================
-        self.cross_sell_prompt = PromptTemplate(
-            input_variables=["base_product", "cross_sell_products"],
-            template="""
-    You are a friendly fashion retail assistant.
-
-    The customer has chosen not to take the bundle.
-
-    Your task is to gently suggest some complementary products to go along with the item they just added.
-
-    Rules:
-    - Be polite and helpful
-    - Use social proof ("Many customers also add...")
-    - Present 2-3 relevant add-ons with emojis and short benefits
-    - Do NOT pressure or ask a yes/no question
-    - Keep tone light and inviting
-    - If no relevant products, output exactly: NO_CROSS_SELL
-    - keep it short and natural, like a real store assistant same like the example below
-    - keep it in simple language that a typical customer would understand don't use haivy words
-    - add emoji relevant emoji for each complementary product (Shirt → 👕, Suit → 👔, Jeans → 👖, Dress → 👗, Jacket → 🧥, Sweater → 🧥, Shoes → 👟, Saree → 🥻, Cap → 🧢, Bag → 👜, 👘 → Kurta)
-
-    Base product:
-    {base_product}
-
-    Complementary products:
-    {cross_sell_products}
-
-    Example output:
-
-    No worries! Many customers also add these handy items to complete their purchase:
-
-    🧦 Comfortable socks – great for daily wear  
-    🎩 Stylish hat – perfect for sunny days  
-    👜 Matching bag – carry your essentials with style
-
-    Feel free to add any of these to your cart if you like!
-    """
-        )
-
-        # =====================================================
         # 8️⃣ ADD BUNDLE ITEM INTENT
         # =====================================================
         self.bundle_prompt = PromptTemplate(
@@ -1137,105 +1096,110 @@ class SalesAgent:
             # -------------------------
             # BUNDLE OFFER DECLINE → CROSS-SELL
             # ------------------------
-            if intent == "DECLINE" and session["pending_action"] == "BUNDLE_OFFER":
-                base_product = session["last_system_action"]["payload"]["base_product"]
-
-                cross_sell_products = self.reco.cross_sell(base_product) or []
-
-                if not cross_sell_products:
-                    self.session.clear_post_add_action(session_id)
-                    return "No worries 🙂 I've added just the shirt to your cart."
-
-                cross_sell_text = (self.cross_sell_prompt | self.llm).invoke({
-                    "base_product": json.dumps(base_product),
-                    "cross_sell_products": json.dumps(cross_sell_products)
-                }).content.strip()
-
-                self.session.set_post_add_upsell(
-                    session_id,
-                    base_product,
-                    cross_sell_products,
-                    []
-                )
-
-                return {"reply":cross_sell_text}
+            if intent == "DECLINE" and session["pending_action"] == "CROSS_SELL":
+                
+                product = session["focus"]["current_product"]["name"]
+                
+                return {"reply":f"No worries 🙂 I've added just the {product} to your cart. Would you like to buy somethong else or would you like to checkout"}
 
             # -------------------------
             # BUNDLE OFFER ACCEPT → CROSS-SELL
             # ------------------------
-            if intent == "ACCEPT" and session["pending_action"] == "BUNDLE_OFFER":
-                base_product = session["last_system_action"]["payload"]["base_product"]
-                bundle_products = session["last_system_action"]["payload"]["bundle_products"]
+            if intent == "ACCEPT" and session["pending_action"] == "CROSS_SELL":
+                
+                bundle_products = session["cross-sell_products"]
 
                 # Add bundle items to cart
                 for product in bundle_products:
                     self.session.add_to_cart(session_id, product)
 
-                self.session.clear_post_add_action(session_id)
-
                 return {
                     "reply": "🎉 Great choice! I've added the full bundle to your cart. do you want checkout or buy something else"
                     }
+                
             # -------------------------
-            # CROSS-SELL DECLINE / ACCEPT
+            # UP-SELL DECLINE
             # ------------------------
-            if intent == "DECLINE" and session["pending_action"] == "CROSS_SELL":
+            if intent == "DECLINE" and session["pending_action"] == "UPSELL_DECISION":
+                
+                session["pending_action"] == "POST_SELECT_PRODUCT"
+                self.session._save(session_id, session)
+                
                 return {
-                    "reply" : f"No worries 🙂 I've added just the {session['focus']['current_product']['name']} to your cart. would you like to see more products? or do you want to proceed with checkout?"
-                    }
+                    "reply" : f"No worries 🙂 shall I added just the {session['focus']['current_product']['name']} into your cart."
+                }
+            
             # -------------------------
-            # UPSALE DECLINE → ADD TO CART
+            # UP_SALE ACCEPT
             # ------------------------
-            if intent == "ACCEPT" and session["pending_action"] == "CROSS_SELL":
-                products = session["last_system_action"]["payload"]["cross_sell_products"]
-
-                session["focus"]["shown_products"] = products
+            if intent == "ACCEPT" and session["pending_action"] == "UPSELL_DECISION":
+                
+                product = session["upsell_product"]
+                session["pending_action"] = "POST_SELECT_PRODUCT"
+                session["focus"]["current_product"] = product
                 self.session._save(session_id, session)
 
-                # 3️⃣ Format products
-                formatted = (self.product_formatter_prompt | self.llm).invoke({
-                    "products": json.dumps(products)
+                product_description = (self.product_description_prompt | self.llm).invoke({
+                "product": json.dumps(product)
                 }).content.strip()
 
-                result = formatted + "\n\n" + "Great! Please tell me which ones you'd like to add to your cart 🙂"
+                response = product_description + "\n\n"
 
-                return {
-                    "reply": result
-                }
+                return {"reply" : response + "Excellent upgrade choice! 👍 Shall I add this to your cart?"}
 
-            if intent == "ACCEPT" and session["pending_action"] == "CHECKOUT_UPSELL":
-                upsell = session["last_system_action"]
-
-                if upsell["type"] == "IMPULSE_ADDON":
-                    self.session.add_to_cart(session_id, upsell["item"])
-
-                elif upsell["type"] == "THRESHOLD_GIFT":
-                    self.session.mark_free_gift_pending(
-                        session_id,
-                        upsell["gift"]
-                    )
-
-                session["pending_action"] = "PAYMENT_SELECTION"
+            # ----------------------------------
+            # DECLINE ADD TO CART
+            # ----------------------------------
+            if intent == "DECLINE" and session.get("pending_action") == "POS_CHECKOUT_CONFIRM":
+                session["pending_action"] = None
+                session["focus"] = None
                 self.session._save(session_id, session)
+                return {"reply":"No problem 🙂 You can continue browsing or try something else."}
 
-                return {
-                    "reply" : (
-                        "✅ Got it!\n\n"
-                        + self.build_checkout_summary(session=session)
-                    )
-                }
+            # ----------------------------------
+            # ACCEPT ADD TO CART
+            # ----------------------------------
+            if intent == "ACCEPT" and session["pending_action"] == "POST_SELECT_PRODUCT":
+                product = self.resolve_product(
+                    message=user_message,
+                    shown_products=session["focus"]["shown_products"],
+                    current_product=session["focus"]["current_product"]
+                )
 
-            if intent == "DECLINE" and session["pending_action"] == "CHECKOUT_UPSELL":
-                session["pending_action"] = "PAYMENT_SELECTION"
-                self.session._save(session_id, session)
+                if not product:
+                    return {"reply": "Please tell me which product you'd like to add 🙂"}
 
-                return {
-                    "reply" : (
-                        "No problem 😊\n\n"
-                        + self.build_checkout_summary(session=session)
-                    )
-                }
+                # 1️⃣ ADD TO CART — SOURCE OF TRUTH
+                self.session.add_to_cart(session_id, product)
 
+                messages = [f"""🛒 Added to your cart!
+
+                            {product['name']} has been successfully added to your cart.
+
+                            💰 Price: ₹{product['price']}
+
+                            You're one step closer to checkout!
+                            Would you like to continue shopping or proceed to checkout? 😊
+                            """]
+
+                # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
+                bundle_products = self.reco.cross_sell(product) or []
+
+                if bundle_products:
+                    bundle_text = (self.bundle_prompt | self.llm).invoke({
+                        "base_product": json.dumps(product),
+                        "bundle_products": json.dumps(bundle_products)
+                    }).content.strip()
+
+                    if bundle_text != "NO_BUNDLE":
+                        messages.append(bundle_text)
+                        session["cross-sell_products"] = bundle_products
+                        session["pending_action"] = "cross_sell"
+                        self.session._save(session_id, session)
+                        return {"reply": "\n\n".join(messages)}
+
+                return {"reply": "\n\n".join(messages)}
+            
             # =====================================================
             # POS CHECKOUT CONFIRM (KIOSK FLOW)
             # =====================================================
@@ -1276,90 +1240,15 @@ class SalesAgent:
                     "items": pos_items
                 }
 
-                # Move state forward
-                session["pending_action"] = "PAYMENT_SELECTION"
-                session["focus"] = None
+                session["pending_action"] = "SELECT_OFFER"
 
                 self.session._save(session_id, session)
 
-                return self.build_checkout_summary(session=session)
+                formatted_checkout = self.build_checkout_summary(session=session)
 
-            if intent == "DECLINE" and session.get("pending_action") == "POS_CHECKOUT_CONFIRM":
-                session["pending_action"] = None
-                session["focus"] = None
-                self.session._save(session_id, session)
-                return {"reply":"No problem 🙂 You can continue browsing or try something else."}
+                formatted_checkout += "\n\n" + offers["reply"]
 
-            if intent == "ACCEPT" and session["pending_action"] == "POST_SELECT_PRODUCT":
-                product = self.resolve_product(
-                    message=user_message,
-                    shown_products=session["focus"]["shown_products"],
-                    current_product=session["focus"]["current_product"]
-                )
-
-                if not product:
-                    return {"reply": "Please tell me which product you'd like to add 🙂"}
-
-                # 1️⃣ ADD TO CART — SOURCE OF TRUTH
-                self.session.add_to_cart(session_id, product)
-
-                messages = [f"""🛒 Added to your cart!
-
-                            {product['name']} has been successfully added to your cart.
-
-                            💰 Price: ₹{product['price']}
-
-                            You're one step closer to checkout!
-                            Would you like to continue shopping or proceed to checkout? 😊
-                            """]
-
-                # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
-                bundle_products = self.reco.bundle(product) or []
-
-                if bundle_products:
-                    bundle_text = (self.bundle_prompt | self.llm).invoke({
-                        "base_product": json.dumps(product),
-                        "bundle_products": json.dumps(bundle_products)
-                    }).content.strip()
-
-                    if bundle_text != "NO_BUNDLE":
-                        messages.append(bundle_text)
-
-                        # save bundle upsell state
-                        self.session.set_post_add_upsell(
-                            session_id=session_id,
-                            base_product=product,
-                            cross_sell_products=[],
-                            bundle_products=bundle_products
-                        )
-
-                        return {"reply": "\n\n".join(messages)}
-
-                # 3️⃣ FALLBACK TO CROSS-SELL (ONLY IF NO BUNDLE)
-                cross_sell_products = self.reco.cross_sell(product) or []
-
-                if cross_sell_products:
-                    cross_sell_text = (self.cross_sell_prompt | self.llm).invoke({
-                        "base_product": json.dumps(product),
-                        "cross_sell_products": json.dumps(cross_sell_products)
-                    }).content.strip()
-
-                    if cross_sell_text != "NO_CROSS_SELL":
-                        messages.append(cross_sell_text)
-
-                        self.session.set_post_add_upsell(
-                            session_id=session_id,
-                            base_product=product,
-                            cross_sell_products=cross_sell_products,
-                            bundle_products=[]
-                        )
-
-                        return {"reply": "\n\n".join(messages)}
-
-                # 4️⃣ NOTHING TO UPSELL
-                self.session.clear_post_add_action(session_id)
-
-                return {"reply": "\n\n".join(messages)}
+                return {"reply": formatted_checkout}
 
 
         # -------------------------
@@ -1543,16 +1432,16 @@ class SalesAgent:
             response = product_description + "\n\n"
 
             # 🔥 ask RecommendationAgent for quality upgrade
-            upgrade_result = self.reco.get_quality_upgrade(
+            upgrade_result = self.reco.up_sell(
                 selected_product=selected_product,
                 occasion=session["discovery"]["occasion"]
             )
 
-            # ❌ No upgrade possible
             if not upgrade_result:
                 return {"reply" : response + "Nice pick 👍 Shall I add this to your cart?"}
 
-            upgrade_product, price_diff = upgrade_result
+            upgrade_product = upgrade_result
+            price_diff = upgrade_product["price"] - selected_product["price"]
 
             # 🧠 LLM only generates language
             upsell_message = (self.one_time_upsell_prompt | self.llm).invoke({
@@ -1565,15 +1454,9 @@ class SalesAgent:
 
             # mark upsell state
             session["pending_action"] = "UPSELL_DECISION"
-            session["last_system_action"] = {
-                "type": "UPSELL",
-                "payload": {
-                    "selected_product": selected_product,
-                    "upgrade_product": upgrade_product
-                }
-            }
-
+            session["upsell_product"] = upgrade_product
             self.session._save(session_id, session)
+            
             return {"reply" : response}
 
         # -------------------------
@@ -1602,8 +1485,8 @@ class SalesAgent:
                             Would you like to continue shopping or proceed to checkout? 😊
                             """]
 
-            # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
-            bundle_products = self.reco.bundle(product) or []
+             # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
+            bundle_products = self.reco.cross_sell(product) or []
 
             if bundle_products:
                 bundle_text = (self.bundle_prompt | self.llm).invoke({
@@ -1613,42 +1496,12 @@ class SalesAgent:
 
                 if bundle_text != "NO_BUNDLE":
                     messages.append(bundle_text)
+                    session["cross-sell_products"] = bundle_products
+                    session["pending_action"] = "cross_sell"
+                    self.session._save(session_id, session)
+                    return {"reply": "\n\n".join(messages)}
 
-                    # save bundle upsell state
-                    self.session.set_post_add_upsell(
-                        session_id=session_id,
-                        base_product=product,
-                        cross_sell_products=[],
-                        bundle_products=bundle_products
-                    )
-
-                    return {"reply" : "\n\n".join(messages)}
-
-            # 3️⃣ FALLBACK TO CROSS-SELL (ONLY IF NO BUNDLE)
-            cross_sell_products = self.reco.cross_sell(product) or []
-
-            if cross_sell_products:
-                cross_sell_text = (self.cross_sell_prompt | self.llm).invoke({
-                    "base_product": json.dumps(product),
-                    "cross_sell_products": json.dumps(cross_sell_products)
-                }).content.strip()
-
-                if cross_sell_text != "NO_CROSS_SELL":
-                    messages.append(cross_sell_text)
-
-                    self.session.set_post_add_upsell(
-                        session_id=session_id,
-                        base_product=product,
-                        cross_sell_products=cross_sell_products,
-                        bundle_products=[]
-                    )
-
-                    return {"reply":"\n\n".join(messages)}
-
-            # 4️⃣ NOTHING TO UPSELL
-            self.session.clear_post_add_action(session_id)
-
-            return {"reply":"\n\n".join(messages)}
+            return {"reply": "\n\n".join(messages)}
 
         # -------------------------
         # WISHLIST HANDLER
@@ -1829,24 +1682,17 @@ class SalesAgent:
 
             session["checkout"]["payment_method"] = method
             session["pending_action"] = "PAYMENT_PROCESS"
-            self.session._save(session_id, session)
-
             amount = self.calculate_cart_total(session["cart"]["items"])
+            session["checkout"]["amount"] = amount
+            self.session._save(session_id, session)
 
             # 🔹 Call Payment Agent
             payment_result = self.payment_agent.pay(
-                amount = amount,
+                amount = amount
             )
 
-            self.session.clear_cart(user, session_id)
-
-            return {
-                "reply" : (
-                f"🎉 Order placed successfully!\n"
-                f"🧾 Order ID: 101\n"
-                f"💰 Total: ₹{amount}\n\n"
-                "Thank you for shopping with us 😊"
-                )
+            return{
+                
             }
 
         # -------------------------
