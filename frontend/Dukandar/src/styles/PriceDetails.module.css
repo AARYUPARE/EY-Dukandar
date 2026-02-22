@@ -33,3 +33,19 @@
     font-weight: 600;
     box-shadow: 0 0 12px rgba(142,36,255,0.5);
 }
+
+.product-link
+{
+    max-width: 150px;
+    padding: 8px;
+    border: 2px solid black;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: all 0.5s;
+}
+
+.product-link:hover
+{
+    background-color: rgb(207, 213, 219);
+    transform: scale(1.05);
+}

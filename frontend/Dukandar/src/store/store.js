@@ -362,22 +362,18 @@ const productsSlice = createSlice({
   initialState: {
     canShow: true,
     products: [
-      // {
-      //   id: 123,
-      //   name: "T-Shirt",
-      //   description: "This, is very good t-shirt",
-      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-      //   brand: "Dukandar",
-      //   size: "M"
-      // },
-      // {
-      //   id: 124,
-      //   name: "T-Shirt",
-      //   description: "This, is very good t-shirt",
-      //   image_url: "https://i5.walmartimages.com/asr/492531f4-6b6c-4aa9-9522-b1d81c2bc493.c7360b4097810e7eede3606cd218764b.jpeg",
-      //   brand: "Dukandar",
-      //   size: "M"
-      // }
+      {
+        name:"Men Peach Super Slim Fit Solid Full Sleeves Casual Shirt",
+        sku:"LP-SH-001",
+        price:1862,
+        brand:"Louis Philippe",
+        category:"shirt",
+        subCategory:"shirt,full sleeve,casual,peach,men",
+        description:"Infuse your casual collection with the vibrant allure of this peach solid shirt from Louis Philippe Sport. Meticulously constructed from a lightweight blend of cotton, nylon, and spandex, it promises exceptional comfort and stretch recovery, making it a staple for versatile styling. The super slim fit not only enhances your silhouette but also adds a contemporary edge. Day or evening, this shirt epitomizes effortless charm and sophistication for the modern man.",
+        image_url:"https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/images\/LP-SH-001.avif",
+        model_url:"https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/models\/LP-SH-001.glb",
+        productLink:"https:\/\/louisphilippe.abfrl.in\/p\/men-peach-super-slim-fit-solid-full-sleeves-casual-shirt-39837787.html?source=plp"
+    }
     ],
   },
   reducers: {

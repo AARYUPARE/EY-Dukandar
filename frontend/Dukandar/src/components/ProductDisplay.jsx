@@ -25,7 +25,7 @@ const ProductDisplay = () => {
             <div className={css["display-container"]}>
                 <ModelDisplay model_url={product.model_url} />
                 <ProductDetails description={product.description} title={product.name} category={product.category} sub_category={product.sub_category} brand={product.brand}/>
-                <PriceDetails price={product.price} />
+                <PriceDetails price={product.price} productLink={product.productLink} />
             </div>
 
         </div>

@@ -14,7 +14,8 @@
   "content_scripts": [
     {
       "matches": [
-       "*://*.abfrl.in/*"
+       "*://*.abfrl.in/*",
+       "*://localhost:*/*"
       ],
       "js": ["content.js"]
     }

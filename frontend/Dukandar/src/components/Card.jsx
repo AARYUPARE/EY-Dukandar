@@ -1,7 +1,7 @@
 import "../styles/Card.css";
 import Tilty from "../utils/Tilty.jsx";   // <-- add this import
 
-export default function Card({ title, image_url, description, onClick, brand, size}) {
+export default function Card({ title, image_url, price, onClick, brand, size}) {
 
   if(!size) size = "";
 
@@ -24,7 +24,7 @@ export default function Card({ title, image_url, description, onClick, brand, si
 	<div className="content">
 		<div className="bottom">
 			<h4>{title}</h4>
-			<p className="description">{description}</p>
+			<p className="description">Rs. {price} : Brand <b>{brand}</b></p>
       {(size != null && size != "") ? <p>Size: {size}</p> : <></>}
 		</div>
 	</div>
