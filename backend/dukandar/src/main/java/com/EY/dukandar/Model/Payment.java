@@ -21,6 +21,8 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    private String reply;
+
     public Payment() {}
 
     public Long getId() {
@@ -69,6 +71,14 @@ public class Payment {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public String getReply() {
+        return reply;
+    }
+
+    public void setReply(String reply) {
+        this.reply = reply;
     }
 }
 

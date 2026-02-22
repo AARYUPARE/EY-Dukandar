@@ -6,8 +6,14 @@ import ComponentToggler from "./ComponentToggler"
 import { Outlet } from "react-router-dom"
 import "../styles/ChatInterface.css"
 import PaymentOverlay from "./PaymentOverlay.jsx"
+import { useEffect } from "react"
+import { backendEventHandler } from "../store/store.js"
 
 const ChatInterface = () => {
+
+  useEffect(() => {
+    connectWS(backendEventHandler);
+  }, []);
   return <div className="container">
     <SidebarContianer />
     <PaymentOverlay />

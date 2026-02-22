@@ -66,18 +66,21 @@ export default function SendOrder() {
   }
 
   return (
-    <div className="send-order-root">
-      <button className="back-btn" onClick={onBack}>
-        <IoArrowBackCircle size={26} />
-      </button>
+   <div className="send-order-root">
+  <div className="send-order-frame">
+    <div className="row g-4 h-100">
 
-      <div className="send-order-frame">
-        <div className="row g-4 h-100">
+      {/* LEFT */}
+      <div className="col-12 col-md-6">
+        <div className="panel panel-left">
 
-          {/* LEFT */}
-          <div className="col-12 col-md-6">
-            <div className="panel">
-              <h4 className="title">Send Order to Company</h4>
+          {/* BACK BUTTON HERE */}
+          <button className="back-btn" onClick={onBack}>
+            <IoArrowBackCircle size={26} />
+          </button>
+
+          <h4 className="title">Send Order to Company</h4>
+
 
               <div className="section">
                 <label>Company name</label>

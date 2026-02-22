@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="af12c041-1e17-4a53-b737-d2471d1e5f5a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Excel to Json Convertor/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/Excel to Json Convertor/data.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Excel to Json Convertor/data.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Excel to Json Convertor/data.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/adapters/pos_adapter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/adapters/pos_adapter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/inventory_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/inventory_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/orchestrator/sales_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/orchestrator/sales_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ai/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

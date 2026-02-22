@@ -133,8 +133,8 @@ class RecommendationAgent:
         if budget:
             filters["price"] = {"$lte": budget}
             
-        if product_type:
-            filters["category"] = product_type
+        # if product_type:
+        #     filters["category"] = product_type
 
         return self._search(
             query=query,
@@ -159,7 +159,7 @@ class RecommendationAgent:
             query=category,
             k=6,
             filters={
-                "category": category,
+                # "category": category,
                 "price": {"$gt": price, "$lte": max_price}
             }
         )

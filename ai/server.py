@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 
-from main import sales_agent, llm, inventory_agent, payment_agent, session_manager   # 🔥 import llm also
+from main import sales_agent, llm, inventory_agent, payment_agent, session_manager, pos_adapter, web_adapter   # 🔥 import llm also
 from utils.translator import LLMTranslator   # 🔥 new
 from adapters.pos_adapter import POSAdapter
 from adapters.web_adapter import WebAdapter
@@ -11,8 +11,7 @@ from adapters.web_adapter import WebAdapter
 app = FastAPI()
 
 translator = LLMTranslator(llm)
-pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm)
-web_adapter = WebAdapter(session_manager, llm)
+
 
 class Query(BaseModel):
     message: str
@@ -26,19 +25,6 @@ def query(data: Query):
 
     # 🔥 Get session first
     session = session_manager.get(data.sessionId) or {}
-
-    # =====================================================
-    # 🔥 1️⃣ POS PAYMENT ROUTING (BEFORE AGENT CALL)
-    # =====================================================
-    if session.get("payment_pending"):
-        print("💳 Routing to POS payment handler")
-
-        reply = pos_adapter.handle_payment(
-            session_id=data.sessionId,
-            payment_method=data.message
-        )
-
-        return {"reply": reply}
 
     # =====================================================
     # 2️⃣ NORMAL AI FLOW

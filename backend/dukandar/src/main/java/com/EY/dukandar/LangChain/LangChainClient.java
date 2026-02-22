@@ -17,7 +17,7 @@ public class LangChainClient {
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String AGENT_URL = "http://localhost:8000/query";
     private static final String LOGIN_EVENT_URL = "http://localhost:8000/login-event";
-    private static final String PAYMENT_SUCCESS_EVENT = "http://localhost:8000/content.strip()";
+    private static final String PAYMENT_SUCCESS_EVENT = "http://localhost:8000/show_success";
     private final String RESERVE_DETAIL_API = "http://localhost:8000/qr-scan";
 
     private final ProductService productService;
@@ -65,10 +65,13 @@ public class LangChainClient {
         );
     }
 
-    public void sendPaymentSuccessEvent()
+    public Map<String, Object> sendPaymentSuccessEvent(String sessionId)
     {
-        restTemplate.postForObject(
-                PAYMENT_SUCCESS_EVENT, null, Map.class
+        Map<String, Object>payload = new HashMap<>();
+        payload.put("sessionId", sessionId);
+
+        return restTemplate.postForObject(
+                PAYMENT_SUCCESS_EVENT, payload, Map.class
         );
     }
 

@@ -35,7 +35,7 @@ class InventoryAgent:
     # =====================================================
     # 2️⃣ NORMALIZE RESPONSE
     # =====================================================
-    def _normalize(self, backend_response: List[Dict]) -> Dict:
+    def _normalize(self, backend_response: List[Dict]) -> List[Dict]:
         stores = backend_response
         available_stores = []
 
@@ -47,10 +47,7 @@ class InventoryAgent:
             key=lambda s: s.get("distanceKm", 9999)
         )
 
-        return {
-            "available_stores": available_stores,
-            "unavailable": len(available_stores) == 0
-        }
+        return available_stores
 
     # =====================================================
     # 3️⃣ PUBLIC METHOD USED BY SALES AGENT

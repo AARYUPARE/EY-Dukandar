@@ -21,3 +21,26 @@ export const connectWS = (eventHandler = () => {}) => {
 
   client.activate();
 };
+
+let orderClient = null;
+
+export const connectStore = (storeId, eventHandler = () => {}) => {
+    if (orderClient) return orderClient; // prevent duplicate
+
+    orderClient = new Client({
+    brokerURL: "ws://localhost:8080/ws",
+    reconnectDelay: 5000,
+
+    onConnect: () => {
+      console.log("WS CONNECTED 🔥");
+
+      orderClient.subscribe("/topic/order/" + storeId, eventHandler);
+    },
+
+    onStompError: (frame) => {
+      console.error("STOMP ERROR", frame);
+    }
+  });
+
+  orderClient.activate();
+}

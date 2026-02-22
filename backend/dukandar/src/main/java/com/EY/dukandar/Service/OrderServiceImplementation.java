@@ -2,8 +2,10 @@ package com.EY.dukandar.Service;
 
 import com.EY.dukandar.Model.*;
 import com.EY.dukandar.Repository.*;
+import com.EY.dukandar.WebSocket.WSEventDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,8 @@ public class OrderServiceImplementation implements OrderService {
 
     // ⭐ Add shipping tracking service
     @Autowired private ShippingTrackingService shippingTrackingService;
+
+    @Autowired private SimpMessagingTemplate simpMessagingTemplate;
 
 
     // =====================================================================
@@ -43,7 +47,7 @@ public class OrderServiceImplementation implements OrderService {
         for (OrderItemAgentRequest item : request.getItems()) {
 
             List<Inventory> inventories =
-                    inventoryRepository.findByProductId(item.getProduct_id());
+                    inventoryRepository.findByProductIdAndSize(item.getProduct_id(), item.getSize());
 
             if (inventories == null || inventories.isEmpty()) {
                 throw new RuntimeException(
@@ -92,7 +96,7 @@ public class OrderServiceImplementation implements OrderService {
 
                 // Fetch inventory again for safe stock reduction
                 List<Inventory> inventories =
-                        inventoryRepository.findByProductId(reqItem.getProduct_id());
+                        inventoryRepository.findByProductIdAndSize(reqItem.getProduct_id(), reqItem.getSize());
 
                 Inventory inv = inventories.stream()
                         .filter(i -> i.getStoreId().equals(storeId))
@@ -140,6 +144,16 @@ public class OrderServiceImplementation implements OrderService {
             // 💾 Save order
             Order savedOrder = orderRepository.save(order);
             createdOrders.add(savedOrder);
+
+            WSEventDTO dto = new WSEventDTO();
+            dto.setEventType("ORDER");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("storeId", storeId);
+
+            dto.setData(data);
+
+            simpMessagingTemplate.convertAndSend("/topic/order/" + storeId.toString(), dto);
 
             // 🚚 Create shipping tracking
             shippingTrackingService.createTracking(savedOrder.getId());

@@ -17,7 +17,7 @@ SIZE_IRRELEVANT_TYPES = {
 
 class SalesAgent:
 
-    def __init__(self, llm, recommendation_agent, fulfillment_agent, inventory_agent, session_manager, payment_agent, loyalty_agent: LoyaltyAgent):
+    def __init__(self, llm, recommendation_agent, fulfillment_agent, inventory_agent, session_manager, payment_agent, loyalty_agent: LoyaltyAgent, pos_adapter):
 
         self.llm = llm
         self.reco = recommendation_agent
@@ -26,6 +26,7 @@ class SalesAgent:
         self.session = session_manager
         self.payment_agent = payment_agent
         self.loyalty_agent = loyalty_agent
+        self.pos_adapter = pos_adapter
 
         # ===================================================
         # 0️⃣ INTENT ROUTER PROMPT
@@ -347,6 +348,7 @@ class SalesAgent:
     - Do NOT add distance comparisons
     - Sound like a helpful store assistant
     - Do not write any other sentence in output other than store details and stores
+    - Do not write any URL in the response even if provided
 
     Stores:
     {stores}
@@ -357,13 +359,11 @@ class SalesAgent:
     ─────────────
     🏬 Dukandar Andheri West
     • Andheri West, Mumbai
-    • Open: 10 AM - 10 PM
 
     OPTION 2
     ─────────────
     🏬 Dukandar Bandra East
     • Bandra East, Mumbai
-    • Open: 11 AM - 9 PM
     """
         )
 
@@ -453,7 +453,7 @@ class SalesAgent:
         # AVAILABILITY TO HUMAN
         # =====================================================
         self.availability_prompt = PromptTemplate(
-            input_variables=["product", "availability"],
+            input_variables=["product", "stores"],
             template="""
     You are a friendly in-store fashion assistant.
 
@@ -479,7 +479,7 @@ class SalesAgent:
     {product}
 
     Availability data:
-    {availability}
+    {stores}
 
     Response:
     """
@@ -1083,7 +1083,7 @@ class SalesAgent:
                     You can view it when it will available near to you and move it to your cart when you're ready.
                     
                     Would you like to explore similar products or continue shopping? 😊"""
-                    }
+                            }
 
             # -------------------------
             # WISHLIST DECLINE
@@ -1097,16 +1097,16 @@ class SalesAgent:
             # BUNDLE OFFER DECLINE → CROSS-SELL
             # ------------------------
             if intent == "DECLINE" and session["pending_action"] == "CROSS_SELL":
-                
+
                 product = session["focus"]["current_product"]["name"]
-                
+
                 return {"reply":f"No worries 🙂 I've added just the {product} to your cart. Would you like to buy somethong else or would you like to checkout"}
 
             # -------------------------
             # BUNDLE OFFER ACCEPT → CROSS-SELL
             # ------------------------
             if intent == "ACCEPT" and session["pending_action"] == "CROSS_SELL":
-                
+
                 bundle_products = session["cross-sell_products"]
 
                 # Add bundle items to cart
@@ -1115,32 +1115,32 @@ class SalesAgent:
 
                 return {
                     "reply": "🎉 Great choice! I've added the full bundle to your cart. do you want checkout or buy something else"
-                    }
-                
+                }
+
             # -------------------------
             # UP-SELL DECLINE
             # ------------------------
             if intent == "DECLINE" and session["pending_action"] == "UPSELL_DECISION":
-                
+
                 session["pending_action"] == "POST_SELECT_PRODUCT"
                 self.session._save(session_id, session)
-                
+
                 return {
                     "reply" : f"No worries 🙂 shall I added just the {session['focus']['current_product']['name']} into your cart."
                 }
-            
+
             # -------------------------
             # UP_SALE ACCEPT
             # ------------------------
             if intent == "ACCEPT" and session["pending_action"] == "UPSELL_DECISION":
-                
+
                 product = session["upsell_product"]
                 session["pending_action"] = "POST_SELECT_PRODUCT"
                 session["focus"]["current_product"] = product
                 self.session._save(session_id, session)
 
                 product_description = (self.product_description_prompt | self.llm).invoke({
-                "product": json.dumps(product)
+                    "product": json.dumps(product)
                 }).content.strip()
 
                 response = product_description + "\n\n"
@@ -1199,7 +1199,7 @@ class SalesAgent:
                         return {"reply": "\n\n".join(messages)}
 
                 return {"reply": "\n\n".join(messages)}
-            
+
             # =====================================================
             # POS CHECKOUT CONFIRM (KIOSK FLOW)
             # =====================================================
@@ -1398,7 +1398,7 @@ class SalesAgent:
             if session["reservation"].get("selected_store") != None:
                 return {
                     "reply" : f"Sure 👍 if you want to reserve {session['focus']['current_product']} Would you like me to reserve it for you at {store['name']}?"
-                    }
+                }
 
             store_description = (self.select_store_prompt | self.llm).invoke({
                 "store": json.dumps(store)
@@ -1406,7 +1406,7 @@ class SalesAgent:
 
             return {
                 "reply" : store_description + "\n\n" + f"Great choice 👍 Would you like me to reserve it for you at {store['name']}?"
-                }
+            }
 
         # -------------------------
         # 4️⃣ SELECT PRODUCT
@@ -1456,7 +1456,7 @@ class SalesAgent:
             session["pending_action"] = "UPSELL_DECISION"
             session["upsell_product"] = upgrade_product
             self.session._save(session_id, session)
-            
+
             return {"reply" : response}
 
         # -------------------------
@@ -1485,7 +1485,7 @@ class SalesAgent:
                             Would you like to continue shopping or proceed to checkout? 😊
                             """]
 
-             # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
+            # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
             bundle_products = self.reco.cross_sell(product) or []
 
             if bundle_products:
@@ -1529,7 +1529,7 @@ class SalesAgent:
                     You can view it when it will available near to you and move it to your cart when you're ready.
                     
                     Would you like to explore similar products or continue shopping? 😊"""
-                    }
+                        }
 
         # -------------------------
         # AVAILABILITY HANDLER
@@ -1544,8 +1544,7 @@ class SalesAgent:
             if not product:
                 return {"reply":"Please select a product first 🙂"}
 
-            availability = self.inventory.check(product, user)
-            stores = availability.get("available_stores", [])
+            stores = self.inventory.check(product, user)
 
             # ✅ Reservation context = single product
             session["reservation"] = {
@@ -1570,7 +1569,7 @@ class SalesAgent:
             # Natural language via LLM
             response = (self.availability_prompt | self.llm).invoke({
                 "product": json.dumps(product),
-                "availability": json.dumps(availability)
+                "stores": json.dumps(stores)
             })
 
             formatted = (self.store_formatter_prompt | self.llm).invoke({
@@ -1589,7 +1588,7 @@ class SalesAgent:
         if intent == "RESERVE" and session["pending_action"] == "wishlist_confirm":
             return {
                 "reply":"product is not available in any nearest store for reservation would you like to add it into wishlist 💖? 🙂"
-                }
+            }
 
         # -------------------------
         # RESERVE HANDLER (ENTRY)
@@ -1604,8 +1603,7 @@ class SalesAgent:
             if not product:
                 return {"reply":"Please select a product first 🙂"}
 
-            availability = self.inventory.check(product, user)
-            stores = availability.get("available_stores", [])
+            stores = self.inventory.check(product, user)
 
             # ✅ Reservation context = single product
             session["reservation"] = {
@@ -1630,7 +1628,7 @@ class SalesAgent:
             # Natural language via LLM
             response = (self.availability_prompt | self.llm).invoke({
                 "product": json.dumps(product),
-                "availability": json.dumps(availability)
+                "stores": json.dumps(stores)
             })
 
             formatted = (self.store_formatter_prompt | self.llm).invoke({
@@ -1680,6 +1678,21 @@ class SalesAgent:
                               "• 🛵 Cash on Delivery")
                 }
 
+
+            # =====================================================
+            # 🔥 1️⃣ POS PAYMENT ROUTING (BEFORE AGENT CALL)
+            # =====================================================
+            if session.get("payment_pending"):
+                print("💳 Routing to POS payment handler")
+
+                reply = self.pos_adapter.handle_payment(
+                    session_id=session_id,
+                    payment_method=method
+                )
+
+                return {"reply": reply.get("reply")}
+
+
             session["checkout"]["payment_method"] = method
             session["pending_action"] = "PAYMENT_PROCESS"
             amount = self.calculate_cart_total(session["cart"]["items"])
@@ -1692,7 +1705,7 @@ class SalesAgent:
             )
 
             return{
-                
+                "reply": "Payment Started"
             }
 
         # -------------------------

@@ -239,7 +239,7 @@ class POSAdapter:
         )
 
         return{
-            
+            "reply": "__blank__"
         }
 
     def handle_qr_scan(self, session_id, product):

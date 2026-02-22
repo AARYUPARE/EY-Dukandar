@@ -22,6 +22,7 @@ import MapOverlay from './components/MapOverlay';
 import ScanningPOS from './components/ScanningPOS';
 import AuthPOS from './components/AuthPos';
 import AuthScanner from './components/AuthScanner';
+import BusinessInsights from './components/business/BusinessInsights';
 
 //Web socket imports
 import { connectWS } from '../web_socket/socketListener';
@@ -131,13 +132,15 @@ const appRouter = createBrowserRouter([
       }
     ]
   },
+  {
+    path: "/company/insights",
+    element: <BusinessInsights />
+  }
 ])
 
 const App = () => {
 
-  useEffect(() => {
-    connectWS(backendEventHandler);
-  }, [])
+  
 
   return (
     <>

@@ -8,8 +8,8 @@ public class OrderItemAgentRequest {
     private String name;
     private Double price;
     private int quantity;
-    private String added_at;
     private String channel;
+    private String size;
     private Map<String, Object> metadata;
 
     public Long getProduct_id() {
@@ -44,12 +44,12 @@ public class OrderItemAgentRequest {
         this.quantity = quantity;
     }
 
-    public String getAdded_at() {
-        return added_at;
+    public String getSize() {
+        return size;
     }
 
-    public void setAdded_at(String added_at) {
-        this.added_at = added_at;
+    public void setSize(String size) {
+        this.size = size;
     }
 
     public String getChannel() {

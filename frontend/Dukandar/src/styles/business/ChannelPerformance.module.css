@@ -1,0 +1,145 @@
+/* ChannelPerformance.module.css */
+
+.container {
+  padding: 2rem;
+  background-color: #f8fafc; /* Very light cool gray */
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: #1e293b;
+  margin: 0;
+}
+
+.header p {
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* HERO CARD - The "Winner" */
+.heroCard {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.heroContent h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.heroContent h3 {
+  font-size: 3rem;
+  margin: 0.5rem 0;
+  font-weight: 800;
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroContent p {
+  font-size: 1.2rem;
+  color: #cbd5e1;
+  max-width: 600px;
+}
+
+.heroStat {
+  text-align: right;
+}
+
+.statValue {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.statLabel {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* CHART SECTION */
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.channelCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s;
+}
+
+.channelCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.channelIcon {
+  font-size: 1.5rem;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.cardValue {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* VISUAL BAR */
+.progressBarContainer {
+  height: 8px;
+  width: 100%;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  margin-top: 1rem;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  background-color: #f1f5f9;
+  color: #64748b;
+}

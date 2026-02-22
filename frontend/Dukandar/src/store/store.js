@@ -270,20 +270,13 @@ export const sendMessageAsync = createAsyncThunk(
       dispatch(
         chatAction.updateMessage({
           id: loaderId,
-          text: res.data.reply ?? "No reply, from Agent",
+          text: (res.data.replay === "__blank__") ? "" : res.data.reply ?? "No reply, from Agent",
           isLoading: false,
           lang: res.data.user_lang
         })
       );
 
-      dispatch(
-        chatAction.updateMessage({
-          id: loaderId,
-          text: res.data.reply ?? "No reply, from Agent",
-          isLoading: false,
-          lang: res.data.user_lang
-        })
-      );
+
       if (Array.isArray(res.data.products) && res.data.products.length != 0) {
         dispatch(productsAction.addProducts(res.data.products))
         dispatch(toggleCardContainersActions.showProducts());
@@ -319,8 +312,16 @@ const chatSlice = createSlice({
     },
 
     updateMessage(state, action) {
-      const msg = state.messages.find(m => m.id === action.payload.id);
+      const { id, text } = action.payload;
 
+      // 🚀 if blank marker → delete message
+      if (text === "__blank__") {
+        state.messages = state.messages.filter(m => m.id !== id);
+        return;
+      }
+
+      // ⭐ normal update
+      const msg = state.messages.find(m => m.id === id);
       if (msg) {
         Object.assign(msg, action.payload);
       }
@@ -363,17 +364,17 @@ const productsSlice = createSlice({
     canShow: true,
     products: [
       {
-        name:"Men Peach Super Slim Fit Solid Full Sleeves Casual Shirt",
-        sku:"LP-SH-001",
-        price:1862,
-        brand:"Louis Philippe",
-        category:"shirt",
-        subCategory:"shirt,full sleeve,casual,peach,men",
-        description:"Infuse your casual collection with the vibrant allure of this peach solid shirt from Louis Philippe Sport. Meticulously constructed from a lightweight blend of cotton, nylon, and spandex, it promises exceptional comfort and stretch recovery, making it a staple for versatile styling. The super slim fit not only enhances your silhouette but also adds a contemporary edge. Day or evening, this shirt epitomizes effortless charm and sophistication for the modern man.",
-        image_url:"https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/images\/LP-SH-001.avif",
-        model_url:"https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/models\/LP-SH-001.glb",
-        productLink:"https:\/\/louisphilippe.abfrl.in\/p\/men-peach-super-slim-fit-solid-full-sleeves-casual-shirt-39837787.html?source=plp"
-    }
+        name: "Men Peach Super Slim Fit Solid Full Sleeves Casual Shirt",
+        sku: "LP-SH-001",
+        price: 1862,
+        brand: "Louis Philippe",
+        category: "shirt",
+        subCategory: "shirt,full sleeve,casual,peach,men",
+        description: "Infuse your casual collection with the vibrant allure of this peach solid shirt from Louis Philippe Sport. Meticulously constructed from a lightweight blend of cotton, nylon, and spandex, it promises exceptional comfort and stretch recovery, making it a staple for versatile styling. The super slim fit not only enhances your silhouette but also adds a contemporary edge. Day or evening, this shirt epitomizes effortless charm and sophistication for the modern man.",
+        image_url: "https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/images\/LP-SH-001.avif",
+        model_url: "https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/models\/LP-SH-001.glb",
+        productLink: "https:\/\/louisphilippe.abfrl.in\/p\/men-peach-super-slim-fit-solid-full-sleeves-casual-shirt-39837787.html?source=plp"
+      }
     ],
   },
   reducers: {
@@ -599,7 +600,6 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     }
-
   }
 });
 
@@ -619,6 +619,18 @@ export const makePayment = createAsyncThunk(
     );
 
     console.log(response.data)
+
+    dispatch(
+      chatAction.addMessage({
+        id: response.data.id,
+        sender: "bot",
+        text: response.data.reply ?? "Payment Done",
+        isLoading: false,
+        inputState: "text",
+        lang: "en"
+      })
+    );
+
     return response.data;
   }
 );
@@ -677,6 +689,10 @@ export const backendEventHandler = (msg) => {
 
   if (event.eventType == "PAYMENT") {
     store.dispatch(paymentActions.startPayment());
+  }
+  else if(event.eventType == "ORDER")
+  {
+    console.log(event)
   }
 }
 

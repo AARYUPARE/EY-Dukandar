@@ -108,7 +108,9 @@ public class PaymentServiceImplementation implements PaymentService {
         payment.setPaymentStatus("SUCCESS");
         payment.setPaidAt(LocalDateTime.now());
 
-        langChainClient.sendPaymentSuccessEvent();
+        Map<String, Object> res = langChainClient.sendPaymentSuccessEvent(userId);
+
+        payment.setReply(res.get("reply").toString());
 
         return payment;
     }

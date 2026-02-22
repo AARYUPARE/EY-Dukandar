@@ -25,6 +25,8 @@ from agents.fulfillment_agent import FulfillmentAgent
 from session.session_manager import RedisSessionManager
 from agents.payment_agent import PaymentAgent
 from agents.loyalty_agent import LoyaltyAgent
+from adapters.pos_adapter import POSAdapter
+from adapters.web_adapter import WebAdapter
 
 # -------------------------------
 # 3️⃣ INIT SESSION MANAGER
@@ -44,6 +46,9 @@ fulfillment_agent = FulfillmentAgent()
 payment_agent = PaymentAgent()
 loyalty_agent = LoyaltyAgent(session_manager=session_manager)
 
+pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm)
+web_adapter = WebAdapter(session_manager, llm)
+
 # -------------------------------
 # 5️⃣ INIT SALES AGENT (CORE)
 # -------------------------------
@@ -54,7 +59,8 @@ sales_agent = SalesAgent(
     inventory_agent=inventory_agent,
     session_manager=session_manager,
     payment_agent=payment_agent,
-    loyalty_agent=loyalty_agent
+    loyalty_agent=loyalty_agent,
+    pos_adapter=pos_adapter
 )
 
 # -------------------------------

@@ -1,20 +1,18 @@
-let originalTabId = null;
-
 chrome.runtime.onMessage.addListener((msg, sender) => {
-  console.log("Background received:", msg);
 
   if (msg.type === "SAVE_TAB") {
-    originalTabId = sender.tab.id;
-    console.log("Saved tab:", originalTabId);
+    chrome.storage.local.set({ originalTabId: sender.tab.id });
   }
 
   if (msg.type === "REDIRECT_TAB") {
-    console.log("Redirect request:", msg.url);
+    chrome.storage.local.get(["originalTabId"], (result) => {
+      const tabId = result.originalTabId;
 
-    if (originalTabId) {
-      chrome.tabs.update(originalTabId, { url: msg.url, active: true }, (tab) => {
-        chrome.windows.update(tab.windowId, { focused: true });
-      });
-    }
+      if (tabId) {
+        chrome.tabs.update(tabId, { url: msg.url, active: true }, (tab) => {
+          chrome.windows.update(tab.windowId, { focused: true });
+        });
+      }
+    });
   }
 });
