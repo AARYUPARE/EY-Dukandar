@@ -36,18 +36,19 @@ def build_index():
 
     for p in products:
         # ---- normalize subCategory from any backend shape ----
-        sub_categories = (
+        sub_category = (
             p.get("subCategory")
             or p.get("sub_category")
             or p.get("subcategory")
         )
-        sub_categories = safe_list(sub_categories)
 
         # ---- text for embedding ----
+
         combined_text = f"""
-        {safe_str(p.get('name'))}
-        {safe_str(p.get('category'))}
-        {' '.join(sub_categories)}
+            name: {safe_str(p.get('name'))}
+            category: {safe_str(p.get('category'))}
+            subcategory: {safe_str(sub_category)}
+            brand: {safe_str(p.get('brand'))}
         """
 
         cleaned = clean_text(combined_text)
@@ -60,11 +61,12 @@ def build_index():
                 "name": safe_str(p.get("name")),
                 "brand": safe_str(p.get("brand")),
                 "category": safe_str(p.get("category")),
-                "sub_category": sub_categories,      # ✅ list[str]
+                "sub_category": sub_category,      # ✅ str
                 "price": float(p.get("price", 0)),   # ✅ number
                 "image_url": safe_str(p.get("imageUrl") or p.get("image_url")),
                 "model_url": safe_str(p.get("modelUrl") or p.get("model_url")),
-                "sku": safe_str(p.get("sku"))
+                "sku": safe_str(p.get("sku")),
+                "productLink": safe_str(p.get("productLink")),
             }
         })
 

@@ -29,8 +29,8 @@ public class Product {
     @Column(nullable = false)
     private String category;           // Example: "Shirts", "Winter Wear"
 
-    @Column(name = "sub_category")
-    private List<String> subCategory = new ArrayList<>();
+    @Column(name = "sub_category", nullable = false)
+    private String subCategory;
 
     @Column(length = 1000)
     private String description;        // Used for vector DB search or embeddings
@@ -48,7 +48,7 @@ public class Product {
 
     // All-args constructor
     public Product(Long id, String name, String sku, double price,
-                    String brand, String category, String description,
+                    String brand, String category, String subCategory,String description,
                    String imageUrl, String modelUrl, String productLink) {
 
         this.id = id;
@@ -57,6 +57,7 @@ public class Product {
         this.price = price;
         this.brand = brand;
         this.category = category;
+        this.subCategory = subCategory;
         this.description = description;
         this.imageUrl = imageUrl;
         this.modelUrl = modelUrl;
@@ -91,11 +92,11 @@ public class Product {
     public String getModelUrl() { return modelUrl; }
     public void setModelUrl(String modelUrl) { this.modelUrl = modelUrl; }
 
-    public List<String> getSubCategory()
+    public String getSubCategory()
     {
         return subCategory;
     }
-    public void setSubCategory(List<String> subCategory)
+    public void setSubCategory(String subCategory)
     {
         this.subCategory = subCategory;
     }

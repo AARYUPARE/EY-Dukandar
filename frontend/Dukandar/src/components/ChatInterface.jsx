@@ -8,6 +8,7 @@ import "../styles/ChatInterface.css"
 import PaymentOverlay from "./PaymentOverlay.jsx"
 import { useEffect } from "react"
 import { backendEventHandler } from "../store/store.js"
+import {connectWS } from "../../web_socket/socketListener.js"
 
 const ChatInterface = () => {
 

@@ -18,8 +18,8 @@ public class InventoryController {
     private InventoryService inventoryService;
 
     @PostMapping
-    public Inventory add(@RequestBody Inventory inventory) {
-        return inventoryService.addInventory(inventory);
+    public List<Inventory> add(@RequestBody List<Inventory> inventories) {
+        return inventoryService.addInventory(inventories);
     }
 
     @GetMapping("/{id}")

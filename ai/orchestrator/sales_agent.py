@@ -1328,6 +1328,8 @@ class SalesAgent:
                 budget=disc["budget"]
             )
 
+            print("Products:", products)
+
             if not products:
                 return {"reply":"I couldn’t find good matches 😕 Want to try something else?"}
 
@@ -1705,7 +1707,7 @@ class SalesAgent:
             )
 
             return{
-                "reply": "Payment Started"
+                "reply": "__blank__"
             }
 
         # -------------------------

@@ -43,7 +43,7 @@ session_manager = RedisSessionManager(
 recommendation_agent = RecommendationAgent()
 inventory_agent = InventoryAgent()
 fulfillment_agent = FulfillmentAgent()
-payment_agent = PaymentAgent()
+payment_agent = PaymentAgent(session=session_manager)
 loyalty_agent = LoyaltyAgent(session_manager=session_manager)
 
 pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm)

@@ -15,7 +15,7 @@ def build_index():
     vectors = []
 
     for p in products:
-        combined_text = f"{p['name']} {p['brand']} {p['category']} {p['sub_category']} {p['description']}"
+        combined_text = f"{p['name']} {p['brand']} {p['category']} {p['sub_category']}"
         cleaned = clean_text(combined_text)
 
         vector = embed(cleaned)
@@ -30,7 +30,9 @@ def build_index():
                 "sub_category": p["sub_category"],
                 "price": p["price"],
                 "image_url": p["image_url"],
-                "sku": p["sku"]
+                "model_url": p["model_url"],
+                "sku": p["sku"],
+                "productLink": p["productLink"],
             }
         })
 

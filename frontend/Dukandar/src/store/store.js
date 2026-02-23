@@ -379,7 +379,9 @@ const productsSlice = createSlice({
   },
   reducers: {
     addProducts(state, action) {
+      state.products.length = 0;
       const seenIds = new Set(state.products.map(p => p.id));
+
 
       const uniqueProducts = [];
 
@@ -391,6 +393,7 @@ const productsSlice = createSlice({
       }
 
       state.products.push(...uniqueProducts);
+      console.log(state.products);
     },
 
     clearProducts() {
@@ -690,8 +693,7 @@ export const backendEventHandler = (msg) => {
   if (event.eventType == "PAYMENT") {
     store.dispatch(paymentActions.startPayment());
   }
-  else if(event.eventType == "ORDER")
-  {
+  else if (event.eventType == "ORDER") {
     console.log(event)
   }
 }

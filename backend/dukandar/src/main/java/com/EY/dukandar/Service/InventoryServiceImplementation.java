@@ -31,10 +31,17 @@ public class InventoryServiceImplementation implements InventoryService {
     // ================= EXISTING METHODS (UNCHANGED) =================
 
     @Override
-    public Inventory addInventory(Inventory inventory)
+    public List<Inventory> addInventory(List<Inventory> inventories)
     {
-        inventory.setAvailable(inventory.getStockQuantity() > 0);
-        return inventoryRepository.save(inventory);
+        List<Inventory> saved = new ArrayList<>();
+
+        for(Inventory inventory : inventories)
+        {
+            inventory.setAvailable(inventory.getStockQuantity() > 0);
+            saved.add(inventoryRepository.save(inventory));
+        }
+
+        return saved;
     }
 
     @Override

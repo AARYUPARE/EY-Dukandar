@@ -6,8 +6,8 @@ import requests
 BASE_URL = "http://localhost:8080/api"
 
 class PaymentAgent:
-    def __init__(self):
-        pass
+    def __init__(self, session):
+        self.session = session
 
     # -----------------------------
     # DUMMY PAYMENT PROCESSOR

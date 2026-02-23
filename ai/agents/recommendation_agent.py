@@ -133,8 +133,8 @@ class RecommendationAgent:
         if budget:
             filters["price"] = {"$lte": budget}
             
-        # if product_type:
-        #     filters["category"] = product_type
+        if product_type:
+            filters["category"] = product_type.lower()
 
         return self._search(
             query=query,
@@ -159,7 +159,7 @@ class RecommendationAgent:
             query=category,
             k=6,
             filters={
-                # "category": category,
+                "category": category.lower(),
                 "price": {"$gt": price, "$lte": max_price}
             }
         )
@@ -191,7 +191,7 @@ class RecommendationAgent:
         if not base_product:
             return None
 
-        category = base_product.get("category")
+        category = base_product.get("category").lower()
         base_price = base_product.get("price", 0)
 
         if not category or not base_price:

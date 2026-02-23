@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface InventoryService {
 
-    Inventory addInventory(Inventory inventory);
+    List<Inventory> addInventory(List<Inventory> inventories);
 
     Inventory getInventoryById(Long id);
 
