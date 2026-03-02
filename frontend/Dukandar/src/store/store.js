@@ -4,6 +4,7 @@ import {
   configureStore,
 } from "@reduxjs/toolkit";
 import axios from "axios";
+import { act } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const BASE_BACKEND_URL = "http://localhost:8080/api"
@@ -39,7 +40,7 @@ const kioskStoreSlice = createSlice({
   name: "store",
   initialState:
   {
-    id: 1,
+    id: 13,
     name: "ABFRL Phoenix Mall Store",
     address: "Phoenix Marketcity, Viman Nagar, Pune",
     phone: "9876543210",
@@ -151,6 +152,22 @@ export const loginKiosk = createAsyncThunk(
 );
 
 
+const getBrandFromExtension = () => {
+  return new Promise((resolve) => {
+
+    const handler = (event) => {
+      if (event.data.type === "BRAND_CONTEXT") {
+        window.removeEventListener("message", handler);
+        resolve(event.data.brand);
+      }
+    };
+
+    window.addEventListener("message", handler);
+
+    window.postMessage({ type: "GET_BRAND" }, "*");
+  });
+};
+
 /* =========================
    WEB LOGIN
 ========================= */
@@ -159,11 +176,13 @@ export const loginWeb = createAsyncThunk(
   async ({ email, password }, { dispatch, getState, rejectWithValue }) => {
     try {
       // const { email, password } = getState().user;
+      const brand = await getBrandFromExtension();
 
       const response = await axios.post(BASE_BACKEND_URL + `/login`, {
         email,
         password,
-        storeType: "web"
+        storeType: "web",
+        brand: brand
       });
 
       if (response.data.message == "login failed") {
@@ -363,39 +382,14 @@ const productsSlice = createSlice({
   initialState: {
     canShow: true,
     products: [
-      {
-        name: "Men Peach Super Slim Fit Solid Full Sleeves Casual Shirt",
-        sku: "LP-SH-001",
-        price: 1862,
-        brand: "Louis Philippe",
-        category: "shirt",
-        subCategory: "shirt,full sleeve,casual,peach,men",
-        description: "Infuse your casual collection with the vibrant allure of this peach solid shirt from Louis Philippe Sport. Meticulously constructed from a lightweight blend of cotton, nylon, and spandex, it promises exceptional comfort and stretch recovery, making it a staple for versatile styling. The super slim fit not only enhances your silhouette but also adds a contemporary edge. Day or evening, this shirt epitomizes effortless charm and sophistication for the modern man.",
-        image_url: "https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/images\/LP-SH-001.avif",
-        model_url: "https:\/\/raw.githubusercontent.com\/AARYUPARE\/EY-Dukandar-Assets\/refs\/heads\/main\/models\/LP-SH-001.glb",
-        productLink: "https:\/\/louisphilippe.abfrl.in\/p\/men-peach-super-slim-fit-solid-full-sleeves-casual-shirt-39837787.html?source=plp"
-      }
+
     ],
   },
   reducers: {
     addProducts(state, action) {
-      state.products.length = 0;
-      const seenIds = new Set(state.products.map(p => p.id));
-
-
-      const uniqueProducts = [];
-
-      for (const product of action.payload) {
-        if (!seenIds.has(product.id)) {
-          seenIds.add(product.id);
-          uniqueProducts.push(product);
-        }
-      }
-
-      state.products.push(...uniqueProducts);
-      console.log(state.products);
+      state.products = [...action.payload];
+      console.log("State Products: ", state.products);
     },
-
     clearProducts() {
       return { products: [] }
     },

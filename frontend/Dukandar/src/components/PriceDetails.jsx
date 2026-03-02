@@ -4,7 +4,7 @@ const PriceDetails = ({ price, productLink }) => {
 
     const goToProductLink = () => {
 
-        console.log("Product link clicked")
+        console.log("Product link clicked: ", productLink)
 
         window.postMessage({
             type: "REDIRECT_TAB",

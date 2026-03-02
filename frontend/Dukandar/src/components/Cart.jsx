@@ -5,6 +5,7 @@ import {
 } from "../store/store";
 
 import PaymentOverlay from "./PaymentOverlay";
+import { paymentActions } from "../store/store";
 
 import css from "../styles/Cart.module.css";
 import { IoTrashOutline } from "react-icons/io5";
@@ -32,8 +33,7 @@ export default function Cart() {
   function handleCheckout() {
     // later → call backend purchase API
     console.log("Checkout:", rows);
-
-    dispatch(cartActions.clearCart());
+    dispatch(paymentActions.startPayment())
   }
 
   return (

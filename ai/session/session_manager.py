@@ -61,6 +61,7 @@ class RedisSessionManager:
             # 🔑 SINGLE SOURCE OF TRUTH
             "pending_action": None,
             "payment_pending": False,
+            "payment_offer": {},
 
             # RESERVATION
             "reservation": {
@@ -75,6 +76,7 @@ class RedisSessionManager:
                 "product_type": None,
                 "occasion": None,
                 "budget": None,
+                "brand": None,
                 "size": None,
                 "occasion_applicable": True,
                 "asked_once": False
@@ -189,6 +191,7 @@ class RedisSessionManager:
                 "product_type": None,
                 "occasion": None,
                 "budget": None,
+                "brand": None,
                 "size": None,
                 "occasion_applicable": True,
                 "asked_once": False

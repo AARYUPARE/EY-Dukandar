@@ -40,6 +40,7 @@ public class Product {
     @JsonProperty("model_url")
     private String modelUrl;          // Optional 3D model
 
+    @JsonProperty("product_link")
     @Column(nullable = true)
     private String productLink;
 

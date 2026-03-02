@@ -118,14 +118,18 @@ class RecommendationAgent:
             self,
             product_type=None,
             occasion=None,
-            budget=None
+            budget=None,
+            brand=None,
+            gender=None
     ):
         query_parts = []
 
         if product_type:
-            query_parts.append(product_type)
+            query_parts.append(product_type.lower())
         if occasion:
-            query_parts.append(occasion)
+            query_parts.append(occasion.lower())
+        if gender:
+            query_parts.append(gender.lower())
 
         query = " ".join(query_parts)
 
@@ -133,8 +137,15 @@ class RecommendationAgent:
         if budget:
             filters["price"] = {"$lte": budget}
             
-        if product_type:
-            filters["category"] = product_type.lower()
+        # if product_type:
+        #     filters["category"] = product_type.lower()
+
+        print("Brand: ", brand)
+
+        if brand:
+            filters["brand"] = brand
+
+
 
         return self._search(
             query=query,
@@ -145,21 +156,31 @@ class RecommendationAgent:
     # =====================================================
     # 2️⃣ QUALITY UPGRADE (SalesAgent → after product select)
     # =====================================================
-    def up_sell(self, selected_product: dict, occasion=None):
+    def up_sell(self, selected_product: dict, gender=None,  occasion=None):
 
         category = selected_product.get("category")
         price = selected_product.get("price")
+
+        query_parts = []
+
+        if  category:
+            query_parts.append(category.lower())
+        if occasion:
+            query_parts.append(occasion.lower())
+        if gender:
+            query_parts.append(gender.lower())
 
         if not category or not price:
             return None
 
         max_price = price + 500
 
+        query = " ".join(query_parts)
+
         candidates = self._search(
-            query=category,
+            query=query,
             k=6,
             filters={
-                "category": category.lower(),
                 "price": {"$gt": price, "$lte": max_price}
             }
         )
@@ -186,7 +207,7 @@ class RecommendationAgent:
     # =====================================================
     # 4️⃣ BUNDLE (DYNAMIC MULTI-ITEM - HACKATHON READY)
     # =====================================================
-    def cross_sell(self, base_product: dict, occasion=None):
+    def cross_sell(self, base_product: dict):
 
         if not base_product:
             return None
@@ -242,9 +263,6 @@ class RecommendationAgent:
             "complete outfit",
             "matching items"
         ]
-
-        if occasion:
-            query_parts.append(occasion)
 
         if base_product.get("subCategory"):
             query_parts.append(base_product["subCategory"])

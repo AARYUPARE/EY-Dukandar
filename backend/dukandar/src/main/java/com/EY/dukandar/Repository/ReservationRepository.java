@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    Reservation findByProductIdAndSizeAndStoreIdAndUserId(Long productId, String size, Long storeId, Long userId);
+    List<Reservation> findByProductIdAndSizeAndStoreIdAndUserId(Long productId, String size, Long storeId, Long userId);
 }

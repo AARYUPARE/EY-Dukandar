@@ -4,6 +4,7 @@ import com.EY.dukandar.Model.Product;
 import com.EY.dukandar.Model.Store;
 import com.EY.dukandar.Model.User;
 import com.EY.dukandar.Service.ProductService;
+import com.EY.dukandar.Service.UserService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,9 +22,11 @@ public class LangChainClient {
     private final String RESERVE_DETAIL_API = "http://localhost:8000/qr-scan";
 
     private final ProductService productService;
+    private final UserService userService;
 
-    public LangChainClient(ProductService productService) {
+    public LangChainClient(ProductService productService, UserService userService) {
         this.productService = productService;
+        this.userService = userService;
     }
 
     public Map<String, Object> sendToAgent(
@@ -49,7 +52,8 @@ public class LangChainClient {
             String sessionId,
             String channel,
             User user,
-            Store store
+            Store store,
+            String brand
     ) {
 
         Map<String, Object> payload = new HashMap<>();
@@ -57,6 +61,7 @@ public class LangChainClient {
         payload.put("channel", channel);
         payload.put("user", user);
         payload.put("store", store);
+        payload.put("brand", brand != null ? brand : "Van Hausen");
 
         return restTemplate.postForObject(
                 LOGIN_EVENT_URL,
@@ -79,12 +84,14 @@ public class LangChainClient {
     public Map<String, Object> authDetail(Long productId, Long userId)
     {
         Product product = productService.getProductById(productId);
+        User user = userService.getUserById(userId);
 
         System.out.println(product);
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("sessionId", userId.toString());
         payload.put("product", product);
+        payload.put("user", user);
 
         System.out.println("go for scan");
 

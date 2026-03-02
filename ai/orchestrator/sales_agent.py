@@ -272,6 +272,7 @@ class SalesAgent:
     - Do NOT change punctuation
     - Do NOT add emojis (emoji already exists)
     - Only replace the content using the product data
+    - Keep description short and small 
 
     FORMAT (copy exactly):
 
@@ -349,6 +350,7 @@ class SalesAgent:
     - Sound like a helpful store assistant
     - Do not write any other sentence in output other than store details and stores
     - Do not write any URL in the response even if provided
+    - Do not add extra fields in response it should only contain fields from example
 
     Stores:
     {stores}
@@ -356,14 +358,20 @@ class SalesAgent:
     Output example:
 
     OPTION 1
-    ─────────────
-    🏬 Dukandar Andheri West
-    • Andheri West, Mumbai
+    ────────────
+    🏬 ABFRL Phoenix Mall Store
+    • Phoenix Marketcity, Viman Nagar, Pune
+    • Phone: 9876543210
+    • Size: M
+    • Stock Quantity: 10
 
     OPTION 2
-    ─────────────
-    🏬 Dukandar Bandra East
-    • Bandra East, Mumbai
+    ────────────
+    🏬 ABFRL Western Mall Store
+    • Western Marketcity, Shivajinagar, Pune
+    • Phone: 9852468221
+    • Size: L
+    • Stock Quantity: 20
     """
         )
 
@@ -1174,16 +1182,16 @@ class SalesAgent:
 
                 messages = [f"""🛒 Added to your cart!
 
-                            {product['name']} has been successfully added to your cart.
+                                            {product['name']} has been successfully added to your cart.
 
-                            💰 Price: ₹{product['price']}
+                                            💰 Price: ₹{product['price']}
 
-                            You're one step closer to checkout!
-                            Would you like to continue shopping or proceed to checkout? 😊
-                            """]
+                                            You're one step closer to checkout!
+                                            Would you like to continue shopping or proceed to checkout? 😊
+                                            """]
 
                 # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
-                bundle_products = self.reco.cross_sell(product) or []
+                bundle_products = self.reco.cross_sell(product) or {}
 
                 if bundle_products:
                     bundle_text = (self.bundle_prompt | self.llm).invoke({
@@ -1192,13 +1200,34 @@ class SalesAgent:
                     }).content.strip()
 
                     if bundle_text != "NO_BUNDLE":
-                        messages.append(bundle_text)
                         session["cross-sell_products"] = bundle_products
                         session["pending_action"] = "cross_sell"
                         self.session._save(session_id, session)
-                        return {"reply": "\n\n".join(messages)}
 
-                return {"reply": "\n\n".join(messages)}
+                        joint = "\n\n".join(messages)
+
+                        combined_products = [
+                            product
+                        ]
+
+                        combined_products += bundle_products.get("items") or []
+
+                        return {
+                            "reply": f"""
+                                                {joint}
+
+                                                ✨ Quick tip ✨
+                                                __________________
+                                                {bundle_text}
+
+                                                Do you want to enhance your purchase with these complementary items?
+                                                """,
+                            "products": combined_products
+                        }
+
+                return {
+                    "reply": messages
+                }
 
             # =====================================================
             # POS CHECKOUT CONFIRM (KIOSK FLOW)
@@ -1322,13 +1351,18 @@ class SalesAgent:
             # -------------------------------
             # 4️⃣ Discovery complete → find products
             # -------------------------------
+
+            print("User: ", user)
+
             products = self.reco.find_products(
                 product_type=disc["product_type"],
                 occasion=disc["occasion"],
-                budget=disc["budget"]
+                budget=disc["budget"],
+                brand=disc["brand"],
+                gender=user["gender"]
             )
 
-            print("Products:", products)
+            # print("Products:", products)
 
             if not products:
                 return {"reply":"I couldn’t find good matches 😕 Want to try something else?"}
@@ -1341,6 +1375,8 @@ class SalesAgent:
                 products=products,
                 category=disc["product_type"]
             )
+
+
 
             session["focus"]["shown_products"] = products
 
@@ -1436,6 +1472,7 @@ class SalesAgent:
             # 🔥 ask RecommendationAgent for quality upgrade
             upgrade_result = self.reco.up_sell(
                 selected_product=selected_product,
+                gender=user["gender"],
                 occasion=session["discovery"]["occasion"]
             )
 
@@ -1452,14 +1489,28 @@ class SalesAgent:
                 "price_diff": price_diff
             }).content.strip()
 
-            response += upsell_message
-
             # mark upsell state
             session["pending_action"] = "UPSELL_DECISION"
             session["upsell_product"] = upgrade_product
             self.session._save(session_id, session)
 
-            return {"reply" : response}
+            compared_products = [
+                selected_product,
+                upgrade_product
+            ]
+
+            return {
+                "reply": f"""
+                        {response}
+                        ✨ Quick tip ✨
+                        __________________
+                        {upsell_message}
+                        
+                        This version offers extra features and better quality. 
+                        Shall we upgrade your selection?
+                        """,
+                "products": compared_products
+            }
 
         # -------------------------
         # 5️⃣ ADD TO CART
@@ -1488,7 +1539,7 @@ class SalesAgent:
                             """]
 
             # 2️⃣ TRY BUNDLE FIRST (AOV MAXIMIZER)
-            bundle_products = self.reco.cross_sell(product) or []
+            bundle_products = self.reco.cross_sell(product) or {}
 
             if bundle_products:
                 bundle_text = (self.bundle_prompt | self.llm).invoke({
@@ -1497,13 +1548,34 @@ class SalesAgent:
                 }).content.strip()
 
                 if bundle_text != "NO_BUNDLE":
-                    messages.append(bundle_text)
                     session["cross-sell_products"] = bundle_products
                     session["pending_action"] = "cross_sell"
                     self.session._save(session_id, session)
-                    return {"reply": "\n\n".join(messages)}
 
-            return {"reply": "\n\n".join(messages)}
+                    joint = "\n\n".join(messages)
+
+                    combined_products = [
+                        product
+                    ]
+
+                    combined_products += bundle_products.get("items") or []
+
+                    return {
+                        "reply": f"""
+                                {joint}
+    
+                                ✨ Quick tip ✨
+                                __________________
+                                {bundle_text}
+                                
+                                Do you want to enhance your purchase with these complementary items?
+                                """,
+                        "products": combined_products
+                    }
+
+            return {
+                "reply": messages
+            }
 
         # -------------------------
         # WISHLIST HANDLER
@@ -1638,7 +1710,8 @@ class SalesAgent:
             }).content.strip()
 
             result = response.content.strip() + "\n\n" + formatted
-            return {"reply": result}
+            return {"reply": result,
+                    "stores": stores}
 
         # -------------------------
         # 7️⃣ CHECKOUT
@@ -1691,8 +1764,10 @@ class SalesAgent:
                     session_id=session_id,
                     payment_method=method
                 )
+                offers = self.loyalty_agent.show_offers(user=user, session=session)
+                reply = reply.get("reply") + "\n\n" + offers["reply"]
 
-                return {"reply": reply.get("reply")}
+                return {"reply": reply}
 
 
             session["checkout"]["payment_method"] = method
@@ -1714,6 +1789,10 @@ class SalesAgent:
         # 8️⃣ OFFER
         # -------------------------
         if intent == "OFFER":
+
+            if session.get("payment_pending"):
+                self.loyalty_agent.apply_payment_offer(session_id=session_id, message=user_message)
+
             if session["cart"]["offer"]:
                 return {"reply": "You already have an offer applied to the cart"}
 

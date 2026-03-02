@@ -45,6 +45,7 @@ public class LoginController {
         }
 
         user.setPassword(null);
+        String brand = request.getBrand();
 
         // WEB LOGIN
         if ("web".equalsIgnoreCase(request.getStoreType())) {
@@ -54,7 +55,8 @@ public class LoginController {
                             user.getId().toString(),
                             "web",
                             user,
-                            null
+                            null,
+                            brand
                     );
 
             return new LoginResponse(
@@ -84,7 +86,8 @@ public class LoginController {
                             user.getId().toString(),
                             "kiosk",
                             user,
-                            store
+                            store,
+                            null
                     );
 
             return new LoginResponse(

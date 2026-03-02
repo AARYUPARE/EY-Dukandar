@@ -127,16 +127,32 @@ Your AI shopping companion
   }, 9000);
 }
 
-/* =======================
-   Bridge listener (all sites)
-=======================*/
+window.addEventListener("message", (event) => {
+if (!event.data || !event.data.type) return;
+
+console.log("Filtered message:", event.data);
+});
+
+/* ===== Listen webpage → extension ===== */
 window.addEventListener("message", (event) => {
   if (event.source !== window) return;
+
+  if (!event.data || !event.data.type) return;
+
 
   if (event.data.type === "REDIRECT_TAB") {
     chrome.runtime.sendMessage({
       type: "REDIRECT_TAB",
       url: event.data.url
+    });
+  }
+
+  if (event.data.type === "GET_BRAND") {
+    chrome.storage.local.get(["brandName"], (result) => {
+      window.postMessage({
+        type: "BRAND_CONTEXT",
+        brand: result.brandName
+      }, "*");
     });
   }
 });

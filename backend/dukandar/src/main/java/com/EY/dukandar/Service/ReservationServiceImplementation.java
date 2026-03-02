@@ -51,10 +51,10 @@ public class ReservationServiceImplementation implements ReservationService {
     {
         Map<String, Object> response = new HashMap<>();
 
-        Reservation reservation = reservationRepository.findByProductIdAndSizeAndStoreIdAndUserId(productId, size, storeId, userId);
+        List<Reservation> reservation = reservationRepository.findByProductIdAndSizeAndStoreIdAndUserId(productId, size, storeId, userId);
 
 
-        if(reservation == null)
+        if(reservation.isEmpty())
         {
             response.put("status", "FAILED");
             return response;

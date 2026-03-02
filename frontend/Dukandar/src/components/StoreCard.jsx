@@ -39,7 +39,7 @@ export default function StoreCard({
 
         <div className="card-body">
           <h5 className="card-title">{name}</h5>
-          <p className="card-text">📍 {address}</p>
+          <p className="card-text" style={{ fontSize: "0.8rem" }}>📍 {address}</p>
           <p className="card-text">📞 {phone}</p>
         </div>
       </div>

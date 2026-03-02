@@ -70,6 +70,7 @@ class LoginEvent(BaseModel):
     channel: str          # "web" | "kiosk"
     user: Optional[Dict[str, Any]] = None
     store: Optional[Dict[str, Any]] = None
+    brand: str
 
 
 @app.post("/login-event")
@@ -87,7 +88,8 @@ def login_event(data: LoginEvent):
         else:
             reply = web_adapter.on_user_login(
                 session_id=data.sessionId,
-                user=data.user
+                user=data.user,
+                brand = data.brand
             )
 
         #print("Login event reply:", reply)
@@ -97,12 +99,13 @@ def login_event(data: LoginEvent):
     except Exception as e:
         print("AI ERROR:", str(e))
         return {
-            "reply": "Welcome back! How can I help you today? 😊"
+            "reply": "welcome to dukandar How can I assist you with your shopping today? You can ask me to show products, check availability, or help with your cart. Just let me know what you need! 😊"
         }
 
 class QRScanEvent(BaseModel):
     sessionId: str
     product: Dict[str, Any]
+    user: Optional[Dict[str, Any]] = None
 
 
 @app.post("/qr-scan")
@@ -112,7 +115,8 @@ def qr_scan(data: QRScanEvent):
 
     reply = pos_adapter.handle_qr_scan(
         session_id=data.sessionId,
-        product=data.product
+        product=data.product,
+        user= data.user
     )
 
     return {"reply": reply}

@@ -46,7 +46,7 @@ fulfillment_agent = FulfillmentAgent()
 payment_agent = PaymentAgent(session=session_manager)
 loyalty_agent = LoyaltyAgent(session_manager=session_manager)
 
-pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm)
+pos_adapter = POSAdapter(session_manager, inventory_agent, payment_agent, llm, loyalty_agent=loyalty_agent)
 web_adapter = WebAdapter(session_manager, llm)
 
 # -------------------------------

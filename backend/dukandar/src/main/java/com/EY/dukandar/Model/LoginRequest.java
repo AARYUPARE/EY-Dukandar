@@ -7,6 +7,9 @@ public class LoginRequest {
     private String storeType; // "web" or "kiosk"
     private Long storeId;     // required only for kiosk
 
+
+    private String brand;
+
     public String getSessionId() {
         return sessionId;
     }
@@ -28,4 +31,12 @@ public class LoginRequest {
 
     public Long getStoreId() { return storeId; }
     public void setStoreId(Long storeId) { this.storeId = storeId; }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 }

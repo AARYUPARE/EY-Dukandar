@@ -194,5 +194,5 @@ class QRGenerator:
 
 # test
 if __name__ == "__main__":
-    QRGenerator.generate_qr_bytes("2_1_M_1", "Transparent Product.png")
+    QRGenerator.generate_qr_bytes("63_13_M_1", "Transparent Product.png")
     print("✅ Styled circular QR generated → test_qr.png")

@@ -23,9 +23,9 @@ const ProductDisplay = () => {
             <button className={css.closeBtn} onClick={handelClose}>×</button>
 
             <div className={css["display-container"]}>
-                <ModelDisplay model_url={product.model_url} />
+                <ModelDisplay model_url={product.model_url} image_url={product.image_url}/>
                 <ProductDetails description={product.description} title={product.name} category={product.category} sub_category={product.sub_category} brand={product.brand}/>
-                <PriceDetails price={product.price} productLink={product.productLink} />
+                <PriceDetails price={product.price} productLink={product.product_link} />
             </div>
 
         </div>

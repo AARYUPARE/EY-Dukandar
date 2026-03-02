@@ -24,7 +24,7 @@ export default function Card({ title, image_url, price, onClick, brand, size}) {
 	<div className="content">
 		<div className="bottom">
 			<h4>{title}</h4>
-			<p className="description">Rs. {price} : Brand <b>{brand}</b></p>
+			<p className="description">Rs. {price} <br /> Brand <b>{brand}</b></p>
       {(size != null && size != "") ? <p>Size: {size}</p> : <></>}
 		</div>
 	</div>

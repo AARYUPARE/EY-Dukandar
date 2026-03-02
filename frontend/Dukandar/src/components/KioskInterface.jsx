@@ -7,8 +7,17 @@ import Navbar from "./Navbar";
 import css from "../styles/KioskInterface.module.css";
 import { Outlet, useLocation } from "react-router-dom";
 import PaymentOverlay from "./PaymentOverlay";
+import { useEffect } from "react";
+import { connectWS } from "../../web_socket/socketListener";
+import { backendEventHandler } from "../store/store";
+import axios from "axios";
+
 
 const KioskInterface = () => {
+
+    useEffect(() => {
+        connectWS(backendEventHandler)
+    })
 
     const location = useLocation();
 

@@ -60,20 +60,20 @@ class WebAdapter:
         {{PRODUCT_LINES}}
 
         Would you like to continue exploring these styles, or try something new?
-
-        Products:
-        {products}
         """
         )
 
     # ---------------------------
     # ENTRY POINT (CALL ON LOGIN)
     # ---------------------------
-    def on_user_login(self, session_id, user=None):
+    def on_user_login(self, session_id, brand=None, user=None):
         session = self.session.get(session_id)
 
         if not session:
             session = {}
+
+        session["discovery"]["brand"] = brand
+        self.session._save(session_id, session)
 
         print("Hello Web")
 

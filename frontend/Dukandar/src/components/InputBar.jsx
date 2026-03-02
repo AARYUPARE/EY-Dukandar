@@ -16,7 +16,7 @@ const InputBar = ({ sendPromt }) => {
 
     if (recognition) {
         recognition.continuous = false; // auto stop
-        recognition.lang = "mr-IN"
+        recognition.lang = "hi-IN"
         recognition.interimResults = false;
     }
 

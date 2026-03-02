@@ -1,3 +1,4 @@
+from huggingface_hub.commands import user
 from langchain_core.prompts import PromptTemplate
 import json
 import re
@@ -11,11 +12,12 @@ class POSAdapter:
     - Re-renders all messages using POS-specific LLM prompts
     """
 
-    def __init__(self, session_manager, inventory_agent, payment_agent, llm):
+    def __init__(self, session_manager, inventory_agent, payment_agent, llm, loyalty_agent):
         self.session = session_manager
         self.inventory = inventory_agent
         self.payment_agent = payment_agent
         self.llm = llm
+        self.loyalty_agent = loyalty_agent
 
         # ---------------------------
         # POS Cart
@@ -242,13 +244,17 @@ class POSAdapter:
             "reply": "__blank__"
         }
 
-    def handle_qr_scan(self, session_id, product):
+    def handle_qr_scan(self, session_id, product, user):
 
         session = self.session.get(session_id)
         if not session:
             return "Session expired."
 
+        offers = self.loyalty_agent.show_offers(user=user, session=session)
+
         summary = self.build_reservation_checkout_summary(product, session_id)
+
+        summary += "\n\n" + offers["reply"]
 
         # 🔥 Mark payment state
         session["payment_pending"] = True
@@ -267,11 +273,14 @@ class POSAdapter:
         total = product["price"]
 
         lines = []
-        lines.append("🧾 **Reserved Item Summary**")
+        lines.append("🧾 Reserved Item Summary")
         lines.append(f"{product['name']} — ₹{product['price']}")
         lines.append(f"\n🧮 Total: ₹{total}")
+        lines.append("🎉 Collect your product from counter")
         lines.append("\n💳 How would you like to pay?")
         lines.append("🔗 UPI | 💳 Card | 🏦 Net Banking | 💵 Cash")
+
+
 
         return "\n".join(lines)
     
@@ -289,7 +298,7 @@ class POSAdapter:
         
         return (
             f"✅ Payment successful!\n"
-            "🎉 Your reservation has been confirmed.\n"
+            "🎉 Collect your product from counter\n"
             f"💰 Total: ₹{product["price"]}"
             f"😊 do you want to buy something else. you can browse here"
         )

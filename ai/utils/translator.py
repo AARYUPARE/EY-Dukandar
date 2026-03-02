@@ -62,28 +62,45 @@ Rules:
     # ======================================================
     def to_english(self, text: str):
 
-        # 1️⃣ Detect language using LLM (cheap)
-        prompt = self.DETECT_PROMPT.format(text=text)
 
-        res = self.llm.invoke(prompt)
         lang = ""
-        lang = res.content.strip().lower()
 
-        print("Detected:", lang)
+        if "इसे रिजर्व करे" in text or "इसे आरक्षित करें" in text or "इससे आरक्षित करें" in text:
+            lang = "hi"
+            text = "Reserve This"
+            return lang, text
+        elif "हाँ" in text:
+            lang = "hi"
+            text = "Yes"
+            return lang, text
+        else:
 
-        # 2️⃣ If already English → skip
-        if "en" in lang:
+            if "अ" in text or "इ" in text:
+                lang = "hi"
+            elif text[0] >= "a" and text[0] <= "z":
+                lang = "en"
+            else:
+                # 1️⃣ Detect language using LLM (cheap)
+                prompt = self.DETECT_PROMPT.format(text=text)
+
+                res = self.llm.invoke(prompt)
+                lang = res.content.strip().lower()
+
+                print("Detected:", lang)
+
+            # 2️⃣ If already English → skip
+            if "en" in lang:
+                return "en", text
+
+            # 3️⃣ Local safe translation
+            if "hi" in lang:
+                return "hi", self._local_translate(text, self.tok_hi_en, self.mod_hi_en)
+
+            if "mr" in lang:
+                return "mr", self._local_translate(text, self.tok_mr_en, self.mod_mr_en)
+
+            # fallback
             return "en", text
-
-        # 3️⃣ Local safe translation
-        if "hi" in lang:
-            return "hi", self._local_translate(text, self.tok_hi_en, self.mod_hi_en)
-
-        if "mr" in lang:
-            return "mr", self._local_translate(text, self.tok_mr_en, self.mod_mr_en)
-
-        # fallback
-        return "en", text
 
     # ======================================================
     # 🔥 Post-agent (LLM nice translation)

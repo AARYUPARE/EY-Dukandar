@@ -1,16 +1,19 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import css from "../styles/ModelDisplay.module.css";
 
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
-const ModelDisplay = ({ model_url }) => {
+const ModelDisplay = ({ model_url, image_url }) => {
     const mountRef = useRef(null);
     const canvasRef = useRef(null);
 
+    // ⭐ fallback state
+    const [fallback, setFallback] = useState(false);
+
     useEffect(() => {
-        if (!mountRef.current || !canvasRef.current) return;
+        if (!mountRef.current || !canvasRef.current || fallback) return;
 
         const width = mountRef.current.clientWidth;
         const height = mountRef.current.clientHeight;
@@ -28,28 +31,18 @@ const ModelDisplay = ({ model_url }) => {
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(width, height);
 
-        // -----------------------------------------------------
-        // 🔥🔥🔥 CLEAN, REALISTIC, COLOR-ACCURATE LIGHTING 🔥🔥🔥
-        // -----------------------------------------------------
-
-        // Soft ambient environment light (natural bounce)
+        // Lights
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0x222222, 1.2);
         hemiLight.position.set(0, 20, 0);
         scene.add(hemiLight);
 
-        // Main studio key light — like Amazon/Myntra showroom
         const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
         keyLight.position.set(5, 10, 7);
         scene.add(keyLight);
 
-        // Gentle fill light to soften shadows
         const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
         fillLight.position.set(-5, 5, -3);
         scene.add(fillLight);
-
-        // -----------------------------------------------------
-        // END LIGHTS
-        // -----------------------------------------------------
 
         const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -59,14 +52,18 @@ const ModelDisplay = ({ model_url }) => {
         loader.load(
             model_url,
             (gltf) => {
+                // ⭐ invalid model guard
+                if (!gltf.scene || gltf.scene.children.length === 0) {
+                    setFallback(true);
+                    return;
+                }
+
                 model = gltf.scene;
 
-                // Fix Sketchfab scale issues
                 model.scale.set(50, 50, 50);
                 model.rotation.set(0, 0, 0);
                 model.position.set(0, 0, 0);
 
-                // Center the model
                 const box = new THREE.Box3().setFromObject(model);
                 const center = new THREE.Vector3();
                 box.getCenter(center);
@@ -79,10 +76,12 @@ const ModelDisplay = ({ model_url }) => {
                 controls.update();
             },
             undefined,
-            (err) => console.error("GLB Load Error:", err)
+            (err) => {
+                console.error("GLB Load Error:", err);
+                setFallback(true);
+            }
         );
 
-        // Orbit control settings
         controls.enableDamping = true;
         controls.enablePan = false;
         controls.enableZoom = true;
@@ -114,11 +113,19 @@ const ModelDisplay = ({ model_url }) => {
             renderer.dispose();
             controls.dispose();
         };
-    }, [model_url]);
+    }, [model_url, fallback]);
 
     return (
         <div ref={mountRef} id={css["model-display"]}>
-            <canvas ref={canvasRef}></canvas>
+            {fallback ? (
+                <img
+                    src={image_url}
+                    alt="fallback"
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                />
+            ) : (
+                <canvas ref={canvasRef}></canvas>
+            )}
         </div>
     );
 };
