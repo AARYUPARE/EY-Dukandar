@@ -1,0 +1,16 @@
+.offers-container {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding: 50px;
+}
+
+.offers-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.offers-container::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}

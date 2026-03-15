@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { makePayment, paymentActions } from "../store/store";
+import { paymentActions } from "../store/store";
+import { makePayment } from "../store/makePaymentMethod";
 import Lottie from "lottie-react";
 import loaderAnimation from "../animations/loader.json";
 import successAnimation from "../animations/success.json";

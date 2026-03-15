@@ -5,38 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="af12c041-1e17-4a53-b737-d2471d1e5f5a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Browser Extension/background.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Browser Extension/background.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Browser Extension/content.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Browser Extension/content.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Excel to Json Convertor/ExcelToJson.py" beforeDir="false" afterPath="$PROJECT_DIR$/Excel to Json Convertor/ExcelToJson.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Excel to Json Convertor/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/Excel to Json Convertor/data.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Excel to Json Convertor/data.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/Excel to Json Convertor/data.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/adapters/pos_adapter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/adapters/pos_adapter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/adapters/web_adapter.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/adapters/web_adapter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/agents/loyalty_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/loyalty_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/agents/recommendation_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/orchestrator/sales_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/orchestrator/sales_agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/session/session_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/session/session_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/test_qr.png" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/test_qr.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/utils/generate_qr.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/utils/generate_qr.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/utils/translator.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/utils/translator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ai/vectorstore/build_index.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ai/vectorstore/build_index.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/LangChain/LangChainClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/LangChain/LangChainClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/LoginRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Model/Product.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/WhatsAppServiceImplementation.java" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/dukandar/src/main/java/com/EY/dukandar/Service/WhatsAppServiceImplementation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Card.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Card.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/Cart.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/InputBar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/KioskInterface.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ModelDisplay.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ModelDisplay.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/PriceDetails.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/PriceDetails.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ProductDisplay.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/ProductDisplay.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/components/StoreCard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/components/StoreCard.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/Dukandar/src/store/store.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

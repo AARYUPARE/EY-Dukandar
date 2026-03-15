@@ -41,7 +41,7 @@
 
 /* ROBOT MESSAGE (LEFT) */
 .chat-bubble.robot {
-    background: var(--bg-ai);
+    width: 100%;
     color: var(--text-ai);
     border-bottom-left-radius: 6px;
 }

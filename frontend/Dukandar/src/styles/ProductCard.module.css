@@ -1,0 +1,46 @@
+.product-card{
+    display:flex;
+
+    align-items:stretch;   /* change this */
+
+    width:100%;
+    padding:20px;
+    border-radius:14px;
+
+    background:white;
+    flex: 2;
+    height: 20em;
+    gap:16px;
+}
+
+.product-left{
+    flex:2;
+    padding:10px;
+    width: 60%;
+
+    color:black;
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+    justify-content:flex-start;
+
+    
+}
+
+.product-left h2{
+    margin:0;
+}
+
+.product-left p{
+    margin:0;
+    text-overflow:clip;
+    word-break: break-all   ;
+}
+
+.product-right{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}

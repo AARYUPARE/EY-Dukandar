@@ -21,13 +21,13 @@ export default function Card({ title, image_url, price, onClick, brand, size}) {
 		<div className="icon">
 			<img src={`${image_url}`} alt="" />
 		</div>
-	<div className="content">
+	{/* <div className="content">
 		<div className="bottom">
 			<h4>{title}</h4>
 			<p className="description">Rs. {price} <br /> Brand <b>{brand}</b></p>
       {(size != null && size != "") ? <p>Size: {size}</p> : <></>}
 		</div>
-	</div>
+	</div> */}
 </div>
     </Tilty>
   );

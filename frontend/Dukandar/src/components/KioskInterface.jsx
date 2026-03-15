@@ -9,7 +9,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import PaymentOverlay from "./PaymentOverlay";
 import { useEffect } from "react";
 import { connectWS } from "../../web_socket/socketListener";
-import { backendEventHandler } from "../store/store";
+import { backendEventHandler } from "../store/backendEventHandler";
 import axios from "axios";
 
 

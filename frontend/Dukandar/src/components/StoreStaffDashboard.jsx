@@ -3,7 +3,7 @@ import {useSelector} from "react-redux"
 import css from "../styles/StoreStaffDashboard.module.css";
 import { useNavigate } from "react-router-dom";
 import { connectStore } from "../../web_socket/socketListener";
-import { backendEventHandler } from "../store/store";
+import { backendEventHandler } from "../store/backendEventHandler";
 import {
   FaPlusCircle,
   FaClipboardList,

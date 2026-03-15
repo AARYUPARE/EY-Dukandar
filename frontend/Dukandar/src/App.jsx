@@ -23,10 +23,11 @@ import ScanningPOS from './components/ScanningPOS';
 import AuthPOS from './components/AuthPos';
 import AuthScanner from './components/AuthScanner';
 import BusinessInsights from './components/business/BusinessInsights';
+import PageTest from "./components/PageTest"
 
 //Web socket imports
 import { connectWS } from '../web_socket/socketListener';
-import { backendEventHandler } from './store/store';
+import { backendEventHandler } from './store/backendEventHandler';
 import { useEffect } from 'react';
 
 const appRouter = createBrowserRouter([
@@ -135,6 +136,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/company/insights",
     element: <BusinessInsights />
+  },
+  {
+    path: "test",
+    element: <PageTest />
   }
 ])
 

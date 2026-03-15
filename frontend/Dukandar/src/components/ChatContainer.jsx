@@ -1,7 +1,7 @@
 import InputBar from "./InputBar"
 import ChatBubble from "./ChatBubble"
 import Loader from "./Loader"
-import { sendMessageAsync } from "../store/store"
+import { sendMessageAsync } from "../store/sendMessageAsync"
 import { useDispatch, useSelector } from "react-redux"
 import "../styles/ChatContainer.css"
 import { useEffect, useRef } from "react"
@@ -31,36 +31,6 @@ const ChatContainer = () => {
     <div className="chat-title">Dukandar</div>
 
     <div className="chat-field">
-      {/* <ChatBubble message={{
-        id: "1234567890",
-        sender: "user",
-        text: "bhai koi mast jacket dikhao 😎",
-        inputState: "Voice",
-        lang: "hi"
-      }} cls={"user"} key={"Aary"} inputState={"Voice"} />
-
-      <ChatBubble message={{
-        id: "1234567891",
-        sender: "bot",
-        text: `🧥 OPTION 1
-                ─────────
-                Running Jacket — ₹1299
-                ✨ Lightweight and perfect for daily jogging
-
-                👕 OPTION 2
-                ─────────
-                Cotton T-Shirt — ₹399
-                ✨ Soft fabric and best for summer
-
-                👟 OPTION 3
-                ─────────
-                Sports Shoes — ₹1999
-                ✨ Comfortable grip for running and walking`,
-        inputState: "Voice",
-        lang: "en"
-      }} cls={"robot"} key={"A"} inputState={"Voice"} /> */}
-
-
       {chatSlice.messages.map((m) => {
         return m.sender == "user"
           ? <ChatBubble message={m} cls="user" key={m.id} inputState={m.inputState} />

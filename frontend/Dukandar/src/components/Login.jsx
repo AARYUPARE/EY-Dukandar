@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useDispatch } from "react-redux";
-import { loginWeb, loginKiosk } from "../store/store";
+import loginWeb  from "../store/loginWebMethod";
+import loginKiosk from "../store/loginKioskMethod"
 import { useLocation, useNavigate } from "react-router-dom";
 import AnimatedBackground from "./AnimatedBackground";
 import css from "../styles/Login.module.css";
